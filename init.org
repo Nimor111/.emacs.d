@@ -6,7 +6,15 @@
 ** Table of contents :TOC_4_gh:
 - [[#configure-all-the-emacs][Configure all the Emacs!]]
   - [[#package-manager][Package manager]]
+    - [[#bootstrap-code-for-the-package-manager---straightel][Bootstrap code for the package manager - ~straight.el~]]
+    - [[#install-use-package-for-sane-package-configuration][Install ~use-package~ for sane package configuration]]
   - [[#general-configs][General configs]]
+    - [[#set-the-emacs-user-directory][Set the emacs user directory]]
+    - [[#set-the-default-font][Set the default font]]
+    - [[#set-the-theme-ok-i-like-the-doom-emacs-themes][Set the theme (ok I like the doom emacs themes)]]
+    - [[#no-scrollbar-toolbar-menubar-because-bloat][No scrollbar, toolbar, menubar, because bloat]]
+    - [[#line-numbers--relative-line-numbers][Line numbers + relative line numbers]]
+    - [[#display-battery-in-the-bar][Display battery in the bar]]
   - [[#evil-mode][Evil-mode]]
   - [[#org-mode][Org-mode]]
     - [[#general][General]]
@@ -22,7 +30,7 @@
 
 ** Package manager
 Must be in the beginning for ~use-package~ usage below.
-Bootstrap code for the package manager - ~straight.el~
+*** Bootstrap code for the package manager - ~straight.el~
 #+begin_src elisp
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -38,22 +46,20 @@ Bootstrap code for the package manager - ~straight.el~
 (load bootstrap-file nil 'nomessage))
 #+end_src
 
-Install ~use-package~ for sane package configuration
+*** Install ~use-package~ for sane package configuration
 #+begin_src elisp
 (straight-use-package 'use-package)
 #+end_src
 ** General configs
-Set the emacs user directory
+*** Set the emacs user directory
 #+begin_src elisp
 (setq user-emacs-directory "/Users/g.bozhinov/.emacs.d/")
 #+end_src
-
-Set the default font
+*** Set the default font
 #+begin_src elisp
 (set-default-font "JetBrains Mono 18")
 #+end_src
-
-Set the theme (ok I like the doom emacs themes)
+*** Set the theme (ok I like the doom emacs themes)
 #+begin_src elisp
 (use-package doom-themes
   :straight t
@@ -75,24 +81,18 @@ Set the theme (ok I like the doom emacs themes)
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
 #+end_src
-
-No scrollbar, toolbar, menubar, because bloat
-
+*** No scrollbar, toolbar, menubar, because bloat
 #+begin_src elisp
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 #+end_src
-
-Line numbers + relative line numbers
-
+*** Line numbers + relative line numbers
 #+begin_src elisp
 (global-display-line-numbers-mode)
 (setq display-line-numbers-type 'relative)
 #+end_src
-
-Display battery in the bar
-
+*** Display battery in the bar
 #+begin_src elisp
 (display-battery-mode t)
 #+end_src
@@ -286,6 +286,7 @@ Your stack overflow and friends inside emacs (and the results are org files!)
 #+end_src
 
 ** Local Variables
+Adds a hook to tangle the file to ~init.el~ after saving.
 # Local Variables:
 # eval: (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t)
 # End:
