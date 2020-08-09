@@ -13,9 +13,13 @@
 
 (straight-use-package 'use-package)
 
-(setq user-emacs-directory "/Users/g.bozhinov/.emacs.d/")
+(let* ((home-dir (getenv "HOME"))
+     (custom-emacs-directory (concat home-dir "/.emacs.d")))
+  (setq user-emacs-directory custom-emacs-directory))
 
-(set-default-font "JetBrains Mono 18")
+(if (eq system-type 'gnu/linux)
+  (set-default-font "Jet Brains Mono 18")
+  (set-default-font "JetBrainsMono 18"))
 
 (use-package doom-themes
   :straight t
@@ -111,7 +115,7 @@
   (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1))))
 
 (use-package org-roam
-  :straight (:host github :repo "org-roam/org-roam" :branch master)
+  :straight t
   :hook
   (after-init . org-roam-mode)
   :custom
