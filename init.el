@@ -19,7 +19,7 @@
 
 (if (eq system-type 'gnu/linux)
   (set-default-font "Jet Brains Mono 18")
-  (set-default-font "JetBrainsMono 18"))
+  (set-default-font "JetBrains Mono 18"))
 
 (use-package doom-themes
   :straight t
