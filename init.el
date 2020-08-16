@@ -18,8 +18,8 @@
   (setq user-emacs-directory custom-emacs-directory))
 
 (if (eq system-type 'gnu/linux)
-  (set-default-font "Jet Brains Mono 18")
-  (set-default-font "JetBrains Mono 18"))
+  (set-frame-font "Jet Brains Mono 18")
+  (set-frame-font "JetBrainsMono 18"))
 
 (use-package doom-themes
   :straight t
@@ -73,41 +73,43 @@
   (define-key evil-ex-map "e" 'find-file))
 
 (use-package org
-  :straight t
-  :hook
-  (org-mode . visual-line-mode)
-  :config
-  (require 'org-tempo)
-  (eval-after-load 'org-agenda
+    :straight t
+    :hook
+    (org-mode . visual-line-mode)
+    :config
+    (require 'org-tempo)
+    (eval-after-load 'org-agenda
     '(progn
-       (evil-set-initial-state 'org-agenda-mode 'normal)
-       (evil-define-key 'normal org-agenda-mode-map
-	 "vd" 'org-agenda-day-view
-	 "vw" 'org-agenda-week-view
-         "I"  'org-agenda-clock-in
-         "O"  'org-agenda-clock-out)))
-  (setq org-refile-targets
-	'(("~/Nextcloud/Orgzly/gtd.org" :maxlevel . 3)
-          ("~/Nextcloud/Orgzly/someday.org" :level . 1)
-          ("~/Nextcloud/Orgzly/tickler.org" :maxlevel . 2)))
-  (setq org-capture-templates
-	'(("t" "Todo [inbox]" entry
-         (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
-         "* TODO %i%?")
-         ("T" "Tickler" entry
-         (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
-         "* TODO %i%? \n SCHEDULED: %T")))
-  (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
-  (setq org-agenda-files
+        (evil-set-initial-state 'org-agenda-mode 'normal)
+        (evil-define-key 'normal org-agenda-mode-map
+            "vd" 'org-agenda-day-view
+            "vw" 'org-agenda-week-view
+            "I"  'org-agenda-clock-in
+            "O"  'org-agenda-clock-out)))
+    (setq org-refile-targets
+        '(("~/Nextcloud/Orgzly/gtd.org" :maxlevel . 3)
+            ("~/Nextcloud/Orgzly/someday.org" :level . 1)
+            ("~/Nextcloud/Orgzly/tickler.org" :maxlevel . 2)))
+    (setq org-capture-templates
+        '(("t" "Todo [inbox]" entry
+            (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
+            "* TODO %i%?")
+            ("T" "Tickler" entry
+            (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
+            "* TODO %i%? \n SCHEDULED: %T")))
+    (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
+    (setq org-agenda-files
     '("~/Nextcloud/Orgzly/gtd.org"
-      "~/Nextcloud/Orgzly/tickler.org"
-      "~/Nextcloud/Orgzly/inbox.org"
-      "~/Nextcloud/org/work"))
+        "~/Nextcloud/Orgzly/tickler.org"
+        "~/Nextcloud/Orgzly/inbox.org"
+        "~/Nextcloud/org/work"))
 
-  (setq org-startup-indented t)
-  (setq org-startup-folded t)
-  (setq org-indent-mode t)
-  (setq org-log-done 'note))
+    (setq org-startup-indented t)
+    (setq org-startup-folded t)
+    (setq org-indent-mode t)
+    (setq org-log-done 'note)
+    (setq org-tags-column 0)
+    (setq org-agenda-tags-column 0))
 
 (use-package org-superstar
   :straight t
@@ -127,6 +129,10 @@
       :map org-mode-map
       (("C-c n i" . org-roam-insert))
       (("C-c n I" . org-roam-insert-immediate))))
+
+(use-package ox-hugo
+  :straight t
+  :after ox)
 
 (use-package magit
   :straight t)
