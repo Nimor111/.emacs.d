@@ -183,6 +183,26 @@
 (use-package howdoyou
   :straight t)
 
+(use-package lsp-mode
+  :straight t
+  :custom
+  (lsp-rust-server 'rust-analyzer)
+  (lsp-rust-analyzer-server-command "/usr/bin/rust-analyzer")
+  :hook
+  (rust-mode . lsp)
+  :commands lsp)
+
+(use-package helm-lsp
+  :straight t
+  :commands helm-lsp-workspace-symbol)
+
+(use-package lsp-ui 
+  :straight t
+  :commands lsp-ui-mode)
+
+(use-package rust-mode
+  :straight t)
+
 ;; [[file:init.org::*Custom set variables][Custom set variables:1]]
 (custom-set-variables
   ;; custom-set-variables was added by Custom.

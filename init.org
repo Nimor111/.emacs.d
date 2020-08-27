@@ -26,6 +26,9 @@
   - [[#company][Company]]
   - [[#toc][Toc]]
   - [[#how-do-you][How-do-you]]
+  - [[#language-specific][Language-specific]]
+    - [[#general-1][General]]
+    - [[#rust][Rust]]
   - [[#local-variables][Local Variables]]
   - [[#custom-set-variables][Custom set variables]]
 
@@ -300,6 +303,32 @@ Your stack overflow and friends inside emacs (and the results are org files!)
   :straight t)
 #+end_src
 
+** Language-specific
+*** General
+For your general language needs.
+#+begin_src elisp
+(use-package lsp-mode
+  :straight t
+  :custom
+  (lsp-rust-server 'rust-analyzer)
+  (lsp-rust-analyzer-server-command "/usr/bin/rust-analyzer")
+  :hook
+  (rust-mode . lsp)
+  :commands lsp)
+
+(use-package helm-lsp
+  :straight t
+  :commands helm-lsp-workspace-symbol)
+
+(use-package lsp-ui 
+  :straight t
+  :commands lsp-ui-mode)
+#+end_src
+*** Rust
+#+begin_src elisp
+(use-package rust-mode
+  :straight t)
+#+end_src
 ** Local Variables
 Adds a hook to tangle the file to ~init.el~ after saving.
 # Local Variables:
