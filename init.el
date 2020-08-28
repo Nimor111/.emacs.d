@@ -19,7 +19,7 @@
 
 (if (eq system-type 'gnu/linux)
   (set-frame-font "Jet Brains Mono 18")
-  (set-frame-font "JetBrainsMono 18"))
+  (set-frame-font "JetBrains Mono 18"))
 
 (use-package doom-themes
   :straight t
@@ -122,13 +122,24 @@
   (after-init . org-roam-mode)
   :custom
   (org-roam-directory "~/Nextcloud/org-roam")
-    :bind (:map org-roam-mode-map
-      (("C-c n l" . org-roam)
-       ("C-c n f" . org-roam-find-file)
-       ("C-c n g" . org-roam-graph-show))
-      :map org-mode-map
-      (("C-c n i" . org-roam-insert))
-      (("C-c n I" . org-roam-insert-immediate))))
+  :bind (:map org-roam-mode-map
+    (("C-c n l" . org-roam)
+     ("C-c n f" . org-roam-find-file)
+     ("C-c n g" . org-roam-graph-show))
+    :map org-mode-map
+    (("C-c n i" . org-roam-insert))
+    (("C-c n I" . org-roam-insert-immediate))))
+
+(use-package deft
+  :straight t
+  :after org
+  :bind
+  ("C-c n d" . deft)
+  :custom
+  (deft-recursive t)
+  (deft-use-filter-string-for-filename t)
+  (deft-default-extension "org")
+  (deft-directory "~/Nextcloud/org-roam"))
 
 (use-package ox-hugo
   :straight t

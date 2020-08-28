@@ -65,7 +65,7 @@ Must be in the beginning for ~use-package~ usage below.
 #+begin_src elisp
 (if (eq system-type 'gnu/linux)
   (set-frame-font "Jet Brains Mono 18")
-  (set-frame-font "JetBrainsMono 18"))
+  (set-frame-font "JetBrains Mono 18"))
 #+end_src
 *** Set the theme (ok I like the doom emacs themes)
 #+begin_src elisp
@@ -205,13 +205,28 @@ The notes (zettelkasten) god
   (after-init . org-roam-mode)
   :custom
   (org-roam-directory "~/Nextcloud/org-roam")
-    :bind (:map org-roam-mode-map
-      (("C-c n l" . org-roam)
-       ("C-c n f" . org-roam-find-file)
-       ("C-c n g" . org-roam-graph-show))
-      :map org-mode-map
-      (("C-c n i" . org-roam-insert))
-      (("C-c n I" . org-roam-insert-immediate))))
+  :bind (:map org-roam-mode-map
+    (("C-c n l" . org-roam)
+     ("C-c n f" . org-roam-find-file)
+     ("C-c n g" . org-roam-graph-show))
+    :map org-mode-map
+    (("C-c n i" . org-roam-insert))
+    (("C-c n I" . org-roam-insert-immediate))))
+#+end_src
+
+Deft for viewing roam files
+
+#+begin_src elisp
+(use-package deft
+  :straight t
+  :after org
+  :bind
+  ("C-c n d" . deft)
+  :custom
+  (deft-recursive t)
+  (deft-use-filter-string-for-filename t)
+  (deft-default-extension "org")
+  (deft-directory "~/Nextcloud/org-roam"))
 #+end_src
 *** Ox-hugo
 Export org mode files to Hugo markdown.
