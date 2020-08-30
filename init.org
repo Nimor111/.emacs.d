@@ -29,6 +29,7 @@
   - [[#language-specific][Language-specific]]
     - [[#general-1][General]]
     - [[#rust][Rust]]
+  - [[#projects][Projects]]
   - [[#local-variables][Local Variables]]
   - [[#custom-set-variables][Custom set variables]]
 
@@ -212,6 +213,7 @@ The notes (zettelkasten) god
     :map org-mode-map
     (("C-c n i" . org-roam-insert))
     (("C-c n I" . org-roam-insert-immediate))))
+<<<<<<< HEAD
 #+end_src
 
 Deft for viewing roam files
@@ -342,6 +344,20 @@ For your general language needs.
 *** Rust
 #+begin_src elisp
 (use-package rust-mode
+  :straight t)
+#+end_src
+** Projects
+#+begin_src elisp
+(use-package projectile
+  :straight t
+  :config 
+  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  (projectile-mode +1))
+#+end_src
+
+#+begin_src elisp
+(use-package helm-projectile
   :straight t)
 #+end_src
 ** Local Variables

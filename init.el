@@ -129,6 +129,7 @@
     :map org-mode-map
     (("C-c n i" . org-roam-insert))
     (("C-c n I" . org-roam-insert-immediate))))
+<<<<<<< HEAD
 
 (use-package deft
   :straight t
@@ -212,6 +213,16 @@
   :commands lsp-ui-mode)
 
 (use-package rust-mode
+  :straight t)
+
+(use-package projectile
+  :straight t
+  :config 
+  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  (projectile-mode +1))
+
+(use-package helm-projectile
   :straight t)
 
 ;; [[file:init.org::*Custom set variables][Custom set variables:1]]
