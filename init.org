@@ -19,6 +19,7 @@
   - [[#org-mode][Org-mode]]
     - [[#general][General]]
     - [[#org-roam][Org-roam]]
+      - [[#deft-for-viewing-roam-files][Deft for viewing roam files]]
     - [[#ox-hugo][Ox-hugo]]
   - [[#magit][Magit]]
   - [[#helm][Helm]]
@@ -213,10 +214,9 @@ The notes (zettelkasten) god
     :map org-mode-map
     (("C-c n i" . org-roam-insert))
     (("C-c n I" . org-roam-insert-immediate))))
-<<<<<<< HEAD
 #+end_src
 
-Deft for viewing roam files
+**** Deft for viewing roam files
 
 #+begin_src elisp
 (use-package deft

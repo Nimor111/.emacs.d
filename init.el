@@ -129,7 +129,6 @@
     :map org-mode-map
     (("C-c n i" . org-roam-insert))
     (("C-c n I" . org-roam-insert-immediate))))
-<<<<<<< HEAD
 
 (use-package deft
   :straight t
