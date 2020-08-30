@@ -16,6 +16,8 @@
     - [[#line-numbers--relative-line-numbers][Line numbers + relative line numbers]]
     - [[#display-battery-in-the-bar][Display battery in the bar]]
   - [[#evil-mode][Evil-mode]]
+    - [[#sane-window-movement][Sane window movement]]
+    - [[#org-mode-integration-with-evil][Org mode integration with evil]]
   - [[#org-mode][Org-mode]]
     - [[#general][General]]
     - [[#org-roam][Org-roam]]
@@ -108,7 +110,8 @@ Must be in the beginning for ~use-package~ usage below.
 #+end_src
 ** Evil-mode
 Vim keybinds and goodness in emacs
-Sane window movement
+
+*** Sane window movement
 
 #+begin_src elisp
 (use-package evil
@@ -122,7 +125,7 @@ Sane window movement
     (kbd "C-j") 'evil-window-down))
 #+end_src
 
-Org mode integration with evil
+*** Org mode integration with evil
 
 #+begin_src elisp
 (use-package evil-org
