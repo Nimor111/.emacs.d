@@ -1,3 +1,20 @@
+#+begin_src elisp :comments link
+(custom-set-variables
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("aaf300544667970333366f2bad847899f193fcfe96172ec325dbc3195b797220" default))
+  '(safe-local-variable-values
+     (quote
+       ((eval add-hook
+	     (quote after-save-hook)
+	     (lambda nil
+	       (org-babel-tangle))
+	     nil t)))))
+#+end_src
+
 #+TITLE: Emacs Literate Configuration
 #+AUTHOR: Georgi Bojinov
 #+PROPERTY: header-args :tangle init.el
@@ -15,6 +32,9 @@
     - [[#no-scrollbar-toolbar-menubar-because-bloat][No scrollbar, toolbar, menubar, because bloat]]
     - [[#line-numbers--relative-line-numbers][Line numbers + relative line numbers]]
     - [[#display-battery-in-the-bar][Display battery in the bar]]
+    - [[#use-spaces-instead-of-tabs][Use spaces instead of tabs]]
+    - [[#commenting][Commenting]]
+  - [[#mode-line][Mode line]]
   - [[#evil-mode][Evil-mode]]
     - [[#sane-window-movement][Sane window movement]]
     - [[#org-mode-integration-with-evil][Org mode integration with evil]]
@@ -23,18 +43,27 @@
     - [[#org-roam][Org-roam]]
       - [[#deft-for-viewing-roam-files][Deft for viewing roam files]]
     - [[#ox-hugo][Ox-hugo]]
+    - [[#org-reading-list][Org reading list]]
   - [[#magit][Magit]]
   - [[#helm][Helm]]
   - [[#ranger][Ranger]]
   - [[#company][Company]]
+  - [[#snippets][Snippets]]
   - [[#toc][Toc]]
   - [[#how-do-you][How-do-you]]
   - [[#language-specific][Language-specific]]
+    - [[#web-mode][Web-mode]]
     - [[#general-1][General]]
     - [[#rust][Rust]]
+    - [[#glsl][GLSL]]
+    - [[#lua][Lua]]
+    - [[#ruby][Ruby]]
+    - [[#typescript][Typescript]]
   - [[#projects][Projects]]
+  - [[#rainbow-parens][Rainbow parens]]
+  - [[#flycheck][Flycheck]]
+  - [[#emojify][Emojify]]
   - [[#local-variables][Local Variables]]
-  - [[#custom-set-variables][Custom set variables]]
 
 ** Package manager
 Must be in the beginning for ~use-package~ usage below.
@@ -108,6 +137,39 @@ Must be in the beginning for ~use-package~ usage below.
 #+begin_src elisp
 (display-battery-mode t)
 #+end_src
+*** Use spaces instead of tabs
+#+begin_src elisp
+(setq-default indent-tabs-mode nil)
+#+end_src
+*** Commenting
+#+begin_src elisp
+(use-package evil-nerd-commenter
+  :straight t
+  :config
+  (evilnc-default-hotkeys))  
+#+end_src
+** Mode line
+Because why not.
+#+begin_src elisp
+(use-package smart-mode-line-atom-one-dark-theme
+  :straight t)
+
+;; blacklist removes minor modes from the mode line that don't contribute any info
+(use-package smart-mode-line
+  :straight t
+  :config
+  (setq sml/theme 'atom-one-dark)
+  (setq sml/short-directory t
+        sml/shorten-modes t)
+  (setq sml/name-width 40
+        sml/mode-width "full")
+  (setq rm-blacklist
+      (format "^ \\(%s\\)$"
+              (mapconcat #'identity
+                         '("Fly.*" "Projectile.*" "Helm" "Org-roam" "Undo-Tree" "company" "yas")
+                         "\\|")))
+  (sml/setup))
+#+end_src
 ** Evil-mode
 Vim keybinds and goodness in emacs
 
@@ -162,34 +224,36 @@ Installing and configuring org-mode:
     '(progn
         (evil-set-initial-state 'org-agenda-mode 'normal)
         (evil-define-key 'normal org-agenda-mode-map
-            "vd" 'org-agenda-day-view
-            "vw" 'org-agenda-week-view
-            "I"  'org-agenda-clock-in
-            "O"  'org-agenda-clock-out)))
+          "vd" 'org-agenda-day-view
+          "vw" 'org-agenda-week-view
+          "I"  'org-agenda-clock-in
+          "O"  'org-agenda-clock-out)))
     (setq org-refile-targets
         '(("~/Nextcloud/Orgzly/gtd.org" :maxlevel . 3)
-            ("~/Nextcloud/Orgzly/someday.org" :level . 1)
-            ("~/Nextcloud/Orgzly/tickler.org" :maxlevel . 2)))
+          ("~/Nextcloud/Orgzly/someday.org" :level . 1)
+          ("~/Nextcloud/Orgzly/tickler.org" :maxlevel . 2)))
     (setq org-capture-templates
         '(("t" "Todo [inbox]" entry
-            (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
-            "* TODO %i%?")
-            ("T" "Tickler" entry
-            (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
-            "* TODO %i%? \n SCHEDULED: %T")))
+          (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
+          "* TODO %i%?")
+          ("T" "Tickler" entry
+          (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
+          "* TODO %i%? \n SCHEDULED: %T")))
     (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
     (setq org-agenda-files
     '("~/Nextcloud/Orgzly/gtd.org"
-        "~/Nextcloud/Orgzly/tickler.org"
-        "~/Nextcloud/Orgzly/inbox.org"
-        "~/Nextcloud/org/work"))
+      "~/Nextcloud/Orgzly/tickler.org"
+      "~/Nextcloud/Orgzly/inbox.org"
+      "~/Nextcloud/org/work"))
 
     (setq org-startup-indented t)
     (setq org-startup-folded t)
     (setq org-indent-mode t)
     (setq org-log-done 'note)
     (setq org-tags-column 0)
-    (setq org-agenda-tags-column 0))
+    (setq org-agenda-tags-column 0)
+    (setq org-src-preserve-indentation nil)
+    (setq org-edit-src-content-indentation 0))
 #+end_src
 
 Like org bullets, but supercharged?
@@ -240,6 +304,15 @@ Export org mode files to Hugo markdown.
 (use-package ox-hugo
   :straight t
   :after ox)
+#+end_src
+*** Org reading list
+Manage yer books.
+#+begin_src elisp
+(use-package org-books
+  :straight t
+  :after org
+  :config
+  (setq org-books-file "~/Nextcloud/org/reading_list.org"))
 #+end_src
 ** Magit
 The git supercharge
@@ -295,6 +368,11 @@ Complete all the things!
   :straight t
   :hook
   (after-init . global-company-mode))
+
+(use-package company-lua
+  :straight t
+  :after (company)
+  :hook (lua-mode my-lua-mode-company-init))
 #+end_src
 
 Completion for org-roam
@@ -305,6 +383,17 @@ Completion for org-roam
   :straight (:host github :repo "org-roam/company-org-roam")
   :config
   (push 'company-org-roam company-backends))
+#+end_src
+** Snippets
+#+begin_src elisp
+(use-package yasnippet
+  :straight t
+  :demand t
+  :custom
+  (yas-also-auto-indent-first-line t)
+  (yas-also-indent-empty-lines t)
+  :config
+  (yas-global-mode t))
 #+end_src
 ** Toc
 Table of contents on save for org files, it's awesome
@@ -324,6 +413,15 @@ Your stack overflow and friends inside emacs (and the results are org files!)
 #+end_src
 
 ** Language-specific
+*** Web-mode
+For different types of templates and web markups and the like
+#+begin_src elisp
+(use-package web-mode
+  :straight t
+  :mode
+  ("\\.erb\\'" . web-mode)
+  ("\\.html?\\'" . web-mode))
+#+end_src
 *** General
 For your general language needs.
 #+begin_src elisp
@@ -334,6 +432,7 @@ For your general language needs.
   (lsp-rust-analyzer-server-command "/usr/bin/rust-analyzer")
   :hook
   (rust-mode . lsp)
+  (ruby-mode . lsp)
   :commands lsp)
 
 (use-package helm-lsp
@@ -347,7 +446,63 @@ For your general language needs.
 *** Rust
 #+begin_src elisp
 (use-package rust-mode
+  :straight t
+  :config
+  (setq rust-format-on-save t))
+#+end_src
+*** GLSL
+For those pesky shaders.
+#+begin_src elisp
+(use-package glsl-mode
   :straight t)
+#+end_src
+*** Lua
+#+begin_src elisp
+(defun set-company-backends-for-lua()
+  "Set lua company backend."
+  (setq-local company-backends '(
+                                 (
+                                  company-lsp
+                                  company-lua
+                                  company-keywords
+                                  company-gtags
+                                  company-yasnippet
+                                  )
+                                 company-capf
+                                 company-dabbrev-code
+                                 company-files
+                                 )))
+
+(use-package lua-mode
+  :straight t
+  :hook (lua-mode . set-company-backends-for-lua))
+
+(use-package love-minor-mode
+  :straight t
+  :hook (lua-mode . love-minor-mode)
+  :config
+  (setq love-exe "/usr/bin/love"))
+#+end_src
+*** Ruby
+#+begin_src elisp
+(use-package projectile-rails
+  :straight t
+  :config
+  (projectile-rails-global-mode))
+#+end_src
+*** Typescript
+#+begin_src elisp
+(use-package typescript-mode
+  :straight t
+  :mode
+  ("\\.ts\\'" . typescript-mode))
+
+(use-package tide
+  :straight t
+  :after (typescript-mode company)
+  :hook ((typescript-mode . tide-setup)
+         (typescript-mode . tide-hl-identifier-mode)
+         (before-save . tide-format-before-save)))
 #+end_src
 ** Projects
 #+begin_src elisp
@@ -363,25 +518,35 @@ For your general language needs.
 (use-package helm-projectile
   :straight t)
 #+end_src
+** Rainbow parens
+To have parens make sense
+#+begin_src elisp
+(use-package rainbow-delimiters
+  :straight t
+  :hook (prog-mode . rainbow-delimiters-mode))
+#+end_src
+** Flycheck
+For all the errors in the world
+#+begin_src elisp
+(use-package flycheck
+  :straight t
+  :init (global-flycheck-mode))
+
+(use-package flycheck-pos-tip
+  :straight t
+  :after flycheck
+  :hook (flycheck-mode . flycheck-pos-tip-mode))
+#+end_src
+** Emojify
+Ugh.
+#+begin_src elisp
+(use-package emojify
+  :straight t
+  :init (global-emojify-mode))
+#+end_src
 ** Local Variables
 Adds a hook to tangle the file to ~init.el~ after saving.
 # Local Variables:
 # eval: (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t)
 # End:
-
-** Custom set variables
-#+begin_src elisp :comments link
-(custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
-  '(safe-local-variable-values
-     (quote
-       ((eval add-hook
-	     (quote after-save-hook)
-	     (lambda nil
-	       (org-babel-tangle))
-	     nil t)))))
-#+end_src
 

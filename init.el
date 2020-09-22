@@ -1,3 +1,20 @@
+;; [[file:init.org::+begin_src elisp :comments link][No heading:1]]
+(custom-set-variables
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("aaf300544667970333366f2bad847899f193fcfe96172ec325dbc3195b797220" default))
+  '(safe-local-variable-values
+     (quote
+       ((eval add-hook
+	     (quote after-save-hook)
+	     (lambda nil
+	       (org-babel-tangle))
+	     nil t)))))
+;; No heading:1 ends here
+
 (defvar bootstrap-version)
 (let ((bootstrap-file
         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -50,6 +67,32 @@
 
 (display-battery-mode t)
 
+(setq-default indent-tabs-mode nil)
+
+(use-package evil-nerd-commenter
+  :straight t
+  :config
+  (evilnc-default-hotkeys))
+
+(use-package smart-mode-line-atom-one-dark-theme
+  :straight t)
+
+;; blacklist removes minor modes from the mode line that don't contribute any info
+(use-package smart-mode-line
+  :straight t
+  :config
+  (setq sml/theme 'atom-one-dark)
+  (setq sml/short-directory t
+        sml/shorten-modes t)
+  (setq sml/name-width 40
+        sml/mode-width "full")
+  (setq rm-blacklist
+      (format "^ \\(%s\\)$"
+              (mapconcat #'identity
+                         '("Fly.*" "Projectile.*" "Helm" "Org-roam" "Undo-Tree" "company" "yas")
+                         "\\|")))
+  (sml/setup))
+
 (use-package evil
   :straight t
   :config
@@ -82,34 +125,36 @@
     '(progn
         (evil-set-initial-state 'org-agenda-mode 'normal)
         (evil-define-key 'normal org-agenda-mode-map
-            "vd" 'org-agenda-day-view
-            "vw" 'org-agenda-week-view
-            "I"  'org-agenda-clock-in
-            "O"  'org-agenda-clock-out)))
+          "vd" 'org-agenda-day-view
+          "vw" 'org-agenda-week-view
+          "I"  'org-agenda-clock-in
+          "O"  'org-agenda-clock-out)))
     (setq org-refile-targets
         '(("~/Nextcloud/Orgzly/gtd.org" :maxlevel . 3)
-            ("~/Nextcloud/Orgzly/someday.org" :level . 1)
-            ("~/Nextcloud/Orgzly/tickler.org" :maxlevel . 2)))
+          ("~/Nextcloud/Orgzly/someday.org" :level . 1)
+          ("~/Nextcloud/Orgzly/tickler.org" :maxlevel . 2)))
     (setq org-capture-templates
         '(("t" "Todo [inbox]" entry
-            (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
-            "* TODO %i%?")
-            ("T" "Tickler" entry
-            (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
-            "* TODO %i%? \n SCHEDULED: %T")))
+          (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
+          "* TODO %i%?")
+          ("T" "Tickler" entry
+          (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
+          "* TODO %i%? \n SCHEDULED: %T")))
     (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
     (setq org-agenda-files
     '("~/Nextcloud/Orgzly/gtd.org"
-        "~/Nextcloud/Orgzly/tickler.org"
-        "~/Nextcloud/Orgzly/inbox.org"
-        "~/Nextcloud/org/work"))
+      "~/Nextcloud/Orgzly/tickler.org"
+      "~/Nextcloud/Orgzly/inbox.org"
+      "~/Nextcloud/org/work"))
 
     (setq org-startup-indented t)
     (setq org-startup-folded t)
     (setq org-indent-mode t)
     (setq org-log-done 'note)
     (setq org-tags-column 0)
-    (setq org-agenda-tags-column 0))
+    (setq org-agenda-tags-column 0)
+    (setq org-src-preserve-indentation nil)
+    (setq org-edit-src-content-indentation 0))
 
 (use-package org-superstar
   :straight t
@@ -144,6 +189,12 @@
 (use-package ox-hugo
   :straight t
   :after ox)
+
+(use-package org-books
+  :straight t
+  :after org
+  :config
+  (setq org-books-file "~/Nextcloud/org/reading_list.org"))
 
 (use-package magit
   :straight t)
@@ -180,11 +231,25 @@
   :hook
   (after-init . global-company-mode))
 
+(use-package company-lua
+  :straight t
+  :after (company)
+  :hook (lua-mode my-lua-mode-company-init))
+
 ;; FIXME this is deprecated and now inside org-roam
 (use-package company-org-roam
   :straight (:host github :repo "org-roam/company-org-roam")
   :config
   (push 'company-org-roam company-backends))
+
+(use-package yasnippet
+  :straight t
+  :demand t
+  :custom
+  (yas-also-auto-indent-first-line t)
+  (yas-also-indent-empty-lines t)
+  :config
+  (yas-global-mode t))
 
 (use-package toc-org
   :straight t
@@ -194,6 +259,12 @@
 (use-package howdoyou
   :straight t)
 
+(use-package web-mode
+  :straight t
+  :mode
+  ("\\.erb\\'" . web-mode)
+  ("\\.html?\\'" . web-mode))
+
 (use-package lsp-mode
   :straight t
   :custom
@@ -201,6 +272,7 @@
   (lsp-rust-analyzer-server-command "/usr/bin/rust-analyzer")
   :hook
   (rust-mode . lsp)
+  (ruby-mode . lsp)
   :commands lsp)
 
 (use-package helm-lsp
@@ -212,7 +284,54 @@
   :commands lsp-ui-mode)
 
 (use-package rust-mode
+  :straight t
+  :config
+  (setq rust-format-on-save t))
+
+(use-package glsl-mode
   :straight t)
+
+(defun set-company-backends-for-lua()
+  "Set lua company backend."
+  (setq-local company-backends '(
+                                 (
+                                  company-lsp
+                                  company-lua
+                                  company-keywords
+                                  company-gtags
+                                  company-yasnippet
+                                  )
+                                 company-capf
+                                 company-dabbrev-code
+                                 company-files
+                                 )))
+
+(use-package lua-mode
+  :straight t
+  :hook (lua-mode . set-company-backends-for-lua))
+
+(use-package love-minor-mode
+  :straight t
+  :hook (lua-mode . love-minor-mode)
+  :config
+  (setq love-exe "/usr/bin/love"))
+
+(use-package projectile-rails
+  :straight t
+  :config
+  (projectile-rails-global-mode))
+
+(use-package typescript-mode
+  :straight t
+  :mode
+  ("\\.ts\\'" . typescript-mode))
+
+(use-package tide
+  :straight t
+  :after (typescript-mode company)
+  :hook ((typescript-mode . tide-setup)
+         (typescript-mode . tide-hl-identifier-mode)
+         (before-save . tide-format-before-save)))
 
 (use-package projectile
   :straight t
@@ -224,17 +343,19 @@
 (use-package helm-projectile
   :straight t)
 
-;; [[file:init.org::*Custom set variables][Custom set variables:1]]
-(custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
-  '(safe-local-variable-values
-     (quote
-       ((eval add-hook
-	     (quote after-save-hook)
-	     (lambda nil
-	       (org-babel-tangle))
-	     nil t)))))
-;; Custom set variables:1 ends here
+(use-package rainbow-delimiters
+  :straight t
+  :hook (prog-mode . rainbow-delimiters-mode))
+
+(use-package flycheck
+  :straight t
+  :init (global-flycheck-mode))
+
+(use-package flycheck-pos-tip
+  :straight t
+  :after flycheck
+  :hook (flycheck-mode . flycheck-pos-tip-mode))
+
+(use-package emojify
+  :straight t
+  :init (global-emojify-mode))
