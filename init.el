@@ -261,9 +261,13 @@
 
 (use-package web-mode
   :straight t
+  :hook (web-mode . emmet-mode)
   :mode
   ("\\.erb\\'" . web-mode)
   ("\\.html?\\'" . web-mode))
+
+(use-package emmet-mode
+  :straight t)
 
 (use-package lsp-mode
   :straight t

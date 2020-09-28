@@ -418,9 +418,17 @@ For different types of templates and web markups and the like
 #+begin_src elisp
 (use-package web-mode
   :straight t
+  :hook (web-mode . emmet-mode)
   :mode
   ("\\.erb\\'" . web-mode)
   ("\\.html?\\'" . web-mode))
+#+end_src
+
+Add emmet for tag completion and stuff
+
+#+begin_src elisp
+(use-package emmet-mode
+  :straight t)
 #+end_src
 *** General
 For your general language needs.
