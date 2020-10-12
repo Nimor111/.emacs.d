@@ -1,3 +1,5 @@
+* Custom variables
+Custom variables set by various emacs packages
 #+begin_src elisp :comments link
 (custom-set-variables
   ;; custom-set-variables was added by Custom.
@@ -21,6 +23,7 @@
 
 * Configure all the Emacs!
 ** Table of contents :TOC_4_gh:
+- [[#custom-variables][Custom variables]]
 - [[#configure-all-the-emacs][Configure all the Emacs!]]
   - [[#package-manager][Package manager]]
     - [[#bootstrap-code-for-the-package-manager---straightel][Bootstrap code for the package manager - ~straight.el~]]
@@ -44,6 +47,8 @@
       - [[#deft-for-viewing-roam-files][Deft for viewing roam files]]
     - [[#ox-hugo][Ox-hugo]]
     - [[#org-reading-list][Org reading list]]
+    - [[#move-through-headings-when-narrowed][Move through headings when narrowed]]
+    - [[#reload-org][Reload org]]
   - [[#magit][Magit]]
   - [[#helm][Helm]]
   - [[#ranger][Ranger]]
@@ -161,8 +166,8 @@ Because why not.
   (setq sml/theme 'atom-one-dark)
   (setq sml/short-directory t
         sml/shorten-modes t)
-  (setq sml/name-width 40
-        sml/mode-width "full")
+  ;; (setq sml/name-width 40
+        ;; sml/mode-width "full")
   (setq rm-blacklist
       (format "^ \\(%s\\)$"
               (mapconcat #'identity
@@ -314,6 +319,28 @@ Manage yer books.
   :config
   (setq org-books-file "~/Nextcloud/org/reading_list.org"))
 #+end_src
+*** Move through headings when narrowed
+#+begin_src elisp
+(defun org-advance ()
+  (interactive)
+  (when (buffer-narrowed-p)
+    (beginning-of-buffer)
+    (widen)
+    (org-forward-heading-same-level 1))
+  (org-narrow-to-subtree))
+
+(defun org-retreat ()
+  (interactive)
+  (when (buffer-narrowed-p)
+    (beginning-of-buffer)
+    (widen)
+    (org-backward-heading-same-level 1))
+  (org-narrow-to-subtre))
+#+end_src
+*** Reload org
+#+BEGIN_SRC elisp
+(org-reload)
+#+END_SRC
 ** Magit
 The git supercharge
 
@@ -394,6 +421,9 @@ Completion for org-roam
   (yas-also-indent-empty-lines t)
   :config
   (yas-global-mode t))
+
+(use-package yasnippet-snippets
+  :straight t)
 #+end_src
 ** Toc
 Table of contents on save for org files, it's awesome

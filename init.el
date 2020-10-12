@@ -1,4 +1,4 @@
-;; [[file:init.org::+begin_src elisp :comments link][No heading:1]]
+;; [[file:init.org::*Custom variables][Custom variables:1]]
 (custom-set-variables
   ;; custom-set-variables was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
@@ -13,7 +13,7 @@
 	     (lambda nil
 	       (org-babel-tangle))
 	     nil t)))))
-;; No heading:1 ends here
+;; Custom variables:1 ends here
 
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -84,8 +84,8 @@
   (setq sml/theme 'atom-one-dark)
   (setq sml/short-directory t
         sml/shorten-modes t)
-  (setq sml/name-width 40
-        sml/mode-width "full")
+  ;; (setq sml/name-width 40
+        ;; sml/mode-width "full")
   (setq rm-blacklist
       (format "^ \\(%s\\)$"
               (mapconcat #'identity
@@ -196,6 +196,22 @@
   :config
   (setq org-books-file "~/Nextcloud/org/reading_list.org"))
 
+(defun org-advance ()
+  (interactive)
+  (when (buffer-narrowed-p)
+    (beginning-of-buffer)
+    (widen)
+    (org-forward-heading-same-level 1))
+  (org-narrow-to-subtree))
+
+(defun org-retreat ()
+  (interactive)
+  (when (buffer-narrowed-p)
+    (beginning-of-buffer)
+    (widen)
+    (org-backward-heading-same-level 1))
+  (org-narrow-to-subtre))
+
 (use-package magit
   :straight t)
 
@@ -250,6 +266,9 @@
   (yas-also-indent-empty-lines t)
   :config
   (yas-global-mode t))
+
+(use-package yasnippet-snippets
+  :straight t)
 
 (use-package toc-org
   :straight t

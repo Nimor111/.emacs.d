@@ -1,0 +1,35 @@
+;;;; Emacs Bookmark Format Version 1 ;;;; -*- coding: utf-8-emacs -*- 
+;;; This format is meant to be slightly human-readable;
+;;; nevertheless, you probably don't want to edit it.
+;;; -*- End Of Bookmark File Format Version Stamp -*-
+(("elsi"
+ (filename . "~/.emacs.d/init.org")
+ (front-context-string . "Package manager\n")
+ (rear-context-string . "variables]]\n\n** ")
+ (position . 721))
+("gtd"
+ (filename . "~/Nextcloud/Orgzly/gtd.org")
+ (front-context-string . "* Articles to re")
+ (rear-context-string . " API for optics\n")
+ (position . 798))
+("elisp-configuration"
+ (filename . "~/.emacs.d/init.el")
+ (front-context-string . "(setq user-emacs")
+ (rear-context-string)
+ (position . 1))
+("configuration"
+ (filename . "~/.emacs.d/init.org")
+ (front-context-string . " contents :TOC_4")
+ (rear-context-string . "acs!\n** Table of")
+ (position . 103))
+("org-refile-last-stored"
+ (filename . "~/Nextcloud/Orgzly/gtd.org")
+ (front-context-string . "** TODO Writing ")
+ (rear-context-string . "h-nix/][Link]]\n\n")
+ (position . 1733))
+("org-capture-last-stored"
+ (filename . "~/Nextcloud/Orgzly/inbox.org")
+ (front-context-string . "** TODO Sbt plug")
+ (rear-context-string . "ex.html][Link]]\n")
+ (position . 369))
+)
