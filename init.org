@@ -40,6 +40,8 @@ Custom variables set by various emacs packages
     - [[#commenting][Commenting]]
     - [[#command-log-mode][Command log mode]]
     - [[#storing-links][Storing links]]
+    - [[#which-key][Which-key]]
+  - [[#dashboard][Dashboard]]
   - [[#modeline][Modeline]]
   - [[#evil-mode][Evil-mode]]
     - [[#sane-window-movement][Sane window movement]]
@@ -68,7 +70,7 @@ Custom variables set by various emacs packages
     - [[#ruby][Ruby]]
     - [[#typescript][Typescript]]
   - [[#projects][Projects]]
-  - [[#rainbow-parens][Rainbow parens]]
+  - [[#parens][Parens]]
   - [[#flycheck][Flycheck]]
   - [[#emojify][Emojify]]
   - [[#local-variables][Local Variables]]
@@ -103,6 +105,7 @@ Must be in the beginning for ~use-package~ usage below.
   (setq user-emacs-directory custom-emacs-directory))
 #+end_src
 *** Set the default font
+This is seriously retarded.
 #+begin_src elisp
 (if (eq system-type 'gnu/linux)
   (set-frame-font "Jet Brains Mono 18")
@@ -174,31 +177,24 @@ Set key bindings for ~org-store-link~
 #+begin_src elisp
 (global-set-key (kbd "C-c l") 'org-store-link)
 #+end_src
-** Modeline
-Because why not.
-Smart modeline
+*** Which-key
+Showing a popup for key combinations that follow the pressed key (like in Spacemacs and Doom)
 #+begin_src elisp
-;; (use-package smart-mode-line-atom-one-dark-theme
-;;   :straight t)
-
-;; ;; blacklist removes minor modes from the mode line that don't contribute any info
-;; (use-package smart-mode-line
-;;   :straight t
-;;   :config
-;;   (setq sml/theme 'atom-one-dark)
-;;   (setq sml/short-directory t
-;;         sml/shorten-modes t)
-;;   ;; (setq sml/name-width 40
-;;         ;; sml/mode-width "full")
-;;   (setq rm-blacklist
-;;       (format "^ \\(%s\\)$"
-;;               (mapconcat #'identity
-;;                          '("Fly.*" "Projectile.*" "Helm" "Org-roam" "Undo-Tree" "company" "yas")
-;;                          "\\|")))
-;;   (sml/setup))
+(use-package which-key
+  :straight t
+  :config
+  (which-key-mode))
 #+end_src
-
-Doom modeline
+** Dashboard
+Ok I admit this is a little bloated, but I like something pretty to open when I turn on Emacs.
+#+begin_src elisp
+(use-package dashboard
+  :straight t
+  :config
+  (dashboard-setup-startup-hook))
+#+end_src
+** Modeline
+Doom modeline - it looks nice!
 #+begin_src elisp
 ;; dependency
 (use-package all-the-icons
@@ -590,13 +586,22 @@ For those pesky shaders.
 (use-package helm-projectile
   :straight t)
 #+end_src
-** Rainbow parens
-To have parens make sense
+** Parens
+To have paren pairs in the same colour
 #+begin_src elisp
 (use-package rainbow-delimiters
   :straight t
   :hook (prog-mode . rainbow-delimiters-mode))
 #+end_src
+
+Automatic paren completion, and other nifty things
+#+begin_src elisp
+(use-package smartparens
+  :straight t
+  :config
+  (smartparens-global-mode))
+#+end_src
+
 ** Flycheck
 For all the errors in the world
 #+begin_src elisp

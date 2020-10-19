@@ -84,24 +84,15 @@
 
 (global-set-key (kbd "C-c l") 'org-store-link)
 
-;; (use-package smart-mode-line-atom-one-dark-theme
-;;   :straight t)
+(use-package which-key
+  :straight t
+  :config
+  (which-key-mode))
 
-;; ;; blacklist removes minor modes from the mode line that don't contribute any info
-;; (use-package smart-mode-line
-;;   :straight t
-;;   :config
-;;   (setq sml/theme 'atom-one-dark)
-;;   (setq sml/short-directory t
-;;         sml/shorten-modes t)
-;;   ;; (setq sml/name-width 40
-;;         ;; sml/mode-width "full")
-;;   (setq rm-blacklist
-;;       (format "^ \\(%s\\)$"
-;;               (mapconcat #'identity
-;;                          '("Fly.*" "Projectile.*" "Helm" "Org-roam" "Undo-Tree" "company" "yas")
-;;                          "\\|")))
-;;   (sml/setup))
+(use-package dashboard
+  :straight t
+  :config
+  (dashboard-setup-startup-hook))
 
 ;; dependency
 (use-package all-the-icons
@@ -390,6 +381,11 @@
 (use-package rainbow-delimiters
   :straight t
   :hook (prog-mode . rainbow-delimiters-mode))
+
+(use-package smartparens
+  :straight t
+  :config
+  (smartparens-global-mode))
 
 (use-package flycheck
   :straight t
