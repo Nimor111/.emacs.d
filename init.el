@@ -74,24 +74,39 @@
   :config
   (evilnc-default-hotkeys))
 
-(use-package smart-mode-line-atom-one-dark-theme
-  :straight t)
-
-;; blacklist removes minor modes from the mode line that don't contribute any info
-(use-package smart-mode-line
+(use-package command-log-mode
   :straight t
   :config
-  (setq sml/theme 'atom-one-dark)
-  (setq sml/short-directory t
-        sml/shorten-modes t)
-  ;; (setq sml/name-width 40
-        ;; sml/mode-width "full")
-  (setq rm-blacklist
-      (format "^ \\(%s\\)$"
-              (mapconcat #'identity
-                         '("Fly.*" "Projectile.*" "Helm" "Org-roam" "Undo-Tree" "company" "yas")
-                         "\\|")))
-  (sml/setup))
+  (global-command-log-mode))
+
+(global-set-key (kbd "C-c l") 'org-store-link)
+
+;; (use-package smart-mode-line-atom-one-dark-theme
+;;   :straight t)
+
+;; ;; blacklist removes minor modes from the mode line that don't contribute any info
+;; (use-package smart-mode-line
+;;   :straight t
+;;   :config
+;;   (setq sml/theme 'atom-one-dark)
+;;   (setq sml/short-directory t
+;;         sml/shorten-modes t)
+;;   ;; (setq sml/name-width 40
+;;         ;; sml/mode-width "full")
+;;   (setq rm-blacklist
+;;       (format "^ \\(%s\\)$"
+;;               (mapconcat #'identity
+;;                          '("Fly.*" "Projectile.*" "Helm" "Org-roam" "Undo-Tree" "company" "yas")
+;;                          "\\|")))
+;;   (sml/setup))
+
+;; dependency
+(use-package all-the-icons
+  :straight t)
+
+(use-package doom-modeline
+  :straight t
+  :init (doom-modeline-mode 1))
 
 (use-package evil
   :straight t
@@ -211,6 +226,8 @@
     (widen)
     (org-backward-heading-same-level 1))
   (org-narrow-to-subtre))
+
+(org-reload)
 
 (use-package magit
   :straight t)
@@ -361,6 +378,7 @@
   :config 
   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  (setq projectile-track-known-projects-automatically nil)
   (projectile-mode +1))
 
 (use-package helm-projectile

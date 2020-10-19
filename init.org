@@ -37,7 +37,9 @@ Custom variables set by various emacs packages
     - [[#display-battery-in-the-bar][Display battery in the bar]]
     - [[#use-spaces-instead-of-tabs][Use spaces instead of tabs]]
     - [[#commenting][Commenting]]
-  - [[#mode-line][Mode line]]
+    - [[#command-log-mode][Command log mode]]
+    - [[#storing-links][Storing links]]
+  - [[#modeline][Modeline]]
   - [[#evil-mode][Evil-mode]]
     - [[#sane-window-movement][Sane window movement]]
     - [[#org-mode-integration-with-evil][Org mode integration with evil]]
@@ -153,27 +155,52 @@ Must be in the beginning for ~use-package~ usage below.
   :config
   (evilnc-default-hotkeys))  
 #+end_src
-** Mode line
-Because why not.
+*** Command log mode
+Show command history in sidebar. Looks slick.
 #+begin_src elisp
-(use-package smart-mode-line-atom-one-dark-theme
-  :straight t)
-
-;; blacklist removes minor modes from the mode line that don't contribute any info
-(use-package smart-mode-line
+(use-package command-log-mode
   :straight t
   :config
-  (setq sml/theme 'atom-one-dark)
-  (setq sml/short-directory t
-        sml/shorten-modes t)
-  ;; (setq sml/name-width 40
-        ;; sml/mode-width "full")
-  (setq rm-blacklist
-      (format "^ \\(%s\\)$"
-              (mapconcat #'identity
-                         '("Fly.*" "Projectile.*" "Helm" "Org-roam" "Undo-Tree" "company" "yas")
-                         "\\|")))
-  (sml/setup))
+  (global-command-log-mode))
+#+end_src
+*** Storing links
+Set key bindings for ~org-store-link~
+#+begin_src elisp
+(global-set-key (kbd "C-c l") 'org-store-link)
+#+end_src
+** Modeline
+Because why not.
+Smart modeline
+#+begin_src elisp
+;; (use-package smart-mode-line-atom-one-dark-theme
+;;   :straight t)
+
+;; ;; blacklist removes minor modes from the mode line that don't contribute any info
+;; (use-package smart-mode-line
+;;   :straight t
+;;   :config
+;;   (setq sml/theme 'atom-one-dark)
+;;   (setq sml/short-directory t
+;;         sml/shorten-modes t)
+;;   ;; (setq sml/name-width 40
+;;         ;; sml/mode-width "full")
+;;   (setq rm-blacklist
+;;       (format "^ \\(%s\\)$"
+;;               (mapconcat #'identity
+;;                          '("Fly.*" "Projectile.*" "Helm" "Org-roam" "Undo-Tree" "company" "yas")
+;;                          "\\|")))
+;;   (sml/setup))
+#+end_src
+
+Doom modeline
+#+begin_src elisp
+;; dependency
+(use-package all-the-icons
+  :straight t)
+
+(use-package doom-modeline
+  :straight t
+  :init (doom-modeline-mode 1))
 #+end_src
 ** Evil-mode
 Vim keybinds and goodness in emacs
@@ -549,6 +576,7 @@ For those pesky shaders.
   :config 
   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  (setq projectile-track-known-projects-automatically nil)
   (projectile-mode +1))
 #+end_src
 
