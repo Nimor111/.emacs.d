@@ -147,7 +147,7 @@ Must be in the beginning for ~use-package~ usage below.
 #+end_src
 *** Display time in the bar
 #+begin_src elisp
-(setq display-time-format "%H:%M:%S %a,%d %b %Y")
+(setq display-time-format "%H:%M %a,%d %b %Y")
 (display-time)
 #+end_src
 *** Use spaces instead of tabs

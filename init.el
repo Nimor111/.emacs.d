@@ -67,7 +67,7 @@
 
 (display-battery-mode t)
 
-(setq display-time-format "%H:%M:%S %a,%d %b %Y")
+(setq display-time-format "%H:%M %a,%d %b %Y")
 (display-time)
 
 (setq-default indent-tabs-mode nil)
