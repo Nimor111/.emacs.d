@@ -35,6 +35,7 @@ Custom variables set by various emacs packages
     - [[#no-scrollbar-toolbar-menubar-because-bloat][No scrollbar, toolbar, menubar, because bloat]]
     - [[#line-numbers--relative-line-numbers][Line numbers + relative line numbers]]
     - [[#display-battery-in-the-bar][Display battery in the bar]]
+    - [[#display-time-in-the-bar][Display time in the bar]]
     - [[#use-spaces-instead-of-tabs][Use spaces instead of tabs]]
     - [[#commenting][Commenting]]
     - [[#command-log-mode][Command log mode]]
@@ -143,6 +144,11 @@ Must be in the beginning for ~use-package~ usage below.
 *** Display battery in the bar
 #+begin_src elisp
 (display-battery-mode t)
+#+end_src
+*** Display time in the bar
+#+begin_src elisp
+(setq display-time-format "%H:%M:%S %a,%d %b %Y")
+(display-time)
 #+end_src
 *** Use spaces instead of tabs
 #+begin_src elisp
@@ -366,7 +372,7 @@ Manage yer books.
 #+end_src
 *** Reload org
 #+BEGIN_SRC elisp
-(org-reload)
+;;(org-reload)
 #+END_SRC
 ** Magit
 The git supercharge

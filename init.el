@@ -67,6 +67,9 @@
 
 (display-battery-mode t)
 
+(setq display-time-format "%H:%M:%S %a,%d %b %Y")
+(display-time)
+
 (setq-default indent-tabs-mode nil)
 
 (use-package evil-nerd-commenter
@@ -227,7 +230,7 @@
     (org-backward-heading-same-level 1))
   (org-narrow-to-subtre))
 
-(org-reload)
+;;(org-reload)
 
 (use-package magit
   :straight t)
