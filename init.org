@@ -31,7 +31,7 @@ Custom variables set by various emacs packages
   - [[#general-configs][General configs]]
     - [[#set-the-emacs-user-directory][Set the emacs user directory]]
     - [[#set-the-default-font][Set the default font]]
-    - [[#set-the-theme-ok-i-like-the-doom-emacs-themes][Set the theme (ok I like the doom emacs themes)]]
+    - [[#set-the-theme][Set the theme]]
     - [[#no-scrollbar-toolbar-menubar-because-bloat][No scrollbar, toolbar, menubar, because bloat]]
     - [[#line-numbers--relative-line-numbers][Line numbers + relative line numbers]]
     - [[#display-battery-in-the-bar][Display battery in the bar]]
@@ -41,25 +41,27 @@ Custom variables set by various emacs packages
     - [[#command-log-mode][Command log mode]]
     - [[#storing-links][Storing links]]
     - [[#which-key][Which-key]]
-  - [[#dashboard][Dashboard]]
+  - [[#keybindings][Keybindings]]
+  - [[#margins][Margins]]
   - [[#modeline][Modeline]]
+  - [[#dashboard][Dashboard]]
   - [[#evil-mode][Evil-mode]]
-    - [[#sane-window-movement][Sane window movement]]
+    - [[#evil-mode-configs][Evil mode configs]]
     - [[#org-mode-integration-with-evil][Org mode integration with evil]]
+    - [[#evil-collection-mode][Evil collection mode]]
   - [[#org-mode][Org-mode]]
     - [[#general][General]]
     - [[#org-roam][Org-roam]]
       - [[#deft-for-viewing-roam-files][Deft for viewing roam files]]
     - [[#ox-hugo][Ox-hugo]]
     - [[#org-reading-list][Org reading list]]
-    - [[#move-through-headings-when-narrowed][Move through headings when narrowed]]
-    - [[#reload-org][Reload org]]
+    - [[#toc][Toc]]
   - [[#magit][Magit]]
   - [[#helm][Helm]]
-  - [[#ranger][Ranger]]
+  - [[#counsel][Counsel]]
+  - [[#ivy][Ivy]]
   - [[#company][Company]]
   - [[#snippets][Snippets]]
-  - [[#toc][Toc]]
   - [[#how-do-you][How-do-you]]
   - [[#language-specific][Language-specific]]
     - [[#web-mode][Web-mode]]
@@ -73,6 +75,7 @@ Custom variables set by various emacs packages
   - [[#parens][Parens]]
   - [[#flycheck][Flycheck]]
   - [[#emojify][Emojify]]
+  - [[#helpful][Helpful]]
   - [[#local-variables][Local Variables]]
 
 ** Package manager
@@ -111,7 +114,8 @@ This is seriously retarded.
   (set-frame-font "Jet Brains Mono 18")
   (set-frame-font "JetBrains Mono 18"))
 #+end_src
-*** Set the theme (ok I like the doom emacs themes)
+*** Set the theme
+Ok I like the doom emacs themes
 #+begin_src elisp
 (use-package doom-themes
   :straight t
@@ -119,7 +123,7 @@ This is seriously retarded.
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-one t)
+  (load-theme 'doom-dracula t)
 
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
@@ -168,9 +172,7 @@ This is seriously retarded.
 Show command history in sidebar. Looks slick.
 #+begin_src elisp
 (use-package command-log-mode
-  :straight t
-  :config
-  (global-command-log-mode))
+  :straight t)
 #+end_src
 *** Storing links
 Set key bindings for ~org-store-link~
@@ -185,13 +187,49 @@ Showing a popup for key combinations that follow the pressed key (like in Spacem
   :config
   (which-key-mode))
 #+end_src
-** Dashboard
-Ok I admit this is a little bloated, but I like something pretty to open when I turn on Emacs.
+** Keybindings
+Using ~general.el~ to define a leader key and various bindings with it. In modes (e.g. insert mode and emacs mode) where space is not applicable, it uses ctrl + space.
+
+Make escape quit prompts.
 #+begin_src elisp
-(use-package dashboard
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+#+end_src 
+
+#+begin_src elisp
+(setq user-init-file-org "~/.emacs.d/init.org")
+
+(defun nimor/open-config ()
+  "Open the init.org file"
+  (interactive)
+  (find-file user-init-file-org))
+
+(use-package general
   :straight t
   :config
-  (dashboard-setup-startup-hook))
+  (general-evil-setup t)
+
+  (general-create-definer nimor/leader-keys
+    :keymaps '(normal insert visual emacs)
+    :prefix "SPC"
+    :global-prefix "C-SPC")
+
+  (nimor/leader-keys
+    "a"  'org-agenda
+    "b"  'counsel-bookmark
+    "f"  'find-file
+    "/"  'swiper
+    "pf" 'nimor/open-config))
+#+end_src
+** Margins
+#+begin_src elisp
+(defun nimor/org-mode-visual-fill ()
+  (setq visual-fill-column-width 100
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :straight t
+  :hook (org-mode . nimor/org-mode-visual-fill))
 #+end_src
 ** Modeline
 Doom modeline - it looks nice!
@@ -204,21 +242,39 @@ Doom modeline - it looks nice!
   :straight t
   :init (doom-modeline-mode 1))
 #+end_src
+** Dashboard
+Ok I admit this is a little bloated, but I like something pretty to open when I turn on Emacs.
+#+begin_src elisp
+(use-package dashboard
+  :straight t
+  :config
+  (setq dashboard-items '((recents  . 5)
+                          (bookmarks . 5)
+                          (projects . 5)
+                          (agenda . 5)))
+  (dashboard-setup-startup-hook))
+#+end_src
 ** Evil-mode
 Vim keybinds and goodness in emacs
 
-*** Sane window movement
+*** Evil mode configs
 
 #+begin_src elisp
 (use-package evil
   :straight t
+  :init
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
   :config
   (evil-mode 1)
+  ;; sane window management
   (evil-define-key 'normal 'global
     (kbd "C-h") 'evil-window-left
     (kbd "C-l") 'evil-window-right
     (kbd "C-k") 'evil-window-up
-    (kbd "C-j") 'evil-window-down))
+    (kbd "C-j") 'evil-window-down)
+
+  (evil-set-initial-state 'dashboard-mode 'normal))
 #+end_src
 
 *** Org mode integration with evil
@@ -234,7 +290,16 @@ Vim keybinds and goodness in emacs
               (evil-org-set-key-theme '(navigation insert textobjects additional calendar))))
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys)
-  (define-key evil-ex-map "e" 'find-file))
+  (define-key evil-ex-map "e" 'counsel-find-file))
+#+end_src
+*** Evil collection mode
+Sets up various other emacs modes with evil-mode bindings
+#+begin_src elisp
+(use-package evil-collection
+  :straight t
+  :after evil
+  :config
+  (evil-collection-init))
 #+end_src
 ** Org-mode
 *** General
@@ -248,10 +313,14 @@ Installing and configuring org-mode:
 6. Indent, fold org files by default
 
 #+begin_src elisp
+(defun nimor/org-mode-setup ()
+  (org-indent-mode)
+  (visual-line-mode 1))
+
 (use-package org
     :straight t
     :hook
-    (org-mode . visual-line-mode)
+    (org-mode . nimor/org-mode-setup)
     :config
     (require 'org-tempo)
     (eval-after-load 'org-agenda
@@ -282,7 +351,6 @@ Installing and configuring org-mode:
 
     (setq org-startup-indented t)
     (setq org-startup-folded t)
-    (setq org-indent-mode t)
     (setq org-log-done 'note)
     (setq org-tags-column 0)
     (setq org-agenda-tags-column 0)
@@ -295,8 +363,13 @@ Like org bullets, but supercharged?
 #+begin_src elisp
 (use-package org-superstar
   :straight t
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1))))
+  :after org
+  :hook (org-mode . org-superstar-mode))
+#+end_src
+
+Disable line numbers in org-mode
+#+begin_src elisp
+(add-hook 'org-mode-hook (lambda () (display-line-numbers-mode 0)))
 #+end_src
 *** Org-roam
 The notes (zettelkasten) god
@@ -348,28 +421,15 @@ Manage yer books.
   :config
   (setq org-books-file "~/Nextcloud/org/reading_list.org"))
 #+end_src
-*** Move through headings when narrowed
-#+begin_src elisp
-(defun org-advance ()
-  (interactive)
-  (when (buffer-narrowed-p)
-    (beginning-of-buffer)
-    (widen)
-    (org-forward-heading-same-level 1))
-  (org-narrow-to-subtree))
+*** Toc
+Table of contents on save for org files, it's awesome
 
-(defun org-retreat ()
-  (interactive)
-  (when (buffer-narrowed-p)
-    (beginning-of-buffer)
-    (widen)
-    (org-backward-heading-same-level 1))
-  (org-narrow-to-subtre))
+#+begin_src elisp
+(use-package toc-org
+  :straight t
+  :hook
+  (org-mode . toc-org-mode))
 #+end_src
-*** Reload org
-#+BEGIN_SRC elisp
-;;(org-reload)
-#+END_SRC
 ** Magit
 The git supercharge
 
@@ -384,37 +444,82 @@ Something weird with ~emacsclient~ being installed with nix and magit not findin
 (setq-default with-editor-emacsclient-executable "emacsclient")
 #+end_src
 ** Helm
-The searching god
+The completion god
 
 #+begin_src elisp
-(use-package helm
-  :init
-    (require 'helm-config)
-    (setq helm-split-window-in-side-p t
-          helm-move-to-line-cycle-in-source t)
-  :config
-    (helm-mode 1) ;; Most of Emacs prompts become helm-enabled
-    (helm-autoresize-mode 1) ;; Helm resizes according to the number of candidates
-    (global-set-key (kbd "C-x b") 'helm-buffers-list) ;; List buffers ( Emacs way )
-    (define-key evil-ex-map "b" 'helm-buffers-list) ;; List buffers ( Vim way )
-    (global-set-key (kbd "C-x r b") 'helm-bookmarks) ;; Bookmarks menu
-    (global-set-key (kbd "C-x C-f") 'helm-find-files) ;; Finding files with Helm
-    (global-set-key (kbd "M-c") 'helm-calcul-expression) ;; Use Helm for calculations
-    (global-set-key (kbd "C-s") 'helm-occur)  ;; Replaces the default isearch keybinding
-    (global-set-key (kbd "C-h a") 'helm-apropos)  ;; Helmized apropos interface
-    (global-set-key (kbd "M-x") 'helm-M-x)  ;; Improved M-x menu
-    (global-set-key (kbd "M-y") 'helm-show-kill-ring)  ;; Show kill ring, pick something to paste
-  :straight t)
+;; (use-package helm
+;;   :init
+;;     (require 'helm-config)
+;;     (setq helm-split-window-in-side-p t
+;;           helm-move-to-line-cycle-in-source t)
+;;   :config
+;;     (helm-mode 1) ;; Most of Emacs prompts become helm-enabled
+;;     (helm-autoresize-mode 1) ;; Helm resizes according to the number of candidates
+;;     (global-set-key (kbd "C-x b") 'helm-buffers-list) ;; List buffers ( Emacs way )
+;;     (define-key evil-ex-map "b" 'helm-buffers-list) ;; List buffers ( Vim way )
+;;     (global-set-key (kbd "C-x r b") 'helm-bookmarks) ;; Bookmarks menu
+;;     (global-set-key (kbd "C-x C-f") 'helm-find-files) ;; Finding files with Helm
+;;     (global-set-key (kbd "M-c") 'helm-calcul-expression) ;; Use Helm for calculations
+;;     (global-set-key (kbd "C-s") 'helm-occur)  ;; Replaces the default isearch keybinding
+;;     (global-set-key (kbd "C-h a") 'helm-apropos)  ;; Helmized apropos interface
+;;     (global-set-key (kbd "M-x") 'helm-M-x)  ;; Improved M-x menu
+;;     (global-set-key (kbd "M-y") 'helm-show-kill-ring)  ;; Show kill ring, pick something to paste
+;;   :straight t)
+
+;; (use-package helm-lsp
+;;   :straight t
+;;   :commands helm-lsp-workspace-symbol)
+
+;; (use-package helm-projectile
+;;   :straight t)
 #+end_src
-** Ranger
-The better file manager for emacs
-
+** Counsel
+Counsel is a customized set of commands to replace ~find-file~ with ~counsel-find-file~, etc which provide useful commands for each of the default completion commands.
 #+begin_src elisp
-(use-package ranger
+(use-package counsel
+  :straight t
+  :bind (("C-M-j" . 'counsel-switch-buffer)
+         :map minibuffer-local-map
+         ("C-r" . 'counsel-minibuffer-history))
+  :config
+  (counsel-mode 1))
+
+(use-package counsel-projectile
   :straight t
   :config
-  (setq ranger-show-hidden t)
-  (setq ranger-cleanup-on-disable t))
+  (counsel-projectile-mode 1))
+#+end_src
+** Ivy
+A more minimal completion framework
+#+begin_src elisp
+(use-package ivy
+  :straight t
+  :diminish
+  :bind (("C-s" . swiper)
+         :map ivy-minibuffer-map
+         ("TAB" . ivy-alt-done)
+         ("C-l" . ivy-alt-done)
+         :map ivy-switch-buffer-map
+         ("C-k" . ivy-previous-line)
+         ("C-l" . ivy-done)
+         ("C-d" . ivy-switch-buffer-kill)
+         :map ivy-reverse-i-search-map
+         ("C-k" . ivy-previous-line)
+         ("C-d" . ivy-reverse-i-search-kill))
+  :config
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-count-format "%d/%d ")
+  (define-key evil-ex-map "b" 'ivy-switch-buffer) ;; List buffers ( Vim way )
+  ;; Press M-o when inside the ivy minibuffer for the actions to show
+  (ivy-set-actions
+    'counsel-find-file
+    '(("d" delete-file "delete")))
+  (ivy-mode 1))
+
+(use-package ivy-rich
+  :straight t
+  :init
+  (ivy-rich-mode 1))
 #+end_src
 ** Company
 Complete all the things!
@@ -454,18 +559,9 @@ Completion for org-roam
 (use-package yasnippet-snippets
   :straight t)
 #+end_src
-** Toc
-Table of contents on save for org files, it's awesome
-
-#+begin_src elisp
-(use-package toc-org
-  :straight t
-  :hook
-  (org-mode . toc-org-mode))
-#+end_src
 ** How-do-you
 Your stack overflow and friends inside emacs (and the results are org files!)
-
+Currently does not work on Emacs 27. ;(
 #+begin_src elisp
 (use-package howdoyou
   :straight t)
@@ -501,10 +597,6 @@ For your general language needs.
   (rust-mode . lsp)
   (ruby-mode . lsp)
   :commands lsp)
-
-(use-package helm-lsp
-  :straight t
-  :commands helm-lsp-workspace-symbol)
 
 (use-package lsp-ui 
   :straight t
@@ -581,11 +673,6 @@ For those pesky shaders.
   (setq projectile-track-known-projects-automatically nil)
   (projectile-mode +1))
 #+end_src
-
-#+begin_src elisp
-(use-package helm-projectile
-  :straight t)
-#+end_src
 ** Parens
 To have paren pairs in the same colour
 #+begin_src elisp
@@ -608,18 +695,35 @@ For all the errors in the world
 (use-package flycheck
   :straight t
   :init (global-flycheck-mode))
+#+end_src
 
+To show errors in a nice pop-up window.
+#+begin_src elisp
 (use-package flycheck-pos-tip
   :straight t
   :after flycheck
   :hook (flycheck-mode . flycheck-pos-tip-mode))
 #+end_src
 ** Emojify
-Ugh.
+Well, they do brighten up the place a bit. 🙉
 #+begin_src elisp
 (use-package emojify
   :straight t
   :init (global-emojify-mode))
+#+end_src
+** Helpful
+Helpful adds a lot of very helpful (get it?) information to Emacs’ describe- command buffers. For example, if you use describe-function, you will not only get the documentation about the function, you will also see the source code of the function and where it gets used in other places in the Emacs configuration. It is very useful for figuring out how things work in Emacs.
+#+begin_src elisp
+(use-package helpful
+  :straight t
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-key] . helpful-key))
 #+end_src
 ** Local Variables
 Adds a hook to tangle the file to ~init.el~ after saving.

@@ -44,7 +44,7 @@
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-one t)
+  (load-theme 'doom-dracula t)
 
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
@@ -78,9 +78,7 @@
   (evilnc-default-hotkeys))
 
 (use-package command-log-mode
-  :straight t
-  :config
-  (global-command-log-mode))
+  :straight t)
 
 (global-set-key (kbd "C-c l") 'org-store-link)
 
@@ -89,10 +87,40 @@
   :config
   (which-key-mode))
 
-(use-package dashboard
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+(setq user-init-file-org "~/.emacs.d/init.org")
+
+(defun nimor/open-config ()
+  "Open the init.org file"
+  (interactive)
+  (find-file user-init-file-org))
+
+(use-package general
   :straight t
   :config
-  (dashboard-setup-startup-hook))
+  (general-evil-setup t)
+
+  (general-create-definer nimor/leader-keys
+    :keymaps '(normal insert visual emacs)
+    :prefix "SPC"
+    :global-prefix "C-SPC")
+
+  (nimor/leader-keys
+    "a"  'org-agenda
+    "b"  'counsel-bookmark
+    "f"  'find-file
+    "/"  'swiper
+    "pf" 'nimor/open-config))
+
+(defun nimor/org-mode-visual-fill ()
+  (setq visual-fill-column-width 100
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :straight t
+  :hook (org-mode . nimor/org-mode-visual-fill))
 
 ;; dependency
 (use-package all-the-icons
@@ -102,15 +130,30 @@
   :straight t
   :init (doom-modeline-mode 1))
 
-(use-package evil
+(use-package dashboard
   :straight t
   :config
+  (setq dashboard-items '((recents  . 5)
+                          (bookmarks . 5)
+                          (projects . 5)
+                          (agenda . 5)))
+  (dashboard-setup-startup-hook))
+
+(use-package evil
+  :straight t
+  :init
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
+  :config
   (evil-mode 1)
+  ;; sane window management
   (evil-define-key 'normal 'global
     (kbd "C-h") 'evil-window-left
     (kbd "C-l") 'evil-window-right
     (kbd "C-k") 'evil-window-up
-    (kbd "C-j") 'evil-window-down))
+    (kbd "C-j") 'evil-window-down)
+
+  (evil-set-initial-state 'dashboard-mode 'normal))
 
 (use-package evil-org
   :straight t
@@ -122,12 +165,22 @@
               (evil-org-set-key-theme '(navigation insert textobjects additional calendar))))
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys)
-  (define-key evil-ex-map "e" 'find-file))
+  (define-key evil-ex-map "e" 'counsel-find-file))
+
+(use-package evil-collection
+  :straight t
+  :after evil
+  :config
+  (evil-collection-init))
+
+(defun nimor/org-mode-setup ()
+  (org-indent-mode)
+  (visual-line-mode 1))
 
 (use-package org
     :straight t
     :hook
-    (org-mode . visual-line-mode)
+    (org-mode . nimor/org-mode-setup)
     :config
     (require 'org-tempo)
     (eval-after-load 'org-agenda
@@ -158,7 +211,6 @@
 
     (setq org-startup-indented t)
     (setq org-startup-folded t)
-    (setq org-indent-mode t)
     (setq org-log-done 'note)
     (setq org-tags-column 0)
     (setq org-agenda-tags-column 0)
@@ -167,8 +219,10 @@
 
 (use-package org-superstar
   :straight t
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1))))
+  :after org
+  :hook (org-mode . org-superstar-mode))
+
+(add-hook 'org-mode-hook (lambda () (display-line-numbers-mode 0)))
 
 (use-package org-roam
   :straight t
@@ -205,53 +259,83 @@
   :config
   (setq org-books-file "~/Nextcloud/org/reading_list.org"))
 
-(defun org-advance ()
-  (interactive)
-  (when (buffer-narrowed-p)
-    (beginning-of-buffer)
-    (widen)
-    (org-forward-heading-same-level 1))
-  (org-narrow-to-subtree))
-
-(defun org-retreat ()
-  (interactive)
-  (when (buffer-narrowed-p)
-    (beginning-of-buffer)
-    (widen)
-    (org-backward-heading-same-level 1))
-  (org-narrow-to-subtre))
-
-;;(org-reload)
+(use-package toc-org
+  :straight t
+  :hook
+  (org-mode . toc-org-mode))
 
 (use-package magit
   :straight t)
 
 (setq-default with-editor-emacsclient-executable "emacsclient")
 
-(use-package helm
-  :init
-    (require 'helm-config)
-    (setq helm-split-window-in-side-p t
-          helm-move-to-line-cycle-in-source t)
-  :config
-    (helm-mode 1) ;; Most of Emacs prompts become helm-enabled
-    (helm-autoresize-mode 1) ;; Helm resizes according to the number of candidates
-    (global-set-key (kbd "C-x b") 'helm-buffers-list) ;; List buffers ( Emacs way )
-    (define-key evil-ex-map "b" 'helm-buffers-list) ;; List buffers ( Vim way )
-    (global-set-key (kbd "C-x r b") 'helm-bookmarks) ;; Bookmarks menu
-    (global-set-key (kbd "C-x C-f") 'helm-find-files) ;; Finding files with Helm
-    (global-set-key (kbd "M-c") 'helm-calcul-expression) ;; Use Helm for calculations
-    (global-set-key (kbd "C-s") 'helm-occur)  ;; Replaces the default isearch keybinding
-    (global-set-key (kbd "C-h a") 'helm-apropos)  ;; Helmized apropos interface
-    (global-set-key (kbd "M-x") 'helm-M-x)  ;; Improved M-x menu
-    (global-set-key (kbd "M-y") 'helm-show-kill-ring)  ;; Show kill ring, pick something to paste
-  :straight t)
+;; (use-package helm
+;;   :init
+;;     (require 'helm-config)
+;;     (setq helm-split-window-in-side-p t
+;;           helm-move-to-line-cycle-in-source t)
+;;   :config
+;;     (helm-mode 1) ;; Most of Emacs prompts become helm-enabled
+;;     (helm-autoresize-mode 1) ;; Helm resizes according to the number of candidates
+;;     (global-set-key (kbd "C-x b") 'helm-buffers-list) ;; List buffers ( Emacs way )
+;;     (define-key evil-ex-map "b" 'helm-buffers-list) ;; List buffers ( Vim way )
+;;     (global-set-key (kbd "C-x r b") 'helm-bookmarks) ;; Bookmarks menu
+;;     (global-set-key (kbd "C-x C-f") 'helm-find-files) ;; Finding files with Helm
+;;     (global-set-key (kbd "M-c") 'helm-calcul-expression) ;; Use Helm for calculations
+;;     (global-set-key (kbd "C-s") 'helm-occur)  ;; Replaces the default isearch keybinding
+;;     (global-set-key (kbd "C-h a") 'helm-apropos)  ;; Helmized apropos interface
+;;     (global-set-key (kbd "M-x") 'helm-M-x)  ;; Improved M-x menu
+;;     (global-set-key (kbd "M-y") 'helm-show-kill-ring)  ;; Show kill ring, pick something to paste
+;;   :straight t)
 
-(use-package ranger
+;; (use-package helm-lsp
+;;   :straight t
+;;   :commands helm-lsp-workspace-symbol)
+
+;; (use-package helm-projectile
+;;   :straight t)
+
+(use-package counsel
+  :straight t
+  :bind (("C-M-j" . 'counsel-switch-buffer)
+         :map minibuffer-local-map
+         ("C-r" . 'counsel-minibuffer-history))
+  :config
+  (counsel-mode 1))
+
+(use-package counsel-projectile
   :straight t
   :config
-  (setq ranger-show-hidden t)
-  (setq ranger-cleanup-on-disable t))
+  (counsel-projectile-mode 1))
+
+(use-package ivy
+  :straight t
+  :diminish
+  :bind (("C-s" . swiper)
+         :map ivy-minibuffer-map
+         ("TAB" . ivy-alt-done)
+         ("C-l" . ivy-alt-done)
+         :map ivy-switch-buffer-map
+         ("C-k" . ivy-previous-line)
+         ("C-l" . ivy-done)
+         ("C-d" . ivy-switch-buffer-kill)
+         :map ivy-reverse-i-search-map
+         ("C-k" . ivy-previous-line)
+         ("C-d" . ivy-reverse-i-search-kill))
+  :config
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-count-format "%d/%d ")
+  (define-key evil-ex-map "b" 'ivy-switch-buffer) ;; List buffers ( Vim way )
+  ;; Press M-o when inside the ivy minibuffer for the actions to show
+  (ivy-set-actions
+    'counsel-find-file
+    '(("d" delete-file "delete")))
+  (ivy-mode 1))
+
+(use-package ivy-rich
+  :straight t
+  :init
+  (ivy-rich-mode 1))
 
 (use-package company
   :straight t
@@ -281,11 +365,6 @@
 (use-package yasnippet-snippets
   :straight t)
 
-(use-package toc-org
-  :straight t
-  :hook
-  (org-mode . toc-org-mode))
-
 (use-package howdoyou
   :straight t)
 
@@ -308,10 +387,6 @@
   (rust-mode . lsp)
   (ruby-mode . lsp)
   :commands lsp)
-
-(use-package helm-lsp
-  :straight t
-  :commands helm-lsp-workspace-symbol)
 
 (use-package lsp-ui 
   :straight t
@@ -375,9 +450,6 @@
   (setq projectile-track-known-projects-automatically nil)
   (projectile-mode +1))
 
-(use-package helm-projectile
-  :straight t)
-
 (use-package rainbow-delimiters
   :straight t
   :hook (prog-mode . rainbow-delimiters-mode))
@@ -399,3 +471,14 @@
 (use-package emojify
   :straight t
   :init (global-emojify-mode))
+
+(use-package helpful
+  :straight t
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-key] . helpful-key))
