@@ -71,6 +71,7 @@ Custom variables set by various emacs packages
     - [[#lua][Lua]]
     - [[#ruby][Ruby]]
     - [[#typescript][Typescript]]
+    - [[#scala][Scala]]
   - [[#projects][Projects]]
   - [[#parens][Parens]]
   - [[#flycheck][Flycheck]]
@@ -663,6 +664,15 @@ For those pesky shaders.
          (typescript-mode . tide-hl-identifier-mode)
          (before-save . tide-format-before-save)))
 #+end_src
+*** Scala
+#+begin_src elisp
+(use-package scala-mode
+  :straight t
+  :mode "\\.s\\(cala\\|bt\\)$"
+  :config
+  (load-file (concat user-emacs-directory "/lisp/ob-scala.el"))) ;; for org babel evaluating of scala code blocks
+#+end_src
+
 ** Projects
 #+begin_src elisp
 (use-package projectile
@@ -725,9 +735,9 @@ Helpful adds a lot of very helpful (get it?) information to Emacs’ describe- c
   ([remap describe-variable] . counsel-describe-variable)
   ([remap describe-key] . helpful-key))
 #+end_src
+
 ** Local Variables
 Adds a hook to tangle the file to ~init.el~ after saving.
 # Local Variables:
-# eval: (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t)
+# eval: (add-hook 'after-save-hook (lambda () (org-babel-tangle)) nil t)
 # End:
-

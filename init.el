@@ -442,6 +442,12 @@
          (typescript-mode . tide-hl-identifier-mode)
          (before-save . tide-format-before-save)))
 
+(use-package scala-mode
+  :straight t
+  :mode "\\.s\\(cala\\|bt\\)$"
+  :config
+  (load-file (concat user-emacs-directory "/lisp/ob-scala.el"))) ;; for org babel evaluating of scala code blocks
+
 (use-package projectile
   :straight t
   :config 
