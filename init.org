@@ -56,6 +56,7 @@ Custom variables set by various emacs packages
     - [[#ox-hugo][Ox-hugo]]
     - [[#org-reading-list][Org reading list]]
     - [[#toc][Toc]]
+    - [[#org-journal][Org journal]]
   - [[#magit][Magit]]
   - [[#helm][Helm]]
   - [[#counsel][Counsel]]
@@ -259,7 +260,6 @@ Ok I admit this is a little bloated, but I like something pretty to open when I 
 Vim keybinds and goodness in emacs
 
 *** Evil mode configs
-
 #+begin_src elisp
 (use-package evil
   :straight t
@@ -279,7 +279,6 @@ Vim keybinds and goodness in emacs
 #+end_src
 
 *** Org mode integration with evil
-
 #+begin_src elisp
 (use-package evil-org
   :straight t
@@ -430,6 +429,14 @@ Table of contents on save for org files, it's awesome
   :straight t
   :hook
   (org-mode . toc-org-mode))
+#+end_src
+*** Org journal
+For your journaling needs.
+#+begin_src elisp
+(use-package org-journal
+  :straight t
+  :config
+  (setq org-journal-dir "~/Documents/journal"))
 #+end_src
 ** Magit
 The git supercharge

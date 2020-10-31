@@ -264,6 +264,11 @@
   :hook
   (org-mode . toc-org-mode))
 
+(use-package org-journal
+  :straight t
+  :config
+  (setq org-journal-dir "~/Documents/journal"))
+
 (use-package magit
   :straight t)
 
