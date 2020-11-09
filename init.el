@@ -109,7 +109,7 @@
   (nimor/leader-keys
     "a"  'org-agenda
     "b"  'counsel-bookmark
-    "f"  'find-file
+    "ff"  'find-file
     "/"  'swiper
     "pf" 'nimor/open-config))
 
@@ -183,39 +183,55 @@
     (org-mode . nimor/org-mode-setup)
     :config
     (require 'org-tempo)
-    (eval-after-load 'org-agenda
-    '(progn
-        (evil-set-initial-state 'org-agenda-mode 'normal)
-        (evil-define-key 'normal org-agenda-mode-map
-          "vd" 'org-agenda-day-view
-          "vw" 'org-agenda-week-view
-          "I"  'org-agenda-clock-in
-          "O"  'org-agenda-clock-out)))
-    (setq org-refile-targets
-        '(("~/Nextcloud/Orgzly/gtd.org" :maxlevel . 3)
-          ("~/Nextcloud/Orgzly/someday.org" :level . 1)
-          ("~/Nextcloud/Orgzly/tickler.org" :maxlevel . 2)))
-    (setq org-capture-templates
-        '(("t" "Todo [inbox]" entry
-          (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
-          "* TODO %i%?")
-          ("T" "Tickler" entry
-          (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
-          "* TODO %i%? \n SCHEDULED: %T")))
-    (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
+
+    ;; make org-agenda respect evil
+    (evil-set-initial-state 'org-agenda-mode 'normal)
+
+    ;; org-agenda custom bindings
+    (evil-define-key 'normal org-agenda-mode-map
+      "vd" 'org-agenda-day-view
+      "vw" 'org-agenda-week-view
+      "I"  'org-agenda-clock-in
+      "O"  'org-agenda-clock-out)
+
+    ;; files that org-agenda will read from 
     (setq org-agenda-files
     '("~/Nextcloud/Orgzly/gtd.org"
       "~/Nextcloud/Orgzly/tickler.org"
       "~/Nextcloud/Orgzly/inbox.org"
       "~/Nextcloud/org/work"))
 
+    ;; org-agenda custom views
+    (setq org-agenda-custom-commands
+      '(("g" "GTD" tags-todo "@gtd"
+        ((org-agenda-overriding-header "GTD")))))
+
+    ;; files to refile to
+    (setq org-refile-targets
+        '(("~/Nextcloud/Orgzly/gtd.org" :maxlevel . 3)
+          ("~/Nextcloud/Orgzly/someday.org" :level . 1)
+          ("~/Nextcloud/Orgzly/tickler.org" :maxlevel . 2)))
+
+    ;; quick templates for org files
+    (setq org-capture-templates
+        '(("t" "Todo [inbox]" entry
+          (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
+         "* TODO %i%?")
+          ("T" "Tickler" entry
+          (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
+          "* TODO %i%? \n SCHEDULED: %T")))
+
+    (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
+
     (setq org-startup-indented t)
     (setq org-startup-folded t)
     (setq org-log-done 'note)
     (setq org-tags-column 0)
     (setq org-agenda-tags-column 0)
-    (setq org-src-preserve-indentation nil)
-    (setq org-edit-src-content-indentation 0))
+    ;; src block indentation / editing / syntax highlighting
+    (setq org-src-fontify-natively t
+          org-src-preserve-indentation t ;; do not put two spaces on the left
+          org-src-tab-acts-natively t))
 
 (use-package org-superstar
   :straight t
@@ -236,7 +252,9 @@
      ("C-c n g" . org-roam-graph-show))
     :map org-mode-map
     (("C-c n i" . org-roam-insert))
-    (("C-c n I" . org-roam-insert-immediate))))
+    (("C-c n I" . org-roam-insert-immediate)))
+  :config
+  (setq org-roam-completion-everywhere t))
 
 (use-package deft
   :straight t
@@ -267,7 +285,17 @@
 (use-package org-journal
   :straight t
   :config
-  (setq org-journal-dir "~/Documents/journal"))
+  (setq org-journal-dir "~/Documents/journal")
+  (setq org-journal-date-format "%A, %d %B %Y")
+  (nimor/leader-keys
+    "nj" 'org-journal-new-entry))
+
+(use-package ob
+  :config
+  (org-babel-do-load-languages
+    'org-babel-load-languages
+      '((python . t)
+       )))
 
 (use-package magit
   :straight t)
@@ -353,10 +381,10 @@
   :hook (lua-mode my-lua-mode-company-init))
 
 ;; FIXME this is deprecated and now inside org-roam
-(use-package company-org-roam
-  :straight (:host github :repo "org-roam/company-org-roam")
-  :config
-  (push 'company-org-roam company-backends))
+;; (use-package company-org-roam
+;;   :straight (:host github :repo "org-roam/company-org-roam")
+;;   :config
+;;   (push 'company-org-roam company-backends))
 
 (use-package yasnippet
   :straight t
@@ -468,7 +496,8 @@
 (use-package smartparens
   :straight t
   :config
-  (smartparens-global-mode))
+  (smartparens-global-mode)
+  (show-smartparens-global-mode))
 
 (use-package flycheck
   :straight t
@@ -493,3 +522,20 @@
   ([remap describe-command] . helpful-command)
   ([remap describe-variable] . counsel-describe-variable)
   ([remap describe-key] . helpful-key))
+
+;; dependency of elpl
+(use-package edit-indirect
+  :straight t)
+
+(use-package elpl
+  :straight t
+  :config
+  (nimor/leader-keys
+    "rl" 'elpl-clean
+    "re" 'elpl-edit))
+
+(use-package link-hint
+  :straight t
+  :config
+  (nimor/leader-keys
+    "fo" 'link-hint-open-link))
