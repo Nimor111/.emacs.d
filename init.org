@@ -41,6 +41,7 @@ Custom variables set by various emacs packages
     - [[#command-log-mode][Command log mode]]
     - [[#storing-links][Storing links]]
     - [[#which-key][Which-key]]
+    - [[#undo][Undo]]
   - [[#keybindings][Keybindings]]
   - [[#margins][Margins]]
   - [[#modeline][Modeline]]
@@ -192,6 +193,13 @@ Showing a popup for key combinations that follow the pressed key (like in Spacem
   :config
   (which-key-mode))
 #+end_src
+*** Undo
+#+begin_src elisp
+(use-package undo-tree
+  :straight t
+  :init
+  (global-undo-tree-mode))
+#+end_src
 ** Keybindings
 Using ~general.el~ to define a leader key and various bindings with it. In modes (e.g. insert mode and emacs mode) where space is not applicable, it uses ctrl + space.
 
@@ -278,7 +286,8 @@ Vim keybinds and goodness in emacs
     (kbd "C-k") 'evil-window-up
     (kbd "C-j") 'evil-window-down)
 
-  (evil-set-initial-state 'dashboard-mode 'normal))
+  (evil-set-initial-state 'dashboard-mode 'normal)
+  (evil-set-undo-system 'undo-tree))
 #+end_src
 
 *** Org mode integration with evil

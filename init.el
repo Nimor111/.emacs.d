@@ -87,6 +87,11 @@
   :config
   (which-key-mode))
 
+(use-package undo-tree
+  :straight t
+  :init
+  (global-undo-tree-mode))
+
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 (setq user-init-file-org "~/.emacs.d/init.org")
@@ -153,7 +158,8 @@
     (kbd "C-k") 'evil-window-up
     (kbd "C-j") 'evil-window-down)
 
-  (evil-set-initial-state 'dashboard-mode 'normal))
+  (evil-set-initial-state 'dashboard-mode 'normal)
+  (evil-set-undo-system 'undo-tree))
 
 (use-package evil-org
   :straight t
