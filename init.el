@@ -1,20 +1,3 @@
-;; [[file:init.org::*Custom variables][Custom variables:1]]
-(custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("aaf300544667970333366f2bad847899f193fcfe96172ec325dbc3195b797220" default))
-  '(safe-local-variable-values
-     (quote
-       ((eval add-hook
-	     (quote after-save-hook)
-	     (lambda nil
-	       (org-babel-tangle))
-	     nil t)))))
-;; Custom variables:1 ends here
-
 (defvar bootstrap-version)
 (let ((bootstrap-file
         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -29,6 +12,25 @@
 (load bootstrap-file nil 'nomessage))
 
 (straight-use-package 'use-package)
+
+(use-package use-package-ensure-system-package
+  :straight t)
+
+(defun nimor/org-babel-tangle-config ()
+  (when (string-equal (buffer-file-name)
+                      (expand-file-name "~/.emacs.d/init.org"))
+    ;; Dynamic scoping to the rescue
+    (let ((org-confirm-babel-evaluate nil))
+      (org-babel-tangle))))
+
+(add-hook 'org-mode-hook
+  (lambda () (add-hook 'after-save-hook #'nimor/org-babel-tangle-config)))
+
+(setq-default
+  custom-file "~/.emacs.d/custom.el")
+
+(when (file-exists-p custom-file)
+  (load custom-file t))
 
 (let* ((home-dir (getenv "HOME"))
      (custom-emacs-directory (concat home-dir "/.emacs.d")))
@@ -95,11 +97,41 @@
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 (setq user-init-file-org "~/.emacs.d/init.org")
+(setq gtd-inbox-file "~/Nextcloud/Orgzly/inbox.org")
+(setq gtd-file "~/Nextcloud/Orgzly/gtd.org")
+(setq gtd-someday-file "~/Nextcloud/Orgzly/someday.org")
+(setq gtd-tickler-file "~/Nextcloud/Orgzly/tickler.org")
+(setq tech-notebook-file "~/Nextcloud/org/tech_notebook.org")
 
 (defun nimor/open-config ()
   "Open the init.org file"
   (interactive)
   (find-file user-init-file-org))
+
+(defun nimor/open-gtd-inbox ()
+  "Open the gtd inbox file"
+  (interactive)
+  (find-file gtd-inbox-file))
+
+(defun nimor/open-gtd ()
+  "Open the gtd file"
+  (interactive)
+  (find-file gtd-file))
+
+(defun nimor/open-gtd-someday ()
+  "Open the gtd someday file"
+  (interactive)
+  (find-file gtd-someday-file))
+
+(defun nimor/open-gtd-tickler ()
+  "Open the gtd tickler file"
+  (interactive)
+  (find-file gtd-tickler-file))
+
+(defun nimor/open-tech-notebook ()
+  "Open the tech notebook file"
+  (interactive)
+  (find-file tech-notebook-file))
 
 (use-package general
   :straight t
@@ -114,9 +146,17 @@
   (nimor/leader-keys
     "a"  'org-agenda
     "b"  'counsel-bookmark
-    "ff"  'find-file
+    "ff" 'find-file
     "/"  'swiper
-    "pf" 'nimor/open-config))
+    "pf" 'nimor/open-config
+    "oc" 'org-capture
+    "gi" 'nimor/open-gtd-inbox
+    "gg" 'nimor/open-gtd
+    "gs" 'nimor/open-gtd-someday
+    "gt" 'nimor/open-gtd-tickler
+    "mt" 'org-todo
+    "oe" 'mu4e
+    "ot" 'nimor/open-tech-notebook))
 
 (defun nimor/org-mode-visual-fill ()
   (setq visual-fill-column-width 100
@@ -133,7 +173,10 @@
 
 (use-package doom-modeline
   :straight t
-  :init (doom-modeline-mode 1))
+  :init (doom-modeline-mode 1)
+  :config
+  ;; Whether display the mu4e notifications. It requires `mu4e-alert' package.
+  (setq doom-modeline-mu4e t))
 
 (use-package dashboard
   :straight t
@@ -214,8 +257,8 @@
 
     ;; files to refile to
     (setq org-refile-targets
-        '(("~/Nextcloud/Orgzly/gtd.org" :maxlevel . 3)
-          ("~/Nextcloud/Orgzly/someday.org" :level . 1)
+        '(("~/Nextcloud/Orgzly/gtd.org"     :maxlevel . 3)
+          ("~/Nextcloud/Orgzly/someday.org" :level    . 1)
           ("~/Nextcloud/Orgzly/tickler.org" :maxlevel . 2)))
 
     ;; quick templates for org files
@@ -225,7 +268,10 @@
          "* TODO %i%?")
           ("T" "Tickler" entry
           (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
-          "* TODO %i%? \n SCHEDULED: %T")))
+          "* TODO %i%? \n SCHEDULED: %T")
+          ("m" "Mail Todo with link" entry
+          (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
+          "* TODO %i%? \n:PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")))
 
     (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
 
@@ -302,6 +348,19 @@
     'org-babel-load-languages
       '((python . t)
        )))
+
+(use-package alert
+  :straight t
+  :config
+  (setq alert-default-style 'notifications))
+
+(use-package org-wild-notifier
+  :straight t
+  :config
+  (org-wild-notifier-mode 1))
+
+(use-package org-pomodoro
+  :straight t)
 
 (use-package magit
   :straight t)
@@ -385,12 +444,6 @@
   :straight t
   :after (company)
   :hook (lua-mode my-lua-mode-company-init))
-
-;; FIXME this is deprecated and now inside org-roam
-;; (use-package company-org-roam
-;;   :straight (:host github :repo "org-roam/company-org-roam")
-;;   :config
-;;   (push 'company-org-roam company-backends))
 
 (use-package yasnippet
   :straight t
@@ -545,3 +598,77 @@
   :config
   (nimor/leader-keys
     "fo" 'link-hint-open-link))
+
+(if (eq system-type 'gnu/linux)
+    (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e"))
+
+(use-package mu4e
+  :if (eq system-type 'gnu/linux)
+  :ensure-system-package mu
+  :config
+  (setq mu4e-sent-messages-behaviour 'delete)
+  (setq mu4e-get-mail-command "/usr/bin/mbsync -Va")
+  (setq mu4e-change-filenames-when-moving t)
+  (setq mu4e-update-interval 60)
+  (setq mu4e-use-fancy-chars t)
+  (setq mu4e-view-show-addresses t)
+  (setq mu4e-view-show-images t)
+  (add-to-list 'mu4e-view-actions '("view in browser" . mu4e-action-view-in-browser))
+  (setq mu4e-contexts
+    `( ,(make-mu4e-context
+          :name "Gmail"
+          :enter-func (lambda () (mu4e-message "Entering Gmail context"))
+          :match-func (lambda (msg)
+                        (when msg
+                          (string-match-p "^/gmail" (mu4e-message-field msg :maildir))))
+          :vars '( ( user-mail-address        . "nimor784@gmail.com" )
+                   ( user-full-name           . "Georgi Bozhinov")
+                   ( mu4e-sent-folder         . "/gmail/[Gmail]/Sent Mail")
+                   ( mu4e-trash-folder        . "/gmail/[Gmail]/Trash")
+                   ( mu4e-drafts-folder       . "/gmail/[Gmail]/Drafts")
+                   (smtpmail-smtp-server      . "smtp.gmail.com")
+                   (smtpmail-smtp-service     . 587)
+                   (smtpmail-stream-type      . starttls)
+                   (smtpmail-debug-info       . t)))
+       ,(make-mu4e-context
+          :name "Outlook"
+          :enter-func (lambda () (mu4e-message "Entering Outlook context"))
+          :match-func (lambda (msg)
+                        (when msg
+                          (string-match-p "^/outlook" (mu4e-message-field msg :maildir))))
+          :vars '( ( user-mail-address    . "georgi.bojinov@hotmail.com" )
+                   ( user-full-name       . "Georgi Bozhinov")
+                   ( mu4e-sent-folder     . "/outlook/Sent")
+                   ( mu4e-trash-folder    . "/outlook/Deleted")
+                   ( mu4e-drafts-folder   . "/outlook/Drafts")
+                   (smtpmail-smtp-server  . "smtp.office365.com")
+                   (smtpmail-smtp-service . 587)
+                   (smtpmail-stream-type  . starttls)
+                   (smtp-debug-info       . t)))
+  ))
+  (setq mu4e-context-policy 'pick-first)
+  (require 'org-mu4e))
+
+;; do not put a trashed flag on messages moved to deleted because then mu4e will delete them forever
+(setf (alist-get 'trash mu4e-marks)
+      (list :char '("d" . "▼")
+            :prompt "dtrash"
+            :dyn-target (lambda (target msg)
+                          (mu4e-get-trash-folder msg))
+            :action (lambda (docid msg target)
+                      ;; Here's the main difference to the regular trash mark,
+                      ;; no +T before -N so the message is not marked as
+                      ;; IMAP-deleted:
+                      (mu4e~proc-move docid (mu4e~mark-check-target target) "-N"))))
+
+(mu4e t)
+
+;; Configure desktop notifs for incoming emails:
+(use-package mu4e-alert
+  :straight t
+  :after mu4e
+  :hook
+  ((after-init . mu4e-alert-enable-mode-line-display)
+   (after-init . mu4e-alert-enable-notifications))
+  :config
+  (mu4e-alert-set-default-style 'libnotify))

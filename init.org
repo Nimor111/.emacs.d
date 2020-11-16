@@ -1,34 +1,17 @@
-* Custom variables
-Custom variables set by various emacs packages
-#+begin_src elisp :comments link
-(custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("aaf300544667970333366f2bad847899f193fcfe96172ec325dbc3195b797220" default))
-  '(safe-local-variable-values
-     (quote
-       ((eval add-hook
-	     (quote after-save-hook)
-	     (lambda nil
-	       (org-babel-tangle))
-	     nil t)))))
-#+end_src
-
 #+TITLE: Emacs Literate Configuration
 #+AUTHOR: Georgi Bojinov
 #+PROPERTY: header-args :tangle init.el
 
 * Configure all the Emacs!
 ** Table of contents :TOC_4_gh:
-- [[#custom-variables][Custom variables]]
 - [[#configure-all-the-emacs][Configure all the Emacs!]]
   - [[#package-manager][Package manager]]
     - [[#bootstrap-code-for-the-package-manager---straightel][Bootstrap code for the package manager - ~straight.el~]]
     - [[#install-use-package-for-sane-package-configuration][Install use-package for sane package configuration]]
+    - [[#ensure-system-packages-to-check-they-exist][Ensure system packages to check they exist]]
   - [[#general-configs][General configs]]
+    - [[#tangle-config-file-on-save][Tangle config file on save]]
+    - [[#custom-vars-file][Custom vars file]]
     - [[#set-the-emacs-user-directory][Set the emacs user directory]]
     - [[#set-the-default-font][Set the default font]]
     - [[#set-the-theme][Set the theme]]
@@ -59,6 +42,8 @@ Custom variables set by various emacs packages
     - [[#toc][Toc]]
     - [[#org-journal][Org journal]]
     - [[#org-babel][Org babel]]
+    - [[#notifications][Notifications]]
+    - [[#pomodoro][Pomodoro]]
   - [[#magit][Magit]]
   - [[#helm][Helm]]
   - [[#counsel][Counsel]]
@@ -82,7 +67,7 @@ Custom variables set by various emacs packages
   - [[#helpful][Helpful]]
   - [[#elisp-repl][Elisp repl]]
   - [[#better-link-opener][Better link opener]]
-  - [[#local-variables][Local Variables]]
+  - [[#email][Email]]
 
 ** Package manager
 Must be in the beginning for ~use-package~ usage below.
@@ -106,7 +91,33 @@ Must be in the beginning for ~use-package~ usage below.
 #+begin_src elisp
 (straight-use-package 'use-package)
 #+end_src
+*** Ensure system packages to check they exist
+#+begin_src elisp
+(use-package use-package-ensure-system-package
+  :straight t)
+#+end_src
 ** General configs
+*** Tangle config file on save
+Courtesy of the great emacs from scratch config: [[https://github.com/daviwil/emacs-from-scratch/blob/master/Emacs.org#auto-tangle-configuration-files][Link]]
+#+begin_src elisp
+(defun nimor/org-babel-tangle-config ()
+  (when (string-equal (buffer-file-name)
+                      (expand-file-name "~/.emacs.d/init.org"))
+    ;; Dynamic scoping to the rescue
+    (let ((org-confirm-babel-evaluate nil))
+      (org-babel-tangle))))
+
+(add-hook 'org-mode-hook
+  (lambda () (add-hook 'after-save-hook #'nimor/org-babel-tangle-config)))
+#+end_src
+*** Custom vars file
+#+begin_src elisp
+(setq-default
+  custom-file "~/.emacs.d/custom.el")
+
+(when (file-exists-p custom-file)
+  (load custom-file t))
+#+end_src
 *** Set the emacs user directory
 #+begin_src elisp
 (let* ((home-dir (getenv "HOME"))
@@ -210,11 +221,41 @@ Make escape quit prompts.
 
 #+begin_src elisp
 (setq user-init-file-org "~/.emacs.d/init.org")
+(setq gtd-inbox-file "~/Nextcloud/Orgzly/inbox.org")
+(setq gtd-file "~/Nextcloud/Orgzly/gtd.org")
+(setq gtd-someday-file "~/Nextcloud/Orgzly/someday.org")
+(setq gtd-tickler-file "~/Nextcloud/Orgzly/tickler.org")
+(setq tech-notebook-file "~/Nextcloud/org/tech_notebook.org")
 
 (defun nimor/open-config ()
   "Open the init.org file"
   (interactive)
   (find-file user-init-file-org))
+
+(defun nimor/open-gtd-inbox ()
+  "Open the gtd inbox file"
+  (interactive)
+  (find-file gtd-inbox-file))
+
+(defun nimor/open-gtd ()
+  "Open the gtd file"
+  (interactive)
+  (find-file gtd-file))
+
+(defun nimor/open-gtd-someday ()
+  "Open the gtd someday file"
+  (interactive)
+  (find-file gtd-someday-file))
+
+(defun nimor/open-gtd-tickler ()
+  "Open the gtd tickler file"
+  (interactive)
+  (find-file gtd-tickler-file))
+
+(defun nimor/open-tech-notebook ()
+  "Open the tech notebook file"
+  (interactive)
+  (find-file tech-notebook-file))
 
 (use-package general
   :straight t
@@ -229,9 +270,17 @@ Make escape quit prompts.
   (nimor/leader-keys
     "a"  'org-agenda
     "b"  'counsel-bookmark
-    "ff"  'find-file
+    "ff" 'find-file
     "/"  'swiper
-    "pf" 'nimor/open-config))
+    "pf" 'nimor/open-config
+    "oc" 'org-capture
+    "gi" 'nimor/open-gtd-inbox
+    "gg" 'nimor/open-gtd
+    "gs" 'nimor/open-gtd-someday
+    "gt" 'nimor/open-gtd-tickler
+    "mt" 'org-todo
+    "oe" 'mu4e
+    "ot" 'nimor/open-tech-notebook))
 #+end_src
 ** Margins
 #+begin_src elisp
@@ -253,7 +302,10 @@ Doom modeline - it looks nice!
 
 (use-package doom-modeline
   :straight t
-  :init (doom-modeline-mode 1))
+  :init (doom-modeline-mode 1)
+  :config
+  ;; Whether display the mu4e notifications. It requires `mu4e-alert' package.
+  (setq doom-modeline-mu4e t))
 #+end_src
 ** Dashboard
 Ok I admit this is a little bloated, but I like something pretty to open when I turn on Emacs.
@@ -360,8 +412,8 @@ Installing and configuring org-mode:
 
     ;; files to refile to
     (setq org-refile-targets
-        '(("~/Nextcloud/Orgzly/gtd.org" :maxlevel . 3)
-          ("~/Nextcloud/Orgzly/someday.org" :level . 1)
+        '(("~/Nextcloud/Orgzly/gtd.org"     :maxlevel . 3)
+          ("~/Nextcloud/Orgzly/someday.org" :level    . 1)
           ("~/Nextcloud/Orgzly/tickler.org" :maxlevel . 2)))
 
     ;; quick templates for org files
@@ -371,7 +423,10 @@ Installing and configuring org-mode:
          "* TODO %i%?")
           ("T" "Tickler" entry
           (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
-          "* TODO %i%? \n SCHEDULED: %T")))
+          "* TODO %i%? \n SCHEDULED: %T")
+          ("m" "Mail Todo with link" entry
+          (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
+          "* TODO %i%? \n:PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")))
 
     (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
 
@@ -480,6 +535,23 @@ For your journaling needs.
       '((python . t)
        )))
 #+end_src
+*** Notifications
+#+begin_src elisp
+(use-package alert
+  :straight t
+  :config
+  (setq alert-default-style 'notifications))
+
+(use-package org-wild-notifier
+  :straight t
+  :config
+  (org-wild-notifier-mode 1))
+#+end_src
+*** Pomodoro
+#+begin_src elisp
+(use-package org-pomodoro
+  :straight t)
+#+end_src
 ** Magit
 The git supercharge
 
@@ -585,16 +657,6 @@ Complete all the things!
   :after (company)
   :hook (lua-mode my-lua-mode-company-init))
 #+end_src
-
-Completion for org-roam
-
-#+begin_src elisp
-;; FIXME this is deprecated and now inside org-roam
-;; (use-package company-org-roam
-;;   :straight (:host github :repo "org-roam/company-org-roam")
-;;   :config
-;;   (push 'company-org-roam company-backends))
-#+end_src
 ** Snippets
 #+begin_src elisp
 (use-package yasnippet
@@ -611,12 +673,10 @@ Completion for org-roam
 #+end_src
 ** How-do-you
 Your stack overflow and friends inside emacs (and the results are org files!)
-Currently does not work on Emacs 27. ;(
 #+begin_src elisp
 (use-package howdoyou
   :straight t)
 #+end_src
-
 ** Language-specific
 *** Web-mode
 For different types of templates and web markups and the like
@@ -807,8 +867,84 @@ Helpful adds a lot of very helpful (get it?) information to Emacs’ describe- c
   (nimor/leader-keys
     "fo" 'link-hint-open-link))
 #+end_src
-** Local Variables
-Adds a hook to tangle the file to ~init.el~ after saving.
-# Local Variables:
-# eval: (add-hook 'after-save-hook (lambda () (org-babel-tangle)) nil t)
-# End:
+** Email
+To read / sync email in emacs. Using this only on home computers.
+#+begin_src elisp
+(if (eq system-type 'gnu/linux)
+    (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e"))
+
+(use-package mu4e
+  :if (eq system-type 'gnu/linux)
+  :ensure-system-package mu
+  :config
+  (setq mu4e-sent-messages-behaviour 'delete)
+  (setq mu4e-get-mail-command "/usr/bin/mbsync -Va")
+  (setq mu4e-change-filenames-when-moving t)
+  (setq mu4e-update-interval 60)
+  (setq mu4e-use-fancy-chars t)
+  (setq mu4e-view-show-addresses t)
+  (setq mu4e-view-show-images t)
+  (add-to-list 'mu4e-view-actions '("view in browser" . mu4e-action-view-in-browser))
+  (setq mu4e-contexts
+    `( ,(make-mu4e-context
+          :name "Gmail"
+          :enter-func (lambda () (mu4e-message "Entering Gmail context"))
+          :match-func (lambda (msg)
+                        (when msg
+                          (string-match-p "^/gmail" (mu4e-message-field msg :maildir))))
+          :vars '( ( user-mail-address        . "nimor784@gmail.com" )
+                   ( user-full-name           . "Georgi Bozhinov")
+                   ( mu4e-sent-folder         . "/gmail/[Gmail]/Sent Mail")
+                   ( mu4e-trash-folder        . "/gmail/[Gmail]/Trash")
+                   ( mu4e-drafts-folder       . "/gmail/[Gmail]/Drafts")
+                   (smtpmail-smtp-server      . "smtp.gmail.com")
+                   (smtpmail-smtp-service     . 587)
+                   (smtpmail-stream-type      . starttls)
+                   (smtpmail-debug-info       . t)))
+       ,(make-mu4e-context
+          :name "Outlook"
+          :enter-func (lambda () (mu4e-message "Entering Outlook context"))
+          :match-func (lambda (msg)
+                        (when msg
+                          (string-match-p "^/outlook" (mu4e-message-field msg :maildir))))
+          :vars '( ( user-mail-address    . "georgi.bojinov@hotmail.com" )
+                   ( user-full-name       . "Georgi Bozhinov")
+                   ( mu4e-sent-folder     . "/outlook/Sent")
+                   ( mu4e-trash-folder    . "/outlook/Deleted")
+                   ( mu4e-drafts-folder   . "/outlook/Drafts")
+                   (smtpmail-smtp-server  . "smtp.office365.com")
+                   (smtpmail-smtp-service . 587)
+                   (smtpmail-stream-type  . starttls)
+                   (smtp-debug-info       . t)))
+  ))
+  (setq mu4e-context-policy 'pick-first)
+  (require 'org-mu4e))
+
+;; do not put a trashed flag on messages moved to deleted because then mu4e will delete them forever
+(setf (alist-get 'trash mu4e-marks)
+      (list :char '("d" . "▼")
+            :prompt "dtrash"
+            :dyn-target (lambda (target msg)
+                          (mu4e-get-trash-folder msg))
+            :action (lambda (docid msg target)
+                      ;; Here's the main difference to the regular trash mark,
+                      ;; no +T before -N so the message is not marked as
+                      ;; IMAP-deleted:
+                      (mu4e~proc-move docid (mu4e~mark-check-target target) "-N"))))
+
+(mu4e t)
+#+end_src
+
+Alerts for emails
+
+#+begin_src elisp
+;; Configure desktop notifs for incoming emails:
+(use-package mu4e-alert
+  :straight t
+  :after mu4e
+  :hook
+  ((after-init . mu4e-alert-enable-mode-line-display)
+   (after-init . mu4e-alert-enable-notifications))
+  :config
+  (mu4e-alert-set-default-style 'libnotify))
+#+end_src
