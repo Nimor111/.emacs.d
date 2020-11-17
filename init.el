@@ -146,7 +146,7 @@
   (nimor/leader-keys
     "a"  'org-agenda
     "b"  'counsel-bookmark
-    "ff" 'find-file
+    "SPC" 'find-file
     "/"  'swiper
     "pf" 'nimor/open-config
     "oc" 'org-capture
@@ -352,12 +352,16 @@
 (use-package alert
   :straight t
   :config
-  (setq alert-default-style 'notifications))
+  (setq alert-default-style
+    (if (eq system-type 'gnu/linux)
+        'notifications
+        'notifier)))
 
 (use-package org-wild-notifier
   :straight t
   :config
-  (org-wild-notifier-mode 1))
+  (org-wild-notifier-mode 1)
+  (setq org-wild-notifier-alert-time '(10 0)))
 
 (use-package org-pomodoro
   :straight t)
@@ -647,28 +651,35 @@
                    (smtp-debug-info       . t)))
   ))
   (setq mu4e-context-policy 'pick-first)
-  (require 'org-mu4e))
+  (require 'org-mu4e)
 
-;; do not put a trashed flag on messages moved to deleted because then mu4e will delete them forever
-(setf (alist-get 'trash mu4e-marks)
-      (list :char '("d" . "▼")
-            :prompt "dtrash"
-            :dyn-target (lambda (target msg)
+  (setf (alist-get 'trash mu4e-marks)
+        (list :char '("d" . "▼")
+              :prompt "dtrash"
+              :dyn-target (lambda (target msg)
                           (mu4e-get-trash-folder msg))
-            :action (lambda (docid msg target)
+              :action (lambda (docid msg target)
                       ;; Here's the main difference to the regular trash mark,
                       ;; no +T before -N so the message is not marked as
                       ;; IMAP-deleted:
                       (mu4e~proc-move docid (mu4e~mark-check-target target) "-N"))))
 
-(mu4e t)
+  (mu4e t))
+
+;; do not put a trashed flag on messages moved to deleted because then mu4e will delete them forever
 
 ;; Configure desktop notifs for incoming emails:
-(use-package mu4e-alert
+(when (eq system-type 'gnu/linux)
+  (use-package mu4e-alert
+    :straight t
+    :after mu4e
+    :hook
+    ((after-init . mu4e-alert-enable-mode-line-display)
+     (after-init . mu4e-alert-enable-notifications))
+    :config
+    (mu4e-alert-set-default-style 'libnotify)))
+
+(use-package persistent-scratch
   :straight t
-  :after mu4e
-  :hook
-  ((after-init . mu4e-alert-enable-mode-line-display)
-   (after-init . mu4e-alert-enable-notifications))
   :config
-  (mu4e-alert-set-default-style 'libnotify))
+  (persistent-scratch-setup-default))
