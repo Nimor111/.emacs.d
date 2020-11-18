@@ -144,19 +144,29 @@
     :global-prefix "C-SPC")
 
   (nimor/leader-keys
-    "a"  'org-agenda
     "b"  'counsel-bookmark
     "SPC" 'find-file
     "/"  'swiper
+
+    "p" '(:ignore t :which-key "file")
     "pf" 'nimor/open-config
-    "oc" 'org-capture
+
+    "e" 'mu4e
+
+    "g"  '(:ignore t :which-key "gtd")
     "gi" 'nimor/open-gtd-inbox
     "gg" 'nimor/open-gtd
     "gs" 'nimor/open-gtd-someday
     "gt" 'nimor/open-gtd-tickler
+
+    "o" '(:ignore t :which-key "org")
+    "oc" 'org-capture
+    "oa" 'org-agenda
+    "ot" 'nimor/open-tech-notebook
+
+    "m" '(:ignore t :which-key "todo")
     "mt" 'org-todo
-    "oe" 'mu4e
-    "ot" 'nimor/open-tech-notebook))
+    "ms" 'org-schedule))
 
 (defun nimor/org-mode-visual-fill ()
   (setq visual-fill-column-width 100
