@@ -239,7 +239,7 @@
     '("~/Nextcloud/Orgzly/gtd.org"
       "~/Nextcloud/Orgzly/tickler.org"
       "~/Nextcloud/Orgzly/inbox.org"
-      "~/Nextcloud/org/work"))
+      "~/Nextcloud/org/work/work.org"))
 
     ;; org-agenda custom views
     (setq org-agenda-custom-commands
