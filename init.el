@@ -102,36 +102,14 @@
 (setq gtd-someday-file "~/Nextcloud/Orgzly/someday.org")
 (setq gtd-tickler-file "~/Nextcloud/Orgzly/tickler.org")
 (setq tech-notebook-file "~/Nextcloud/org/tech_notebook.org")
+(setq work-file "~/Nextcloud/org/work/work.org")
 
-(defun nimor/open-config ()
-  "Open the init.org file"
-  (interactive)
-  (find-file user-init-file-org))
-
-(defun nimor/open-gtd-inbox ()
-  "Open the gtd inbox file"
-  (interactive)
-  (find-file gtd-inbox-file))
-
-(defun nimor/open-gtd ()
-  "Open the gtd file"
-  (interactive)
-  (find-file gtd-file))
-
-(defun nimor/open-gtd-someday ()
-  "Open the gtd someday file"
-  (interactive)
-  (find-file gtd-someday-file))
-
-(defun nimor/open-gtd-tickler ()
-  "Open the gtd tickler file"
-  (interactive)
-  (find-file gtd-tickler-file))
-
-(defun nimor/open-tech-notebook ()
-  "Open the tech notebook file"
-  (interactive)
-  (find-file tech-notebook-file))
+;; would love to be able to do it like this but it doesn't work for some reason
+(defun nimor/open-file (file-name)
+  "Open a specific file"
+  `(lambda ()
+     (interactive)
+     (find-file file-name)))
 
 (use-package general
   :straight t
@@ -148,21 +126,24 @@
     "SPC" 'find-file
     "/"  'swiper
 
-    "p" '(:ignore t :which-key "file")
-    "pf" 'nimor/open-config
+    "p"  '(:ignore t :which-key "file")
+    "pf" (list (lambda () (interactive) (find-file user-init-file-org)) :which-key "config")
 
     "e" 'mu4e
 
     "g"  '(:ignore t :which-key "gtd")
-    "gi" 'nimor/open-gtd-inbox
-    "gg" 'nimor/open-gtd
-    "gs" 'nimor/open-gtd-someday
-    "gt" 'nimor/open-gtd-tickler
+    "gi"  (list (lambda () (interactive) (find-file gtd-inbox-file))   :which-key "inbox")
+    "gg"  (list (lambda () (interactive) (find-file gtd-file))         :which-key "gtd")
+    "gs"  (list (lambda () (interactive) (find-file gtd-someday-file)) :which-key "someday")
+    "gt"  (list (lambda () (interactive) (find-file gtd-tickler-file)) :which-key "tickler")
 
-    "o" '(:ignore t :which-key "org")
+    "w"   (list (lambda () (interactive) (find-file work-file)) :which-key "work")
+
+    "o"  '(:ignore t :which-key "org")
     "oc" 'org-capture
     "oa" 'org-agenda
-    "ot" 'nimor/open-tech-notebook
+    "ot" (list (lambda () (interactive) (find-file tech-notebook-file)) :which-key "tech-notebook")
+    "op" 'org-pomodoro
 
     "m" '(:ignore t :which-key "todo")
     "mt" 'org-todo
