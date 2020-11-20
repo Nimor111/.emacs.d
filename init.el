@@ -260,7 +260,7 @@
           ("T" "Tickler" entry
           (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
           "* TODO %i%? \n SCHEDULED: %T")
-          ("m" "Mail Todo with link" entry
+          ("M" "Mail Todo with link" entry
           (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
           "* TODO %i%? \n:PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")))
 
@@ -289,15 +289,35 @@
   (after-init . org-roam-mode)
   :custom
   (org-roam-directory "~/Nextcloud/org-roam")
-  :bind (:map org-roam-mode-map
-    (("C-c n l" . org-roam)
-     ("C-c n f" . org-roam-find-file)
-     ("C-c n g" . org-roam-graph-show))
-    :map org-mode-map
-    (("C-c n i" . org-roam-insert))
-    (("C-c n I" . org-roam-insert-immediate)))
   :config
-  (setq org-roam-completion-everywhere t))
+  (setq org-roam-directory "~/Nextcloud/org-roam")
+  (nimor/leader-keys
+    "n" '(:ignore t :which-key "org-roam")
+    "nl" 'org-roam
+    "nf" 'org-roam-find-file
+    "ng" 'org-roam-graph-show
+    "ni" 'org-roam-insert
+    "nI" 'org-roam-insert-immediate
+    "no" 'org-roam-dailies-capture-today)
+
+  (setq org-roam-completion-everywhere t)
+
+  (setq org-roam-dailies-directory "daily/")
+
+  (setq org-roam-dailies-capture-templates
+    '(("m" "meeting" entry
+       #'org-roam-capture--get-point
+       "* %?"
+       :file-name "daily/%<%Y-%m-%d>"
+       :head "#+title: %<%Y-%m-%d>\n"
+       :olp ("Meeting notes"))
+
+      ("j" "journal" entry
+       #'org-roam-capture--get-point
+       "* %?"
+       :file-name "daily/%<%Y-%m-%d>"
+       :head "#+title: %<%Y-%m-%d>\n"
+       :olp ("Journal")))))
 
 (use-package deft
   :straight t
