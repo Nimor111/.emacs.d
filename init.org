@@ -60,7 +60,9 @@
     - [[#ruby][Ruby]]
     - [[#typescript][Typescript]]
     - [[#scala][Scala]]
-  - [[#projects][Projects]]
+    - [[#gdscript][GDScript]]
+    - [[#python][Python]]
+  - [[#projectile][Projectile]]
   - [[#parens][Parens]]
   - [[#flycheck][Flycheck]]
   - [[#emojify][Emojify]]
@@ -232,19 +234,28 @@ Make escape quit prompts.
 ;; would love to be able to do it like this but it doesn't work for some reason
 (defun nimor/open-file (file-name)
   "Open a specific file"
-  `(lambda ()
-     (interactive)
-     (find-file file-name)))
+  (lambda ()
+    (interactive)
+    (find-file file-name)))
 
 (use-package general
   :straight t
   :config
   (general-evil-setup t)
 
+  ;; general leader key
   (general-create-definer nimor/leader-keys
     :keymaps '(normal insert visual emacs)
     :prefix "SPC"
     :global-prefix "C-SPC")
+
+  ;; leader key for language specific bindings
+  (general-create-definer nimor/language-leader-def
+    :keymaps '(normal insert visual emacs)
+    :prefix "SPC l"
+    ;; for insert mode
+    :global-prefix "C-SPC l"
+    "" '(:ignore t :which-key "language"))
 
   (nimor/leader-keys
     "b"  'counsel-bookmark
@@ -252,7 +263,7 @@ Make escape quit prompts.
     "/"  'swiper
 
     "p"  '(:ignore t :which-key "file")
-    "pf" (list (lambda () (interactive) (find-file user-init-file-org)) :which-key "config")
+    "pf"  (list (lambda () (interactive) (find-file user-init-file-org)) :which-key "config")
 
     "e" 'mu4e
 
@@ -374,63 +385,67 @@ Installing and configuring org-mode:
   (visual-line-mode 1))
 
 (use-package org
-    :straight t
-    :hook
-    (org-mode . nimor/org-mode-setup)
-    :config
-    (require 'org-tempo)
+  :straight t
+  :hook
+  (org-mode . nimor/org-mode-setup)
+  :config
+  (require 'org-tempo)
 
-    ;; make org-agenda respect evil
-    (evil-set-initial-state 'org-agenda-mode 'normal)
+  ;; make org-agenda respect evil
+  (evil-set-initial-state 'org-agenda-mode 'normal)
 
-    ;; org-agenda custom bindings
-    (evil-define-key 'normal org-agenda-mode-map
-      "vd" 'org-agenda-day-view
-      "vw" 'org-agenda-week-view
-      "I"  'org-agenda-clock-in
-      "O"  'org-agenda-clock-out)
+  ;; org-agenda custom bindings
+  (evil-define-key 'normal org-agenda-mode-map
+    "vd" 'org-agenda-day-view
+    "vw" 'org-agenda-week-view
+    "I"  'org-agenda-clock-in
+    "O"  'org-agenda-clock-out)
 
-    ;; files that org-agenda will read from 
-    (setq org-agenda-files
-    '("~/Nextcloud/Orgzly/gtd.org"
-      "~/Nextcloud/Orgzly/tickler.org"
-      "~/Nextcloud/Orgzly/inbox.org"
-      "~/Nextcloud/org/work/work.org"))
+  ;; files that org-agenda will read from 
+  (setq org-agenda-files
+  '("~/Nextcloud/Orgzly/gtd.org"
+    "~/Nextcloud/Orgzly/tickler.org"
+    "~/Nextcloud/Orgzly/inbox.org"
+    "~/Nextcloud/org/work/work.org"))
 
-    ;; org-agenda custom views
-    (setq org-agenda-custom-commands
-      '(("g" "GTD" tags-todo "@gtd"
-        ((org-agenda-overriding-header "GTD")))))
+  ;; org-agenda custom views
+  (setq org-agenda-custom-commands
+    '(("g" "GTD" tags-todo "@gtd"
+      ((org-agenda-overriding-header "GTD")))))
 
-    ;; files to refile to
-    (setq org-refile-targets
-        '(("~/Nextcloud/Orgzly/gtd.org"     :maxlevel . 3)
-          ("~/Nextcloud/Orgzly/someday.org" :level    . 1)
-          ("~/Nextcloud/Orgzly/tickler.org" :maxlevel . 2)))
+  ;; files to refile to
+  (setq org-refile-targets
+    '(("~/Nextcloud/Orgzly/gtd.org"     :maxlevel . 3)
+      ("~/Nextcloud/Orgzly/someday.org" :level    . 1)
+      ("~/Nextcloud/Orgzly/tickler.org" :maxlevel . 2)))
 
-    ;; quick templates for org files
-    (setq org-capture-templates
-        '(("t" "Todo [inbox]" entry
-          (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
-         "* TODO %i%?")
-          ("T" "Tickler" entry
-          (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
-          "* TODO %i%? \n SCHEDULED: %T")
-          ("M" "Mail Todo with link" entry
-          (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
-          "* TODO %i%? \n:PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")))
+  ;; quick templates for org files
+  (setq org-capture-templates
+    '(("t" "Todo [inbox]" entry
+      (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
+     "* TODO %i%?")
+      ("T" "Tickler" entry
+      (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
+      "* TODO %i%? \n SCHEDULED: %T")
+      ("M" "Mail Todo with link" entry
+      (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
+      "* TODO %i%? \n:PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")))
 
-    (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
+  ;; TODO keywords that I use - the ones after the | are the done states
+  (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
 
-    (setq org-startup-indented t)
-    (setq org-startup-folded t)
-    (setq org-log-done 'note)
-    (setq org-tags-column 0)
-    (setq org-agenda-tags-column 0)
-    ;; src block indentation / editing / syntax highlighting
-    (setq org-src-fontify-natively t
-          org-src-preserve-indentation t ;; do not put two spaces on the left
-          org-src-tab-acts-natively t))
+  ;; Clocking settings
+  (setq org-pretty-entities t)
+
+  ;; indentation settings and other misc stuff
+  (setq org-startup-indented t)
+  (setq org-startup-folded t)
+  (setq org-log-done 'note)
+  (setq org-tags-column 0)
+  (setq org-agenda-tags-column 0)
+  (setq org-src-fontify-natively t
+        org-src-preserve-indentation t ;; do not put two spaces on the left
+        org-src-tab-acts-natively t))
 #+end_src
 
 Like org bullets, but supercharged?
@@ -530,6 +545,7 @@ Table of contents on save for org files, it's awesome
 *** Org journal
 For your journaling needs.
 #+begin_src elisp
+;; TODO Remove this as it's in org roam now
 (use-package org-journal
   :straight t
   :config
@@ -545,7 +561,8 @@ For your journaling needs.
   (org-babel-do-load-languages
     'org-babel-load-languages
       '((python . t)
-       )))
+        (shell  . t)
+      )))
 #+end_src
 *** Notifications
 #+begin_src elisp
@@ -702,7 +719,9 @@ For different types of templates and web markups and the like
   :hook (web-mode . emmet-mode)
   :mode
   ("\\.erb\\'" . web-mode)
-  ("\\.html?\\'" . web-mode))
+  ("\\.html?\\'" . web-mode)
+  :config
+  (setq web-mode-engines-alist '(("django" . "\\.html\\'"))))
 #+end_src
 
 Add emmet for tag completion and stuff
@@ -720,13 +739,28 @@ For your general language needs.
   (lsp-rust-server 'rust-analyzer)
   (lsp-rust-analyzer-server-command "/usr/bin/rust-analyzer")
   :hook
-  (rust-mode . lsp)
-  (ruby-mode . lsp)
+  (rust-mode     . lsp)
+  (ruby-mode     . lsp)
+  (gdscript-mode . lsp)
   :commands lsp)
 
 (use-package lsp-ui 
   :straight t
   :commands lsp-ui-mode)
+
+(defun lsp--gdscript-ignore-errors (original-function &rest args)
+  "Ignore the error message resulting from Godot not replying to the `JSONRPC' request."
+  (if (string-equal major-mode "gdscript-mode")
+      (let ((json-data (nth 0 args)))
+        (if (and (string= (gethash "jsonrpc" json-data "") "2.0")
+                 (not (gethash "id" json-data nil))
+                 (not (gethash "method" json-data nil)))
+            nil ; (message "Method not found")
+          (apply original-function args)))
+    (apply original-function args)))
+
+;; Runs the function `lsp--gdscript-ignore-errors` around `lsp--get-message-type` to suppress unknown notification errors.
+(advice-add #'lsp--get-message-type :around #'lsp--gdscript-ignore-errors)
 #+end_src
 *** Rust
 #+begin_src elisp
@@ -798,7 +832,28 @@ For those pesky shaders.
   (load-file (concat user-emacs-directory "/lisp/ob-scala.el"))) ;; for org babel evaluating of scala code blocks
 #+end_src
 
-** Projects
+*** GDScript
+#+begin_src elisp
+(use-package gdscript-mode
+  :ensure-system-package godot
+  :straight
+  (gdscript-mode
+     :type git
+     :host github
+     :repo "GDQuest/emacs-gdscript-mode"))
+#+end_src
+*** Python
+#+begin_src elisp
+(use-package elpy
+  :straight t
+  :init
+  (elpy-enable))
+
+(nimor/language-leader-def
+  "p" '(:ignore t :which-key "python")
+  "pf" 'elpy-autopep8-fix-code)
+#+end_src
+** Projectile
 #+begin_src elisp
 (use-package projectile
   :straight t
