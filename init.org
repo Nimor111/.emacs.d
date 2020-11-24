@@ -12,6 +12,7 @@
   - [[#general-configs][General configs]]
     - [[#tangle-config-file-on-save][Tangle config file on save]]
     - [[#custom-vars-file][Custom vars file]]
+    - [[#start-emacs-in-fullscreen][Start emacs in fullscreen]]
     - [[#set-the-emacs-user-directory][Set the emacs user directory]]
     - [[#set-the-default-font][Set the default font]]
     - [[#set-the-theme][Set the theme]]
@@ -120,6 +121,10 @@ Courtesy of the great emacs from scratch config: [[https://github.com/daviwil/em
 
 (when (file-exists-p custom-file)
   (load custom-file t))
+#+end_src
+*** Start emacs in fullscreen
+#+begin_src elisp
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
 #+end_src
 *** Set the emacs user directory
 #+begin_src elisp
@@ -273,7 +278,7 @@ Make escape quit prompts.
     "gs"  (list (lambda () (interactive) (find-file gtd-someday-file)) :which-key "someday")
     "gt"  (list (lambda () (interactive) (find-file gtd-tickler-file)) :which-key "tickler")
 
-    "w"   (list (lambda () (interactive) (find-file work-file)) :which-key "work")
+    "fw"   (list (lambda () (interactive) (find-file work-file)) :which-key "work")
 
     "o"  '(:ignore t :which-key "org")
     "oc" 'org-capture
@@ -283,7 +288,13 @@ Make escape quit prompts.
 
     "m" '(:ignore t :which-key "todo")
     "mt" 'org-todo
-    "ms" 'org-schedule))
+    "ms" 'org-schedule
+
+    "w" '(:ignore t :which-key "window")
+    "wh" 'evil-window-left
+    "wl" 'evil-window-right
+    "wk" 'evil-window-up
+    "wj" 'evil-window-down))
 #+end_src
 ** Margins
 #+begin_src elisp
@@ -334,13 +345,6 @@ Vim keybinds and goodness in emacs
   (setq evil-want-keybinding nil)
   :config
   (evil-mode 1)
-  ;; sane window management
-  (evil-define-key 'normal 'global
-    (kbd "C-h") 'evil-window-left
-    (kbd "C-l") 'evil-window-right
-    (kbd "C-k") 'evil-window-up
-    (kbd "C-j") 'evil-window-down)
-
   (evil-set-initial-state 'dashboard-mode 'normal)
   (evil-set-undo-system 'undo-tree))
 #+end_src

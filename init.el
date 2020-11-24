@@ -32,6 +32,8 @@
 (when (file-exists-p custom-file)
   (load custom-file t))
 
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+
 (let* ((home-dir (getenv "HOME"))
      (custom-emacs-directory (concat home-dir "/.emacs.d")))
   (setq user-emacs-directory custom-emacs-directory))
@@ -146,7 +148,7 @@
     "gs"  (list (lambda () (interactive) (find-file gtd-someday-file)) :which-key "someday")
     "gt"  (list (lambda () (interactive) (find-file gtd-tickler-file)) :which-key "tickler")
 
-    "w"   (list (lambda () (interactive) (find-file work-file)) :which-key "work")
+    "fw"   (list (lambda () (interactive) (find-file work-file)) :which-key "work")
 
     "o"  '(:ignore t :which-key "org")
     "oc" 'org-capture
@@ -156,7 +158,13 @@
 
     "m" '(:ignore t :which-key "todo")
     "mt" 'org-todo
-    "ms" 'org-schedule))
+    "ms" 'org-schedule
+
+    "w" '(:ignore t :which-key "window")
+    "wh" 'evil-window-left
+    "wl" 'evil-window-right
+    "wk" 'evil-window-up
+    "wj" 'evil-window-down))
 
 (defun nimor/org-mode-visual-fill ()
   (setq visual-fill-column-width 100
@@ -194,13 +202,6 @@
   (setq evil-want-keybinding nil)
   :config
   (evil-mode 1)
-  ;; sane window management
-  (evil-define-key 'normal 'global
-    (kbd "C-h") 'evil-window-left
-    (kbd "C-l") 'evil-window-right
-    (kbd "C-k") 'evil-window-up
-    (kbd "C-j") 'evil-window-down)
-
   (evil-set-initial-state 'dashboard-mode 'normal)
   (evil-set-undo-system 'undo-tree))
 
