@@ -203,7 +203,9 @@
   :config
   (evil-mode 1)
   (evil-set-initial-state 'dashboard-mode 'normal)
-  (evil-set-undo-system 'undo-tree))
+  (evil-set-undo-system 'undo-tree)
+  (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
+  (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line))
 
 (use-package evil-org
   :straight t
@@ -714,6 +716,7 @@
   (setq mu4e-context-policy 'pick-first)
   (require 'org-mu4e)
 
+;; do not put a trashed flag on messages moved to deleted because then mu4e will delete them forever
   (setf (alist-get 'trash mu4e-marks)
         (list :char '("d" . "▼")
               :prompt "dtrash"
@@ -726,8 +729,6 @@
                       (mu4e~proc-move docid (mu4e~mark-check-target target) "-N"))))
 
   (mu4e t))
-
-;; do not put a trashed flag on messages moved to deleted because then mu4e will delete them forever
 
 ;; Configure desktop notifs for incoming emails:
 (when (eq system-type 'gnu/linux)
