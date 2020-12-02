@@ -323,14 +323,14 @@
   (setq org-roam-dailies-capture-templates
     '(("m" "meeting" entry
        #'org-roam-capture--get-point
-       "* %?"
+       "* %<%H:%M> %?"
        :file-name "daily/%<%Y-%m-%d>"
        :head "#+title: %<%Y-%m-%d>\n"
        :olp ("Meeting notes"))
 
       ("j" "journal" entry
        #'org-roam-capture--get-point
-       "* %?"
+       "* %<%H:%M> %?"
        :file-name "daily/%<%Y-%m-%d>"
        :head "#+title: %<%Y-%m-%d>\n"
        :olp ("Journal")))))
@@ -393,7 +393,11 @@
   (setq org-wild-notifier-alert-time '(10 0)))
 
 (use-package org-pomodoro
-  :straight t)
+  :straight t
+  :config
+  (setq org-pomodoro-finished-sound (concat user-emacs-directory "/eraser.mp3"))
+  (setq org-pomodoro-short-break-sound (concat user-emacs-directory "/eraser.mp3"))
+  (setq org-pomodoro-long-break-sound (concat user-emacs-directory "/eraser.mp3")))
 
 (use-package magit
   :straight t)
@@ -514,6 +518,7 @@
   (rust-mode     . lsp)
   (ruby-mode     . lsp)
   (gdscript-mode . lsp)
+  (scala-mode    . lsp)
   :commands lsp)
 
 (use-package lsp-ui 
@@ -589,6 +594,10 @@
   :mode "\\.s\\(cala\\|bt\\)$"
   :config
   (load-file (concat user-emacs-directory "/lisp/ob-scala.el"))) ;; for org babel evaluating of scala code blocks
+
+(use-package lsp-metals
+  :straight t
+  :config (setq lsp-metals-treeview-show-when-views-received t))
 
 (use-package gdscript-mode
   :ensure-system-package godot
