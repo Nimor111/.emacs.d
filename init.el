@@ -460,7 +460,8 @@
   :config
   (setq ivy-use-virtual-buffers t)
   (setq ivy-count-format "%d/%d ")
-  (define-key evil-ex-map "b" 'ivy-switch-buffer) ;; List buffers ( Vim way )
+  ;;(define-key evil-ex-map "b" 'ivy-switch-buffer) ;; List buffers ( Vim way )
+  (define-key evil-ex-map "b" 'counsel-ibuffer) ;; List buffers ( Vim way )
   ;; Press M-o when inside the ivy minibuffer for the actions to show
   (ivy-set-actions
     'counsel-find-file
