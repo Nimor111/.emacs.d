@@ -148,13 +148,18 @@
     "gs"  (list (lambda () (interactive) (find-file gtd-someday-file)) :which-key "someday")
     "gt"  (list (lambda () (interactive) (find-file gtd-tickler-file)) :which-key "tickler")
 
-    "fw"   (list (lambda () (interactive) (find-file work-file)) :which-key "work")
+    "fw"  (list (lambda () (interactive) (find-file work-file)) :which-key "work")
 
     "o"  '(:ignore t :which-key "org")
     "oc" 'org-capture
     "oa" 'org-agenda
-    "ot" (list (lambda () (interactive) (find-file tech-notebook-file)) :which-key "tech-notebook")
     "op" 'org-pomodoro
+
+    "ot" '(:ignore t :which-key "timestamp")
+    "otu" 'org-timestamp-up-day
+    "otd" 'org-timestamp-down-day
+
+    "tn" (list (lambda () (interactive) (find-file tech-notebook-file)) :which-key "tech-notebook")
 
     "m" '(:ignore t :which-key "todo")
     "mt" 'org-todo
@@ -164,7 +169,9 @@
     "wh" 'evil-window-left
     "wl" 'evil-window-right
     "wk" 'evil-window-up
-    "wj" 'evil-window-down))
+    "wj" 'evil-window-down
+
+    "hd" 'howdoyou-query))
 
 (defun nimor/org-mode-visual-fill ()
   (setq visual-fill-column-width 100
