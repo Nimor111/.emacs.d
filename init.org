@@ -48,6 +48,7 @@
     - [[#notifications][Notifications]]
     - [[#pomodoro][Pomodoro]]
     - [[#kanban][Kanban]]
+    - [[#org-super-agenda][Org super agenda]]
   - [[#magit][Magit]]
   - [[#helm][Helm]]
   - [[#counsel][Counsel]]
@@ -460,7 +461,8 @@ Installing and configuring org-mode:
     "~/Nextcloud/Orgzly/tickler.org"
     "~/Nextcloud/Orgzly/inbox.org"
     "~/Nextcloud/Orgzly/daily.org"
-    "~/Nextcloud/org/work/work.org"))
+    "~/Nextcloud/org/work/work.org"
+    "~/Nextcloud/org/reading_list.org"))
 
   ;; org-agenda custom views
   (setq org-agenda-custom-commands
@@ -693,6 +695,22 @@ For your journaling needs.
 (use-package org-kanban
   :straight t
   :after org)
+#+end_src
+*** Org super agenda
+For a better way to group entries in the agenda.
+#+begin_src elisp
+(use-package org-super-agenda
+  :straight t
+  :after org
+  :config
+  (org-super-agenda-mode 1)
+  ;; conflicts of header bindings with evil-mode
+  (setq org-super-agenda-header-map nil)
+  (setq org-super-agenda-groups
+       '((:auto-category t)
+         (:discard (:not  ; Is it easier to read like this?
+                    (:and
+                     (:todo "READING" :file-path "reading_list")))))))
 #+end_src
 ** Magit
 The git supercharge

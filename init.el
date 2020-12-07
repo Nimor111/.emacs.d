@@ -288,7 +288,8 @@
     "~/Nextcloud/Orgzly/tickler.org"
     "~/Nextcloud/Orgzly/inbox.org"
     "~/Nextcloud/Orgzly/daily.org"
-    "~/Nextcloud/org/work/work.org"))
+    "~/Nextcloud/org/work/work.org"
+    "~/Nextcloud/org/reading_list.org"))
 
   ;; org-agenda custom views
   (setq org-agenda-custom-commands
@@ -480,6 +481,19 @@
 (use-package org-kanban
   :straight t
   :after org)
+
+(use-package org-super-agenda
+  :straight t
+  :after org
+  :config
+  (org-super-agenda-mode 1)
+  ;; conflicts of header bindings with evil-mode
+  (setq org-super-agenda-header-map nil)
+  (setq org-super-agenda-groups
+       '((:auto-category t)
+         (:discard (:not  ; Is it easier to read like this?
+                    (:and
+                     (:todo "READING" :file-path "reading_list")))))))
 
 (use-package magit
   :straight t
