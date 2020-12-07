@@ -172,6 +172,8 @@
     "oc"  'org-capture
     "oa"  'org-agenda
     "op"  'org-pomodoro
+    "or"  'org-refile
+    "os"  'org-archive-subtree
     "ok"  '(:ignore t :which-key "kanban")
     "oki" 'org-kanban/initialize-at-end
     "oks" 'org-kanban/shift
