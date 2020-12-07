@@ -475,8 +475,6 @@
   (setq org-pomodoro-short-break-sound (concat user-emacs-directory "/eraser.mp3"))
   (setq org-pomodoro-long-break-sound (concat user-emacs-directory "/eraser.mp3")))
 
-
-
 (use-package org-kanban
   :straight t
   :after org)

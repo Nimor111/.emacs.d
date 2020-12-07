@@ -47,7 +47,6 @@
     - [[#org-babel][Org babel]]
     - [[#notifications][Notifications]]
     - [[#pomodoro][Pomodoro]]
-    - [[#embed-yt-videos][Embed YT videos]]
     - [[#kanban][Kanban]]
   - [[#magit][Magit]]
   - [[#helm][Helm]]
@@ -686,11 +685,6 @@ For your journaling needs.
   (setq org-pomodoro-finished-sound (concat user-emacs-directory "/eraser.mp3"))
   (setq org-pomodoro-short-break-sound (concat user-emacs-directory "/eraser.mp3"))
   (setq org-pomodoro-long-break-sound (concat user-emacs-directory "/eraser.mp3")))
-#+end_src
-*** Embed YT videos
-Well, in HTML exports
-Creating a new type of org mode link
-#+begin_src elisp
 #+end_src
 *** Kanban
 #+begin_src elisp
