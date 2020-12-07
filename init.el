@@ -96,6 +96,21 @@
   :init
   (global-undo-tree-mode))
 
+(setq display-buffer-alist
+  `(;; Messages, errors, processes, Calendar in the bottom side window
+     (,(rx bos (or "*Emacs Log*"))  ; interaction log *Emacs Log*
+       (display-buffer-reuse-window display-buffer-in-side-window)
+       (side . right)
+       (reusable-frames . visible)
+       (window-height . 0.45))
+       ;; Let `display-buffer' reuse visible frames for all buffers. This must
+       ;; be the last entry in `display-buffer-alist', because it overrides any
+       ;; previous entry with more actions.
+     ("." nil (reusable-frames . visible))))
+
+(use-package simple
+  :hook (before-save . delete-trailing-whitespace))
+
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 (setq user-init-file-org "~/.emacs.d/init.org")
@@ -103,6 +118,7 @@
 (setq gtd-file "~/Nextcloud/Orgzly/gtd.org")
 (setq gtd-someday-file "~/Nextcloud/Orgzly/someday.org")
 (setq gtd-tickler-file "~/Nextcloud/Orgzly/tickler.org")
+(setq daily-file "~/Nextcloud/Orgzly/daily.org")
 (setq tech-notebook-file "~/Nextcloud/org/tech_notebook.org")
 (setq work-file "~/Nextcloud/org/work/work.org")
 
@@ -140,7 +156,7 @@
     "p"  '(:ignore t :which-key "file")
     "pf"  (list (lambda () (interactive) (find-file user-init-file-org)) :which-key "config")
 
-    "e" 'mu4e
+    "e"  'mu4e
 
     "g"  '(:ignore t :which-key "gtd")
     "gi"  (list (lambda () (interactive) (find-file gtd-inbox-file))   :which-key "inbox")
@@ -148,12 +164,17 @@
     "gs"  (list (lambda () (interactive) (find-file gtd-someday-file)) :which-key "someday")
     "gt"  (list (lambda () (interactive) (find-file gtd-tickler-file)) :which-key "tickler")
 
+    "fd"  (list (lambda () (interactive) (find-file daily-file)) :which-key "daily")
+
     "fw"  (list (lambda () (interactive) (find-file work-file)) :which-key "work")
 
-    "o"  '(:ignore t :which-key "org")
-    "oc" 'org-capture
-    "oa" 'org-agenda
-    "op" 'org-pomodoro
+    "o"   '(:ignore t :which-key "org")
+    "oc"  'org-capture
+    "oa"  'org-agenda
+    "op"  'org-pomodoro
+    "ok"  '(:ignore t :which-key "kanban")
+    "oki" 'org-kanban/initialize-at-end
+    "oks" 'org-kanban/shift
 
     "ot" '(:ignore t :which-key "timestamp")
     "otu" 'org-timestamp-up-day
@@ -171,7 +192,15 @@
     "wk" 'evil-window-up
     "wj" 'evil-window-down
 
-    "hd" 'howdoyou-query))
+    "hd" 'howdoyou-query
+
+    "x"   '(:ignore t :which-key "buffer")
+    "xk"  'kill-buffer
+    "xs"  '(:ignore t :which-key "split-window")
+    "xsr" 'split-window-right
+    "xsb" 'split-window-below
+
+    "ie"  'emojify-insert-emoji))
 
 (defun nimor/org-mode-visual-fill ()
   (setq visual-fill-column-width 100
@@ -241,8 +270,6 @@
   :hook
   (org-mode . nimor/org-mode-setup)
   :config
-  (require 'org-tempo)
-
   ;; make org-agenda respect evil
   (evil-set-initial-state 'org-agenda-mode 'normal)
 
@@ -253,11 +280,12 @@
     "I"  'org-agenda-clock-in
     "O"  'org-agenda-clock-out)
 
-  ;; files that org-agenda will read from 
+  ;; files that org-agenda will read from
   (setq org-agenda-files
   '("~/Nextcloud/Orgzly/gtd.org"
     "~/Nextcloud/Orgzly/tickler.org"
     "~/Nextcloud/Orgzly/inbox.org"
+    "~/Nextcloud/Orgzly/daily.org"
     "~/Nextcloud/org/work/work.org"))
 
   ;; org-agenda custom views
@@ -267,9 +295,9 @@
 
   ;; files to refile to
   (setq org-refile-targets
-    '(("~/Nextcloud/Orgzly/gtd.org"     :maxlevel . 3)
-      ("~/Nextcloud/Orgzly/someday.org" :level    . 1)
-      ("~/Nextcloud/Orgzly/tickler.org" :maxlevel . 2)))
+    '(("~/Nextcloud/Orgzly/gtd.org"     :maxlevel . 9)
+      ("~/Nextcloud/Orgzly/someday.org" :maxlevel . 9)
+      ("~/Nextcloud/Orgzly/tickler.org" :maxlevel . 9)))
 
   ;; quick templates for org files
   (setq org-capture-templates
@@ -281,10 +309,19 @@
       "* TODO %i%? \n SCHEDULED: %T")
       ("M" "Mail Todo with link" entry
       (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
-      "* TODO %i%? \n:PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")))
+      "* TODO %i%? \n:PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
+      ("W" "Finnish word of the day" entry
+      (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
+      "* TODO Word of the day - %t \n:PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
+      ("d" "Todo [daily]" entry
+        (file+olp+datetree "~/Nextcloud/Orgzly/daily.org")
+        "* TODO %i%? \n SCHEDULED: %t")
+      ("D" "Todo with link [daily]" entry
+        (file+olp+datetree "~/Nextcloud/Orgzly/daily.org")
+        "* TODO %a \n SCHEDULED: %t")))
 
   ;; TODO keywords that I use - the ones after the | are the done states
-  (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
+  (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "IN PROGRESS(p)" "|" "DONE(d)" "CANCELLED(c)")))
 
   ;; Clocking settings
   (setq org-pretty-entities t)
@@ -297,17 +334,42 @@
   (setq org-agenda-tags-column 0)
   (setq org-src-fontify-natively t
         org-src-preserve-indentation t ;; do not put two spaces on the left
-        org-src-tab-acts-natively t))
+        org-src-tab-acts-natively t)
+
+  (setq yt-iframe-format
+    ;; You may want to change your width and height.
+    (concat "<iframe width=\"440\""
+            " height=\"335\""
+            " src=\"https://www.youtube.com/embed/%s\""
+            " frameborder=\"0\""
+            " allowfullscreen>%s</iframe>"))
+
+  (org-add-link-type
+   "yt"
+   (lambda (handle)
+     (browse-url
+      (concat "https://www.youtube.com/embed/"
+              handle)))
+   (lambda (path desc backend)
+     (cl-case backend
+       (html (format yt-iframe-format
+                   path (or desc "")))
+       (latex (format "\href{%s}{%s}"
+                    path (or desc "video")))))))
 
 (use-package org-superstar
   :straight t
   :after org
   :hook (org-mode . org-superstar-mode))
 
+(use-package org-tempo
+  :after org)
+
 (add-hook 'org-mode-hook (lambda () (display-line-numbers-mode 0)))
 
 (use-package org-roam
-  :straight t
+  :straight
+  (:host github :repo "jethrokuan/org-roam" :branch "master")
   :hook
   (after-init . org-roam-mode)
   :custom
@@ -328,12 +390,12 @@
   (setq org-roam-dailies-directory "daily/")
 
   (setq org-roam-dailies-capture-templates
-    '(("m" "meeting" entry
+    '(("d" "daily" entry
        #'org-roam-capture--get-point
        "* %<%H:%M> %?"
        :file-name "daily/%<%Y-%m-%d>"
        :head "#+title: %<%Y-%m-%d>\n"
-       :olp ("Meeting notes"))
+       :olp ("Daily notes"))
 
       ("j" "journal" entry
        #'org-roam-capture--get-point
@@ -365,12 +427,14 @@
 
 (use-package toc-org
   :straight t
+  :after org
   :hook
-  (org-mode . toc-org-mode))
+  (org-mode . toc-org-enable))
 
 ;; TODO Remove this as it's in org roam now
 (use-package org-journal
   :straight t
+  :after org
   :config
   (setq org-journal-dir "~/Documents/journal")
   (setq org-journal-date-format "%A, %d %B %Y")
@@ -378,6 +442,8 @@
     "nj" 'org-journal-new-entry))
 
 (use-package ob
+  :defer t
+  :after org
   :config
   (org-babel-do-load-languages
     'org-babel-load-languages
@@ -387,6 +453,7 @@
 
 (use-package alert
   :straight t
+  :defer t
   :config
   (setq alert-default-style
     (if (eq system-type 'gnu/linux)
@@ -395,19 +462,28 @@
 
 (use-package org-wild-notifier
   :straight t
+  :after org
   :config
   (org-wild-notifier-mode 1)
   (setq org-wild-notifier-alert-time '(10 0)))
 
 (use-package org-pomodoro
   :straight t
+  :after org
   :config
   (setq org-pomodoro-finished-sound (concat user-emacs-directory "/eraser.mp3"))
   (setq org-pomodoro-short-break-sound (concat user-emacs-directory "/eraser.mp3"))
   (setq org-pomodoro-long-break-sound (concat user-emacs-directory "/eraser.mp3")))
 
+
+
+(use-package org-kanban
+  :straight t
+  :after org)
+
 (use-package magit
-  :straight t)
+  :straight t
+  :defer t)
 
 (setq-default with-editor-emacsclient-executable "emacsclient")
 
@@ -490,20 +566,20 @@
   :after (company)
   :hook (lua-mode my-lua-mode-company-init))
 
-(use-package yasnippet
-  :straight t
-  :demand t
-  :custom
-  (yas-also-auto-indent-first-line t)
-  (yas-also-indent-empty-lines t)
-  :config
-  (yas-global-mode t))
+;; (use-package yasnippet
+;;   :straight t
+;;   :custom
+;;   (yas-also-auto-indent-first-line t)
+;;   (yas-also-indent-empty-lines t)
+;;   :config
+;;   (yas-global-mode t))
 
-(use-package yasnippet-snippets
-  :straight t)
+;; (use-package yasnippet-snippets
+;;   :straight t)
 
 (use-package howdoyou
-  :straight t)
+  :straight t
+  :defer t)
 
 (use-package web-mode
   :straight t
@@ -529,7 +605,7 @@
   (scala-mode    . lsp)
   :commands lsp)
 
-(use-package lsp-ui 
+(use-package lsp-ui
   :straight t
   :commands lsp-ui-mode)
 
@@ -605,6 +681,7 @@
 
 (use-package lsp-metals
   :straight t
+  :defer t
   :config (setq lsp-metals-treeview-show-when-views-received t))
 
 (use-package gdscript-mode
@@ -613,20 +690,25 @@
   (gdscript-mode
      :type git
      :host github
-     :repo "GDQuest/emacs-gdscript-mode"))
+     :repo "GDQuest/emacs-gdscript-mode")
+  :defer t)
 
 (use-package elpy
   :straight t
+  :defer t
   :init
-  (elpy-enable))
+  (advice-add 'python-mode :before 'elpy-enable))
 
 (nimor/language-leader-def
   "p" '(:ignore t :which-key "python")
   "pf" 'elpy-autopep8-fix-code)
 
+(use-package cider
+  :straight t)
+
 (use-package projectile
   :straight t
-  :config 
+  :config
   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   (setq projectile-track-known-projects-automatically nil)
@@ -762,3 +844,16 @@
   :straight t
   :config
   (persistent-scratch-setup-default))
+
+(use-package esup
+  :straight t
+  :config
+  ;; don't try to follow symlinks in straight.el repos
+  (setq esup-depth 0)
+  (setq esup-user-init-file (file-truename "~/.emacs.d/init.el")))
+
+(use-package emms
+  :straight t
+  :config
+  (emms-all)
+  (emms-default-players))
