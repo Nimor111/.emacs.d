@@ -96,17 +96,17 @@
   :init
   (global-undo-tree-mode))
 
-(setq display-buffer-alist
-  `(;; Messages, errors, processes, Calendar in the bottom side window
-     (,(rx bos (or "*Emacs Log*"))  ; interaction log *Emacs Log*
-       (display-buffer-reuse-window display-buffer-in-side-window)
-       (side . right)
-       (reusable-frames . visible)
-       (window-height . 0.45))
-       ;; Let `display-buffer' reuse visible frames for all buffers. This must
-       ;; be the last entry in `display-buffer-alist', because it overrides any
-       ;; previous entry with more actions.
-     ("." nil (reusable-frames . visible))))
+;; (setq display-buffer-alist
+;;   `(;; Messages, errors, processes, Calendar in the bottom side window
+;;      (,(rx bos (or "*Emacs Log*"))  ; interaction log *Emacs Log*
+;;        (display-buffer-reuse-window display-buffer-in-side-window)
+;;        (side . right)
+;;        (reusable-frames . visible)
+;;        (window-height . 0.45))
+;;        ;; Let `display-buffer' reuse visible frames for all buffers. This must
+;;        ;; be the last entry in `display-buffer-alist', because it overrides any
+;;        ;; previous entry with more actions.
+;;      ("." nil (reusable-frames . visible))))
 
 (use-package simple
   :hook (before-save . delete-trailing-whitespace))
@@ -187,6 +187,7 @@
     "m" '(:ignore t :which-key "todo")
     "mt" 'org-todo
     "ms" 'org-schedule
+    "md" 'org-deadline
 
     "w" '(:ignore t :which-key "window")
     "wh" 'evil-window-left

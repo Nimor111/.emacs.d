@@ -228,18 +228,19 @@ Showing a popup for key combinations that follow the pressed key (like in Spacem
 #+end_src
 *** Buffer display
 When running ~display-buffer~, will show the ~*Emacs Log*~ buffer on the right side of the window
+Here for informational purposes.
 #+begin_src elisp
-(setq display-buffer-alist
-  `(;; Messages, errors, processes, Calendar in the bottom side window
-     (,(rx bos (or "*Emacs Log*"))  ; interaction log *Emacs Log*
-       (display-buffer-reuse-window display-buffer-in-side-window)
-       (side . right)
-       (reusable-frames . visible)
-       (window-height . 0.45))
-       ;; Let `display-buffer' reuse visible frames for all buffers. This must
-       ;; be the last entry in `display-buffer-alist', because it overrides any
-       ;; previous entry with more actions.
-     ("." nil (reusable-frames . visible))))
+;; (setq display-buffer-alist
+;;   `(;; Messages, errors, processes, Calendar in the bottom side window
+;;      (,(rx bos (or "*Emacs Log*"))  ; interaction log *Emacs Log*
+;;        (display-buffer-reuse-window display-buffer-in-side-window)
+;;        (side . right)
+;;        (reusable-frames . visible)
+;;        (window-height . 0.45))
+;;        ;; Let `display-buffer' reuse visible frames for all buffers. This must
+;;        ;; be the last entry in `display-buffer-alist', because it overrides any
+;;        ;; previous entry with more actions.
+;;      ("." nil (reusable-frames . visible))))
 #+end_src
 *** Delete unnecessary whitespace
 #+begin_src elisp
@@ -254,6 +255,7 @@ Make escape quit prompts.
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 #+end_src
 
+General keybindings
 #+begin_src elisp
 (setq user-init-file-org "~/.emacs.d/init.org")
 (setq gtd-inbox-file "~/Nextcloud/Orgzly/inbox.org")
@@ -329,6 +331,7 @@ Make escape quit prompts.
     "m" '(:ignore t :which-key "todo")
     "mt" 'org-todo
     "ms" 'org-schedule
+    "md" 'org-deadline
 
     "w" '(:ignore t :which-key "window")
     "wh" 'evil-window-left
