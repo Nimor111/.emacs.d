@@ -464,6 +464,7 @@ Installing and configuring org-mode:
     "~/Nextcloud/org/work/work.org"
     "~/Nextcloud/org/reading_list.org"))
 
+  (setq org-agenda-start-with-log-mode t)
   ;; org-agenda custom views
   (setq org-agenda-custom-commands
     '(("g" "GTD" tags-todo "@gtd"
@@ -479,7 +480,7 @@ Installing and configuring org-mode:
   (setq org-capture-templates
     '(("t" "Todo [inbox]" entry
       (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
-     "* TODO %i%?")
+      "* TODO %i%?")
       ("T" "Tickler" entry
       (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
       "* TODO %i%? \n SCHEDULED: %T")
@@ -508,6 +509,15 @@ Installing and configuring org-mode:
   (setq org-log-done 'note)
   (setq org-tags-column 0)
   (setq org-agenda-tags-column 0)
+
+  ;; org habit
+  (setq org-habit-show-all-today t
+        org-habit-show-habits-only-for-today t
+        ;;org-habit-show-done-always-green t
+        org-habit-graph-column 80
+        org-habit-preceding-days 28
+        org-habit-following-days 7)
+
   (setq org-src-fontify-natively t
         org-src-preserve-indentation t ;; do not put two spaces on the left
         org-src-tab-acts-natively t)
