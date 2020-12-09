@@ -1,0 +1,3 @@
+[submodule "lisp/elfeed-dashboard"]
+	path = lisp/elfeed-dashboard
+	url = https://github.com/Manoj321/elfeed-dashboard

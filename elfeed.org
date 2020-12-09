@@ -1,0 +1,12 @@
+* root :elfeed:
+** Programming :programming:
+*** [[https://this-week-in-rust.org/rss.xml][This week in Rust]] :rust:
+*** [[https://haskellweekly.news/newsletter.atom][Haskell weekly]] :haskell:
+*** [[https://reddit.com/r/haskell/.rss][r/haskell]] :haskell:
+*** [[https://reddit.com/r/purescript/.rss][r/purescript]] :purescript:
+*** [[https://reddit.com/r/scala/.rss][r/scala]] :scala:
+** Org-mode
+*** [[https://reddit.com/r/orgmode/.rss][r/org-mode]] :orgmode:
+** Linux
+*** [[https://www.gamingonlinux.com/article_rss.php][Gaming on Linux]] :linux:
+*** [[https://distrowatch.com/news/dwd.xml][DistroWatch]] :linux:

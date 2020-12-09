@@ -889,3 +889,19 @@
   :config
   (emms-all)
   (emms-default-players))
+
+(use-package elfeed
+  :straight t)
+
+(use-package elfeed-org
+  :straight t
+  :config
+  (elfeed-org)
+  (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org")))
+
+(use-package elfeed-dashboard
+  :load-path "~/.emacs.d/lisp/elfeed-dashboard/"
+  :config (progn
+            (setq elfeed-dashboard-file "~/.emacs.d/lisp/elfeed-dashboard/elfeed-dashboard.org")
+             ;; to update feed counts automatically
+            (advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links)))
