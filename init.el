@@ -111,6 +111,9 @@
 (use-package simple
   :hook (before-save . delete-trailing-whitespace))
 
+(use-package restart-emacs
+  :straight t)
+
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 (setq user-init-file-org "~/.emacs.d/init.org")
@@ -156,7 +159,7 @@
     "p"  '(:ignore t :which-key "file")
     "pf"  (list (lambda () (interactive) (find-file user-init-file-org)) :which-key "config")
 
-    "e"  'mu4e
+    "em"  'mu4e
 
     "g"  '(:ignore t :which-key "gtd")
     "gi"  (list (lambda () (interactive) (find-file gtd-inbox-file))   :which-key "inbox")
@@ -203,7 +206,11 @@
     "xsr" 'split-window-right
     "xsb" 'split-window-below
 
-    "ie"  'emojify-insert-emoji))
+    "ie"  'emojify-insert-emoji
+
+    "re"  'restart-emacs
+
+    "eli" 'ielm))
 
 (defun nimor/org-mode-visual-fill ()
   (setq visual-fill-column-width 100
@@ -774,15 +781,15 @@
   ([remap describe-key] . helpful-key))
 
 ;; dependency of elpl
-(use-package edit-indirect
-  :straight t)
+;; (use-package edit-indirect
+;;   :straight t)
 
-(use-package elpl
-  :straight t
-  :config
-  (nimor/leader-keys
-    "rl" 'elpl-clean
-    "re" 'elpl-edit))
+;; (use-package elpl
+;;   :straight t
+;;   :config
+;;   (nimor/leader-keys
+;;     "rl" 'elpl-clean
+;;     "re" 'elpl-edit))
 
 (use-package link-hint
   :straight t

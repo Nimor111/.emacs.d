@@ -28,6 +28,7 @@
     - [[#undo][Undo]]
     - [[#buffer-display][Buffer display]]
     - [[#delete-unnecessary-whitespace][Delete unnecessary whitespace]]
+    - [[#restart-emacs-from-within-emacs][Restart emacs from within emacs]]
   - [[#keybindings][Keybindings]]
   - [[#margins][Margins]]
   - [[#modeline][Modeline]]
@@ -247,6 +248,11 @@ Here for informational purposes.
 (use-package simple
   :hook (before-save . delete-trailing-whitespace))
 #+end_src
+*** Restart emacs from within emacs
+#+begin_src elisp
+(use-package restart-emacs
+  :straight t)
+#+end_src
 ** Keybindings
 Using ~general.el~ to define a leader key and various bindings with it. In modes (e.g. insert mode and emacs mode) where space is not applicable, it uses ctrl + space.
 
@@ -300,7 +306,7 @@ General keybindings
     "p"  '(:ignore t :which-key "file")
     "pf"  (list (lambda () (interactive) (find-file user-init-file-org)) :which-key "config")
 
-    "e"  'mu4e
+    "em"  'mu4e
 
     "g"  '(:ignore t :which-key "gtd")
     "gi"  (list (lambda () (interactive) (find-file gtd-inbox-file))   :which-key "inbox")
@@ -347,7 +353,11 @@ General keybindings
     "xsr" 'split-window-right
     "xsb" 'split-window-below
 
-    "ie"  'emojify-insert-emoji))
+    "ie"  'emojify-insert-emoji
+
+    "re"  'restart-emacs
+
+    "eli" 'ielm))
 #+end_src
 ** Margins
 #+begin_src elisp
@@ -1076,15 +1086,15 @@ Helpful adds a lot of very helpful (get it?) information to Emacs’ describe- c
 ** Elisp repl
 #+begin_src elisp
 ;; dependency of elpl
-(use-package edit-indirect
-  :straight t)
+;; (use-package edit-indirect
+;;   :straight t)
 
-(use-package elpl
-  :straight t
-  :config
-  (nimor/leader-keys
-    "rl" 'elpl-clean
-    "re" 'elpl-edit))
+;; (use-package elpl
+;;   :straight t
+;;   :config
+;;   (nimor/leader-keys
+;;     "rl" 'elpl-clean
+;;     "re" 'elpl-edit))
 #+end_src
 ** Better link opener
 #+begin_src elisp
