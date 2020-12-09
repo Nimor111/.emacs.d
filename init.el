@@ -315,7 +315,7 @@
   (setq org-capture-templates
     '(("t" "Todo [inbox]" entry
       (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
-      "* TODO %i%?")
+      "* TODO %i%? \n SCHEDULED: %t")
       ("T" "Tickler" entry
       (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
       "* TODO %i%? \n SCHEDULED: %T")
