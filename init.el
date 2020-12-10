@@ -201,6 +201,8 @@
     "hd" 'howdoyou-query
 
     "x"   '(:ignore t :which-key "buffer")
+    "xl"  'previous-buffer
+    "xh"  'next-buffer
     "xk"  'kill-buffer
     "xs"  '(:ignore t :which-key "split-window")
     "xsr" 'split-window-right
@@ -210,7 +212,10 @@
 
     "re"  'restart-emacs
 
-    "eli" 'ielm))
+    "eli" 'ielm
+
+    "d" '(:ignore t :which-key "dired")
+    "dd" 'dired))
 
 (defun nimor/org-mode-visual-fill ()
   (setq visual-fill-column-width 100
@@ -889,12 +894,6 @@
   :config
   (emms-all)
   (emms-default-players))
-
-(use-package peep-dired
-  :straight t
-  :defer t ; don't access `dired-mode-map' until `peep-dired' is loaded
-  :bind (:map dired-mode-map
-              ("E" . peep-dired)))
 
 (use-package elfeed
   :straight t)
