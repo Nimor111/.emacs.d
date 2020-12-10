@@ -80,6 +80,7 @@
   - [[#persistent-scratch][Persistent scratch]]
   - [[#esup][Esup]]
   - [[#emms][EMMS]]
+  - [[#peep-dired][Peep dired]]
   - [[#elfeed][Elfeed]]
 
 ** Package manager
@@ -1215,6 +1216,16 @@ For the music and stuff.
   :config
   (emms-all)
   (emms-default-players))
+#+end_src
+
+** Peep dired
+To view previews of files in dired
+#+begin_src elisp
+(use-package peep-dired
+  :straight t
+  :defer t ; don't access `dired-mode-map' until `peep-dired' is loaded
+  :bind (:map dired-mode-map
+              ("E" . peep-dired)))
 #+end_src
 
 ** Elfeed

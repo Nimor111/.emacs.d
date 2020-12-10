@@ -890,6 +890,12 @@
   (emms-all)
   (emms-default-players))
 
+(use-package peep-dired
+  :straight t
+  :defer t ; don't access `dired-mode-map' until `peep-dired' is loaded
+  :bind (:map dired-mode-map
+              ("E" . peep-dired)))
+
 (use-package elfeed
   :straight t)
 
