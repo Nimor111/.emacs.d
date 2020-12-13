@@ -201,8 +201,8 @@
     "hd" 'howdoyou-query
 
     "x"   '(:ignore t :which-key "buffer")
-    "xl"  'previous-buffer
-    "xh"  'next-buffer
+    "xh"  'previous-buffer
+    "xl"  'next-buffer
     "xk"  'kill-buffer
     "xs"  '(:ignore t :which-key "split-window")
     "xsr" 'split-window-right
@@ -910,3 +910,7 @@
             (setq elfeed-dashboard-file "~/.emacs.d/lisp/elfeed-dashboard/elfeed-dashboard.org")
              ;; to update feed counts automatically
             (advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links)))
+
+(use-package all-the-icons-dired
+  :straight t
+  :hook (dired-mode . all-the-icons-dired-mode))

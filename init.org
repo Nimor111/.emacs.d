@@ -81,6 +81,7 @@
   - [[#esup][Esup]]
   - [[#emms][EMMS]]
   - [[#elfeed][Elfeed]]
+  - [[#dired][Dired]]
 
 ** Package manager
 Must be in the beginning for ~use-package~ usage below.
@@ -349,8 +350,8 @@ General keybindings
     "hd" 'howdoyou-query
 
     "x"   '(:ignore t :which-key "buffer")
-    "xl"  'previous-buffer
-    "xh"  'next-buffer
+    "xh"  'previous-buffer
+    "xl"  'next-buffer
     "xk"  'kill-buffer
     "xs"  '(:ignore t :which-key "split-window")
     "xsr" 'split-window-right
@@ -1246,4 +1247,12 @@ Elfeed dashboard similar to mu4e one.
             (setq elfeed-dashboard-file "~/.emacs.d/lisp/elfeed-dashboard/elfeed-dashboard.org")
              ;; to update feed counts automatically
             (advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links)))
+#+end_src
+
+** Dired
+Adding fancy icons to dired items because why not.
+#+begin_src elisp
+(use-package all-the-icons-dired
+  :straight t
+  :hook (dired-mode . all-the-icons-dired-mode))
 #+end_src
