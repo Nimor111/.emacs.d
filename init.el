@@ -42,25 +42,30 @@
   (set-frame-font "Jet Brains Mono 18")
   (set-frame-font "JetBrains Mono 18"))
 
-(use-package doom-themes
+;; (use-package doom-themes
+;;   :straight t
+;;   :config
+;;   ;; Global settings (defaults)
+;;   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+;;         doom-themes-enable-italic t) ; if nil, italics is universally disabled
+;;   (load-theme 'doom-dracula t)
+
+;;   ;; Enable flashing mode-line on errors
+;;   (doom-themes-visual-bell-config)
+
+;;   ;; Enable custom neotree theme (all-the-icons must be installed!)
+;;   (doom-themes-neotree-config)
+;;   ;; or for treemacs users
+;;   (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
+;;   (doom-themes-treemacs-config)
+
+;;   ;; Corrects (and improves) org-mode's native fontification.
+;;   (doom-themes-org-config))
+
+(use-package challenger-deep-theme
   :straight t
   :config
-  ;; Global settings (defaults)
-  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-        doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-dracula t)
-
-  ;; Enable flashing mode-line on errors
-  (doom-themes-visual-bell-config)
-
-  ;; Enable custom neotree theme (all-the-icons must be installed!)
-  (doom-themes-neotree-config)
-  ;; or for treemacs users
-  (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
-  (doom-themes-treemacs-config)
-
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config))
+  (load-theme 'challenger-deep t))
 
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
@@ -213,6 +218,10 @@
     "re"  'restart-emacs
 
     "eli" 'ielm
+
+    "ed"  '(:ignore t :which-key "elfeed-dashboard")
+    "edd" 'elfeed-dashboard
+    "edi" 'elfeed-dashboard-edit
 
     "d" '(:ignore t :which-key "dired")
     "dd" 'dired))
@@ -395,7 +404,7 @@
 
 (use-package org-roam
   :straight
-  (:host github :repo "jethrokuan/org-roam" :branch "master")
+  (:host github :repo "org-roam/org-roam" :branch "master")
   :hook
   (after-init . org-roam-mode)
   :custom

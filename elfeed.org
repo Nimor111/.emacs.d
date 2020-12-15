@@ -10,3 +10,5 @@
 ** Linux
 *** [[https://www.gamingonlinux.com/article_rss.php][Gaming on Linux]] :linux:
 *** [[https://distrowatch.com/news/dwd.xml][DistroWatch]] :linux:
+** Emacs
+*** [[https://emacsredux.com/atom.xml][Emacs Redux]] :emacs:
