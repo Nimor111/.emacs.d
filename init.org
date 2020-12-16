@@ -69,6 +69,7 @@
     - [[#gdscript][GDScript]]
     - [[#python][Python]]
     - [[#clojure][Clojure]]
+    - [[#nix][Nix]]
   - [[#projectile][Projectile]]
   - [[#parens][Parens]]
   - [[#flycheck][Flycheck]]
@@ -1036,6 +1037,11 @@ For those pesky shaders.
 *** Clojure
 #+begin_src elisp
 (use-package cider
+  :straight t)
+#+end_src
+*** Nix
+#+begin_src elisp
+(use-package nix-mode
   :straight t)
 #+end_src
 ** Projectile

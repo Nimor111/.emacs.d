@@ -752,6 +752,9 @@
 (use-package cider
   :straight t)
 
+(use-package nix-mode
+  :straight t)
+
 (use-package projectile
   :straight t
   :config
