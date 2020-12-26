@@ -23,7 +23,6 @@
     - [[#use-spaces-instead-of-tabs][Use spaces instead of tabs]]
     - [[#commenting][Commenting]]
     - [[#command-log-mode][Command log mode]]
-    - [[#storing-links][Storing links]]
     - [[#which-key][Which-key]]
     - [[#undo][Undo]]
     - [[#buffer-display][Buffer display]]
@@ -50,6 +49,9 @@
     - [[#pomodoro][Pomodoro]]
     - [[#kanban][Kanban]]
     - [[#org-super-agenda][Org super agenda]]
+    - [[#better-linking][Better? Linking]]
+    - [[#web-tools][Web tools]]
+    - [[#encryption-with-org-mode][Encryption with org-mode]]
   - [[#magit][Magit]]
   - [[#helm][Helm]]
   - [[#counsel][Counsel]]
@@ -83,6 +85,7 @@
   - [[#emms][EMMS]]
   - [[#elfeed][Elfeed]]
   - [[#dired][Dired]]
+  - [[#snow][Snow]]
 
 ** Package manager
 Must be in the beginning for ~use-package~ usage below.
@@ -115,15 +118,29 @@ Must be in the beginning for ~use-package~ usage below.
 *** Tangle config file on save
 Courtesy of the great emacs from scratch config: [[https://github.com/daviwil/emacs-from-scratch/blob/master/Emacs.org#auto-tangle-configuration-files][Link]]
 #+begin_src elisp
+(setq gtd-table-file "~/Nextcloud/org/gtd-notion/gtd.org")
+
 (defun nimor/org-babel-tangle-config ()
+  "Tangles the org config file to init.el"
   (when (string-equal (buffer-file-name)
                       (expand-file-name "~/.emacs.d/init.org"))
     ;; Dynamic scoping to the rescue
     (let ((org-confirm-babel-evaluate nil))
       (org-babel-tangle))))
 
+(defun nimor/gtd-update-dblocks ()
+  "Updates the org-columns dynamic blocks in the gtd file"
+  (interactive)
+  (when (string-equal (buffer-file-name)
+                      (expand-file-name gtd-table-file))
+    (progn
+      (org-update-all-dblocks))))
+
 (add-hook 'org-mode-hook
   (lambda () (add-hook 'after-save-hook #'nimor/org-babel-tangle-config)))
+
+(add-hook 'org-mode-hook
+  (lambda () (add-hook 'before-save-hook #'nimor/gtd-update-dblocks-on-save)))
 #+end_src
 *** Custom vars file
 #+begin_src elisp
@@ -217,11 +234,6 @@ Show command history in sidebar. Looks slick.
 #+begin_src elisp
 (use-package command-log-mode
   :straight t)
-#+end_src
-*** Storing links
-Set key bindings for ~org-store-link~
-#+begin_src elisp
-(global-set-key (kbd "C-c l") 'org-store-link)
 #+end_src
 *** Which-key
 Showing a popup for key combinations that follow the pressed key (like in Spacemacs and Doom)
@@ -377,12 +389,16 @@ General keybindings
     "edi" 'elfeed-dashboard-edit
 
     "d" '(:ignore t :which-key "dired")
-    "dd" 'dired))
+    "dd" 'dired
+
+    "c" '(:ignore t :which-key "store link")
+    "cc" 'sl-store-link
+    "cp" 'sl-insert-link))
 #+end_src
 ** Margins
 #+begin_src elisp
 (defun nimor/org-mode-visual-fill ()
-  (setq visual-fill-column-width 100
+  (setq visual-fill-column-width 120
         visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
@@ -551,12 +567,14 @@ Installing and configuring org-mode:
         org-habit-preceding-days 28
         org-habit-following-days 7)
 
+  ;; log when an item is rescheduled
+  (setq org-log-reschedule (quote time))
+
   (setq org-src-fontify-natively t
         org-src-preserve-indentation t ;; do not put two spaces on the left
         org-src-tab-acts-natively t)
 
   (setq yt-iframe-format
-    ;; You may want to change your width and height.
     (concat "<iframe width=\"440\""
             " height=\"335\""
             " src=\"https://www.youtube.com/embed/%s\""
@@ -687,8 +705,11 @@ For your journaling needs.
 (use-package org-journal
   :straight t
   :after org
+  :init
+  (setq org-journal-enable-encryption t)
+  (setq org-journal-encrypt-journal t)
   :config
-  (setq org-journal-dir "~/Documents/journal")
+  (setq org-journal-dir "~/Nextcloud/journal")
   (setq org-journal-date-format "%A, %d %B %Y")
   (nimor/leader-keys
     "nj" 'org-journal-new-entry))
@@ -754,6 +775,27 @@ For a better way to group entries in the agenda.
          (:discard (:not  ; Is it easier to read like this?
                     (:and
                      (:todo "READING" :file-path "reading_list")))))))
+#+end_src
+*** Better? Linking
+#+begin_src elisp
+(use-package org-super-links
+  :straight (:host github :repo "toshism/org-super-links" :branch "master"))
+#+end_src
+*** Web tools
+#+begin_src elisp
+(use-package org-web-tools
+  :straight t)
+#+end_src
+*** Encryption with org-mode
+#+begin_src elisp
+(use-package org-crypt
+  :after org
+  :init
+  (org-crypt-use-before-save-magic)
+  :custom
+  (org-crypt-key "C7F48F25C1B7378F6111676E50390E6011771685")
+  :config
+  (setq org-tags-exclude-from-inheritance '("crypt")))
 #+end_src
 ** Magit
 The git supercharge
@@ -903,6 +945,12 @@ Add emmet for tag completion and stuff
 (use-package emmet-mode
   :straight t)
 #+end_src
+
+Impatient mode for live preview of html
+#+begin_src elisp
+(use-package impatient-mode
+  :straight t)
+#+end_src
 *** General
 For your general language needs.
 #+begin_src elisp
@@ -1029,6 +1077,13 @@ For those pesky shaders.
   :defer t
   :init
   (advice-add 'python-mode :before 'elpy-enable))
+
+(use-package virtualenvwrapper
+  :straight t
+  :defer t
+  :init
+  (venv-initialize-interactive-shells)
+  (venv-initialize-eshell))
 
 (nimor/language-leader-def
   "p" '(:ignore t :which-key "python")
@@ -1266,11 +1321,16 @@ Elfeed dashboard similar to mu4e one.
              ;; to update feed counts automatically
             (advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links)))
 #+end_src
-
 ** Dired
 Adding fancy icons to dired items because why not.
 #+begin_src elisp
 (use-package all-the-icons-dired
   :straight t
   :hook (dired-mode . all-the-icons-dired-mode))
+#+end_src
+
+** Snow
+#+begin_src elisp
+(use-package snow
+  :straight (:host github :repo "alphapapa/snow.el" :branch "master"))
 #+end_src

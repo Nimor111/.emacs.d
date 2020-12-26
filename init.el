@@ -16,15 +16,29 @@
 (use-package use-package-ensure-system-package
   :straight t)
 
+(setq gtd-table-file "~/Nextcloud/org/gtd-notion/gtd.org")
+
 (defun nimor/org-babel-tangle-config ()
+  "Tangles the org config file to init.el"
   (when (string-equal (buffer-file-name)
                       (expand-file-name "~/.emacs.d/init.org"))
     ;; Dynamic scoping to the rescue
     (let ((org-confirm-babel-evaluate nil))
       (org-babel-tangle))))
 
+(defun nimor/gtd-update-dblocks ()
+  "Updates the org-columns dynamic blocks in the gtd file"
+  (interactive)
+  (when (string-equal (buffer-file-name)
+                      (expand-file-name gtd-table-file))
+    (progn
+      (org-update-all-dblocks))))
+
 (add-hook 'org-mode-hook
   (lambda () (add-hook 'after-save-hook #'nimor/org-babel-tangle-config)))
+
+(add-hook 'org-mode-hook
+  (lambda () (add-hook 'before-save-hook #'nimor/gtd-update-dblocks-on-save)))
 
 (setq-default
   custom-file "~/.emacs.d/custom.el")
@@ -88,8 +102,6 @@
 
 (use-package command-log-mode
   :straight t)
-
-(global-set-key (kbd "C-c l") 'org-store-link)
 
 (use-package which-key
   :straight t
@@ -224,10 +236,14 @@
     "edi" 'elfeed-dashboard-edit
 
     "d" '(:ignore t :which-key "dired")
-    "dd" 'dired))
+    "dd" 'dired
+
+    "c" '(:ignore t :which-key "store link")
+    "cc" 'sl-store-link
+    "cp" 'sl-insert-link))
 
 (defun nimor/org-mode-visual-fill ()
-  (setq visual-fill-column-width 100
+  (setq visual-fill-column-width 120
         visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
@@ -367,12 +383,14 @@
         org-habit-preceding-days 28
         org-habit-following-days 7)
 
+  ;; log when an item is rescheduled
+  (setq org-log-reschedule (quote time))
+
   (setq org-src-fontify-natively t
         org-src-preserve-indentation t ;; do not put two spaces on the left
         org-src-tab-acts-natively t)
 
   (setq yt-iframe-format
-    ;; You may want to change your width and height.
     (concat "<iframe width=\"440\""
             " height=\"335\""
             " src=\"https://www.youtube.com/embed/%s\""
@@ -470,8 +488,11 @@
 (use-package org-journal
   :straight t
   :after org
+  :init
+  (setq org-journal-enable-encryption t)
+  (setq org-journal-encrypt-journal t)
   :config
-  (setq org-journal-dir "~/Documents/journal")
+  (setq org-journal-dir "~/Nextcloud/journal")
   (setq org-journal-date-format "%A, %d %B %Y")
   (nimor/leader-keys
     "nj" 'org-journal-new-entry))
@@ -526,6 +547,21 @@
          (:discard (:not  ; Is it easier to read like this?
                     (:and
                      (:todo "READING" :file-path "reading_list")))))))
+
+(use-package org-super-links
+  :straight (:host github :repo "toshism/org-super-links" :branch "master"))
+
+(use-package org-web-tools
+  :straight t)
+
+(use-package org-crypt
+  :after org
+  :init
+  (org-crypt-use-before-save-magic)
+  :custom
+  (org-crypt-key "C7F48F25C1B7378F6111676E50390E6011771685")
+  :config
+  (setq org-tags-exclude-from-inheritance '("crypt")))
 
 (use-package magit
   :straight t
@@ -639,6 +675,9 @@
 (use-package emmet-mode
   :straight t)
 
+(use-package impatient-mode
+  :straight t)
+
 (use-package lsp-mode
   :straight t
   :custom
@@ -744,6 +783,13 @@
   :defer t
   :init
   (advice-add 'python-mode :before 'elpy-enable))
+
+(use-package virtualenvwrapper
+  :straight t
+  :defer t
+  :init
+  (venv-initialize-interactive-shells)
+  (venv-initialize-eshell))
 
 (nimor/language-leader-def
   "p" '(:ignore t :which-key "python")
@@ -926,3 +972,6 @@
 (use-package all-the-icons-dired
   :straight t
   :hook (dired-mode . all-the-icons-dired-mode))
+
+(use-package snow
+  :straight (:host github :repo "alphapapa/snow.el" :branch "master"))

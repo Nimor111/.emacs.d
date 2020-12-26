@@ -5,10 +5,12 @@
 *** [[https://reddit.com/r/haskell/.rss][r/haskell]] :haskell:
 *** [[https://reddit.com/r/purescript/.rss][r/purescript]] :purescript:
 *** [[https://reddit.com/r/scala/.rss][r/scala]] :scala:
+*** [[https://www.fpcomplete.com/atom.xml][FP Complete]] :fp:
 ** Org-mode
 *** [[https://reddit.com/r/orgmode/.rss][r/org-mode]] :orgmode:
 ** Linux
-*** [[https://www.gamingonlinux.com/article_rss.php][Gaming on Linux]] :linux:
 *** [[https://distrowatch.com/news/dwd.xml][DistroWatch]] :linux:
 ** Emacs
 *** [[https://emacsredux.com/atom.xml][Emacs Redux]] :emacs:
+*** [[https://reddit.com/r/emacs/.rss][r/emacs]] :emacs:
+*** [[https://melpa.org/updates.rss][Melpa updates]] :emacs:
