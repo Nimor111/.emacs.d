@@ -38,7 +38,7 @@
   (lambda () (add-hook 'after-save-hook #'nimor/org-babel-tangle-config)))
 
 (add-hook 'org-mode-hook
-  (lambda () (add-hook 'before-save-hook #'nimor/gtd-update-dblocks-on-save)))
+  (lambda () (add-hook 'before-save-hook #'nimor/gtd-update-dblocks)))
 
 (setq-default
   custom-file "~/.emacs.d/custom.el")
@@ -130,6 +130,25 @@
 
 (use-package restart-emacs
   :straight t)
+
+(fset 'yes-or-no-p 'y-or-n-p)
+
+(column-number-mode 1)
+
+(defun nimor/org-mode-visual-fill ()
+  (setq visual-fill-column-width 120
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :straight t
+  :hook (org-mode . nimor/org-mode-visual-fill))
+
+(use-package simple
+  :hook ((prog-mode . turn-on-auto-fill)
+         (text-mode . turn-on-auto-fill))
+  :config
+  (setq-default fill-column 112))
 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
@@ -237,19 +256,11 @@
 
     "d" '(:ignore t :which-key "dired")
     "dd" 'dired
+    "dj" 'dired-jump
 
     "c" '(:ignore t :which-key "store link")
     "cc" 'sl-store-link
     "cp" 'sl-insert-link))
-
-(defun nimor/org-mode-visual-fill ()
-  (setq visual-fill-column-width 120
-        visual-fill-column-center-text t)
-  (visual-fill-column-mode 1))
-
-(use-package visual-fill-column
-  :straight t
-  :hook (org-mode . nimor/org-mode-visual-fill))
 
 ;; dependency
 (use-package all-the-icons
@@ -266,10 +277,11 @@
   :straight t
   :config
   (setq dashboard-items '((recents  . 5)
-                          (bookmarks . 5)
-                          (projects . 5)
-                          (agenda . 5)))
+                          (projects . 5)))
   (dashboard-setup-startup-hook))
+
+(use-package dashboard-hackernews
+  :straight t)
 
 (use-package evil
   :straight t
@@ -363,7 +375,7 @@
         "* TODO %a \n SCHEDULED: %t")))
 
   ;; TODO keywords that I use - the ones after the | are the done states
-  (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "IN PROGRESS(p)" "|" "DONE(d)" "CANCELLED(c)")))
+  (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "NEXT(n)" "|" "DONE(d)" "CANCELLED(c)")))
 
   ;; Clocking settings
   (setq org-pretty-entities t)
@@ -490,7 +502,6 @@
   :after org
   :init
   (setq org-journal-enable-encryption t)
-  (setq org-journal-encrypt-journal t)
   :config
   (setq org-journal-dir "~/Nextcloud/journal")
   (setq org-journal-date-format "%A, %d %B %Y")
@@ -563,37 +574,21 @@
   :config
   (setq org-tags-exclude-from-inheritance '("crypt")))
 
+(use-package org-dashboard
+  :straight t)
+
+(use-package org-re-reveal
+  :straight t
+  :after org
+  :config
+  (setq org-reveal-mathjax t)
+  (setq org-re-reveal-root "https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2"))
+
 (use-package magit
   :straight t
   :defer t)
 
 (setq-default with-editor-emacsclient-executable "emacsclient")
-
-;; (use-package helm
-;;   :init
-;;     (require 'helm-config)
-;;     (setq helm-split-window-in-side-p t
-;;           helm-move-to-line-cycle-in-source t)
-;;   :config
-;;     (helm-mode 1) ;; Most of Emacs prompts become helm-enabled
-;;     (helm-autoresize-mode 1) ;; Helm resizes according to the number of candidates
-;;     (global-set-key (kbd "C-x b") 'helm-buffers-list) ;; List buffers ( Emacs way )
-;;     (define-key evil-ex-map "b" 'helm-buffers-list) ;; List buffers ( Vim way )
-;;     (global-set-key (kbd "C-x r b") 'helm-bookmarks) ;; Bookmarks menu
-;;     (global-set-key (kbd "C-x C-f") 'helm-find-files) ;; Finding files with Helm
-;;     (global-set-key (kbd "M-c") 'helm-calcul-expression) ;; Use Helm for calculations
-;;     (global-set-key (kbd "C-s") 'helm-occur)  ;; Replaces the default isearch keybinding
-;;     (global-set-key (kbd "C-h a") 'helm-apropos)  ;; Helmized apropos interface
-;;     (global-set-key (kbd "M-x") 'helm-M-x)  ;; Improved M-x menu
-;;     (global-set-key (kbd "M-y") 'helm-show-kill-ring)  ;; Show kill ring, pick something to paste
-;;   :straight t)
-
-;; (use-package helm-lsp
-;;   :straight t
-;;   :commands helm-lsp-workspace-symbol)
-
-;; (use-package helm-projectile
-;;   :straight t)
 
 (use-package counsel
   :straight t
@@ -642,11 +637,6 @@
   :straight t
   :hook
   (after-init . global-company-mode))
-
-(use-package company-lua
-  :straight t
-  :after (company)
-  :hook (lua-mode my-lua-mode-company-init))
 
 ;; (use-package yasnippet
 ;;   :straight t
@@ -769,6 +759,16 @@
   :defer t
   :config (setq lsp-metals-treeview-show-when-views-received t))
 
+(use-package sbt-mode
+  :straight t
+  :commands sbt-start sbt-command
+  :config
+  ;; WORKAROUND: allows using SPACE when in the minibuffer
+  (substitute-key-definition
+   'minibuffer-complete-word
+   'self-insert-command
+   minibuffer-local-completion-map))
+
 (use-package gdscript-mode
   :ensure-system-package godot
   :straight
@@ -842,17 +842,6 @@
   ([remap describe-command] . helpful-command)
   ([remap describe-variable] . counsel-describe-variable)
   ([remap describe-key] . helpful-key))
-
-;; dependency of elpl
-;; (use-package edit-indirect
-;;   :straight t)
-
-;; (use-package elpl
-;;   :straight t
-;;   :config
-;;   (nimor/leader-keys
-;;     "rl" 'elpl-clean
-;;     "re" 'elpl-edit))
 
 (use-package link-hint
   :straight t
@@ -969,9 +958,66 @@
              ;; to update feed counts automatically
             (advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links)))
 
+(use-package dired
+  :config
+
+  (defun dw/dired-link (path)
+    (lexical-let ((target path))
+      (lambda () (interactive) (message "Path: %s" target) (dired target))))
+
+  (nimor/leader-keys
+   "drm" `(,(dw/dired-link "/run/media/gbojinov") :which-key "Media")))
+
 (use-package all-the-icons-dired
   :straight t
-  :hook (dired-mode . all-the-icons-dired-mode))
+  :hook (dired-mode . all-the-icons-dired-mode)
+  :config
+  (setq dired-auto-revert-buffer t)
+  (setq dired-dwim-target t)
+  (setq dired-listing-switches "-lah"))
+
+(use-package dired-open
+  :straight t
+  :config
+  (setq dired-open-extensions '(("png" . "feh")
+                                ("mkv" . "mpv")
+                                ("avi" . "mpv")
+                                ("mp4" . "mpv"))))
 
 (use-package snow
   :straight (:host github :repo "alphapapa/snow.el" :branch "master"))
+
+(use-package engine-mode
+  :straight (:host github :repo "hrs/engine-mode" :branch "main")
+  :defer t
+  :config
+  (defengine duckduckgo
+    "https://duckduckgo.com/?q=%s"
+    :keybinding "d")
+
+  (defengine github
+    "https://github.com/search?ref=simplesearch&q=%s"
+    :keybinding "g")
+
+  (defengine google-images
+    "http://www.google.com/images?hl=en&source=hp&biw=1440&bih=795&gbv=2&aq=f&aqi=&aql=&oq=&q=%s"
+    :keybinding "i")
+
+  (defengine google-maps
+    "http://maps.google.com/maps?q=%s"
+    :keybinding "m"
+    :docstring "Mappin' it up.")
+
+  (defengine stack-overflow
+    "https://stackoverflow.com/search?q=%s"
+    :keybinding "s")
+
+  (defengine youtube
+    "http://www.youtube.com/results?aq=f&oq=&search_query=%s"
+    :keybinding "y")
+
+  (defengine wikipedia
+    "http://www.wikipedia.org/search-redirect.php?language=en&go=Go&search=%s"
+    :keybinding "w"
+    :docstring "Searchin' the wikis.")
+  (engine-mode t))

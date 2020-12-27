@@ -10,26 +10,28 @@
     - [[#install-use-package-for-sane-package-configuration][Install use-package for sane package configuration]]
     - [[#ensure-system-packages-to-check-they-exist][Ensure system packages to check they exist]]
   - [[#general-configs][General configs]]
-    - [[#tangle-config-file-on-save][Tangle config file on save]]
-    - [[#custom-vars-file][Custom vars file]]
-    - [[#start-emacs-in-fullscreen][Start emacs in fullscreen]]
-    - [[#set-the-emacs-user-directory][Set the emacs user directory]]
-    - [[#set-the-default-font][Set the default font]]
-    - [[#set-the-theme][Set the theme]]
-    - [[#no-scrollbar-toolbar-menubar-because-bloat][No scrollbar, toolbar, menubar, because bloat]]
-    - [[#line-numbers--relative-line-numbers][Line numbers + relative line numbers]]
-    - [[#display-battery-in-the-bar][Display battery in the bar]]
-    - [[#display-time-in-the-bar][Display time in the bar]]
-    - [[#use-spaces-instead-of-tabs][Use spaces instead of tabs]]
-    - [[#commenting][Commenting]]
-    - [[#command-log-mode][Command log mode]]
-    - [[#which-key][Which-key]]
-    - [[#undo][Undo]]
-    - [[#buffer-display][Buffer display]]
-    - [[#delete-unnecessary-whitespace][Delete unnecessary whitespace]]
-    - [[#restart-emacs-from-within-emacs][Restart emacs from within emacs]]
+      - [[#tangle-config-file-on-save][Tangle config file on save]]
+      - [[#custom-vars-file-so-it-doesnt-pollute-the-init-file][Custom vars file, so it doesn't pollute the init file]]
+      - [[#start-emacs-in-fullscreen-happens-when-everything-is-loaded][Start emacs in fullscreen, happens when everything is loaded.]]
+      - [[#set-the-emacs-user-directory-for-re-use-in-other-places][Set the emacs user directory for re-use in other places]]
+      - [[#set-the-default-font][Set the default font.]]
+      - [[#set-the-theme][Set the theme]]
+      - [[#no-scrollbar-toolbar-menubar-because-bloat][No scrollbar, toolbar, menubar, because bloat]]
+      - [[#line-numbers--relative-line-numbers][Line numbers + relative line numbers]]
+      - [[#display-battery-in-the-bar][Display battery in the bar]]
+      - [[#display-time-in-the-bar][Display time in the bar]]
+      - [[#use-spaces-instead-of-tabs][Use spaces instead of tabs]]
+      - [[#commenting][Commenting]]
+      - [[#command-log-mode][Command log mode]]
+      - [[#which-key][Which-key]]
+      - [[#undo-magic][Undo magic]]
+      - [[#buffer-display][Buffer display]]
+      - [[#delete-unnecessary-whitespace][Delete unnecessary whitespace]]
+      - [[#restart-emacs-from-within-emacs][Restart emacs from within emacs]]
+      - [[#better-yesno-prompts][Better yes/no prompts]]
+      - [[#show-the-column-number][Show the column number]]
+      - [[#auto-fill-and-visual-fill][Auto Fill and Visual fill]]
   - [[#keybindings][Keybindings]]
-  - [[#margins][Margins]]
   - [[#modeline][Modeline]]
   - [[#dashboard][Dashboard]]
   - [[#evil-mode][Evil-mode]]
@@ -52,8 +54,9 @@
     - [[#better-linking][Better? Linking]]
     - [[#web-tools][Web tools]]
     - [[#encryption-with-org-mode][Encryption with org-mode]]
+    - [[#org-dashboard][Org dashboard]]
+    - [[#org-reveal-for-presentations][Org reveal for presentations]]
   - [[#magit][Magit]]
-  - [[#helm][Helm]]
   - [[#counsel][Counsel]]
   - [[#ivy][Ivy]]
   - [[#company][Company]]
@@ -77,7 +80,6 @@
   - [[#flycheck][Flycheck]]
   - [[#emojify][Emojify]]
   - [[#helpful][Helpful]]
-  - [[#elisp-repl][Elisp repl]]
   - [[#better-link-opener][Better link opener]]
   - [[#email][Email]]
   - [[#persistent-scratch][Persistent scratch]]
@@ -86,6 +88,7 @@
   - [[#elfeed][Elfeed]]
   - [[#dired][Dired]]
   - [[#snow][Snow]]
+  - [[#engine-mode][Engine mode]]
 
 ** Package manager
 Must be in the beginning for ~use-package~ usage below.
@@ -115,7 +118,7 @@ Must be in the beginning for ~use-package~ usage below.
   :straight t)
 #+end_src
 ** General configs
-*** Tangle config file on save
+**** Tangle config file on save
 Courtesy of the great emacs from scratch config: [[https://github.com/daviwil/emacs-from-scratch/blob/master/Emacs.org#auto-tangle-configuration-files][Link]]
 #+begin_src elisp
 (setq gtd-table-file "~/Nextcloud/org/gtd-notion/gtd.org")
@@ -140,9 +143,9 @@ Courtesy of the great emacs from scratch config: [[https://github.com/daviwil/em
   (lambda () (add-hook 'after-save-hook #'nimor/org-babel-tangle-config)))
 
 (add-hook 'org-mode-hook
-  (lambda () (add-hook 'before-save-hook #'nimor/gtd-update-dblocks-on-save)))
+  (lambda () (add-hook 'before-save-hook #'nimor/gtd-update-dblocks)))
 #+end_src
-*** Custom vars file
+**** Custom vars file, so it doesn't pollute the init file
 #+begin_src elisp
 (setq-default
   custom-file "~/.emacs.d/custom.el")
@@ -150,25 +153,25 @@ Courtesy of the great emacs from scratch config: [[https://github.com/daviwil/em
 (when (file-exists-p custom-file)
   (load custom-file t))
 #+end_src
-*** Start emacs in fullscreen
+**** Start emacs in fullscreen, happens when everything is loaded.
 #+begin_src elisp
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 #+end_src
-*** Set the emacs user directory
+**** Set the emacs user directory for re-use in other places
 #+begin_src elisp
 (let* ((home-dir (getenv "HOME"))
      (custom-emacs-directory (concat home-dir "/.emacs.d")))
   (setq user-emacs-directory custom-emacs-directory))
 #+end_src
-*** Set the default font
+**** Set the default font.
 This is seriously retarded.
 #+begin_src elisp
 (if (eq system-type 'gnu/linux)
   (set-frame-font "Jet Brains Mono 18")
   (set-frame-font "JetBrains Mono 18"))
 #+end_src
-*** Set the theme
-Ok I like the doom emacs themes
+**** Set the theme
+***** Doom emacs themes
 #+begin_src elisp
 ;; (use-package doom-themes
 ;;   :straight t
@@ -190,52 +193,51 @@ Ok I like the doom emacs themes
 ;;   ;; Corrects (and improves) org-mode's native fontification.
 ;;   (doom-themes-org-config))
 #+end_src
-
-Challenger deep theme
+***** Challenger deep theme
 #+begin_src elisp
 (use-package challenger-deep-theme
   :straight t
   :config
   (load-theme 'challenger-deep t))
 #+end_src
-*** No scrollbar, toolbar, menubar, because bloat
+**** No scrollbar, toolbar, menubar, because bloat
 #+begin_src elisp
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 #+end_src
-*** Line numbers + relative line numbers
+**** Line numbers + relative line numbers
 #+begin_src elisp
 (global-display-line-numbers-mode)
 (setq display-line-numbers-type 'relative)
 #+end_src
-*** Display battery in the bar
+**** Display battery in the bar
 #+begin_src elisp
 (display-battery-mode t)
 #+end_src
-*** Display time in the bar
+**** Display time in the bar
 #+begin_src elisp
 (setq display-time-format "%H:%M %a,%d %b %Y")
 (display-time)
 #+end_src
-*** Use spaces instead of tabs
+**** Use spaces instead of tabs
 #+begin_src elisp
 (setq-default indent-tabs-mode nil)
 #+end_src
-*** Commenting
+**** Commenting
 #+begin_src elisp
 (use-package evil-nerd-commenter
   :straight t
   :config
   (evilnc-default-hotkeys))
 #+end_src
-*** Command log mode
-Show command history in sidebar. Looks slick.
+**** Command log mode
+Show command history in sidebar. Looks slick. Works good for demos and stuff.
 #+begin_src elisp
 (use-package command-log-mode
   :straight t)
 #+end_src
-*** Which-key
+**** Which-key
 Showing a popup for key combinations that follow the pressed key (like in Spacemacs and Doom)
 #+begin_src elisp
 (use-package which-key
@@ -243,14 +245,14 @@ Showing a popup for key combinations that follow the pressed key (like in Spacem
   :config
   (which-key-mode))
 #+end_src
-*** Undo
+**** Undo magic
 #+begin_src elisp
 (use-package undo-tree
   :straight t
   :init
   (global-undo-tree-mode))
 #+end_src
-*** Buffer display
+**** Buffer display
 When running ~display-buffer~, will show the ~*Emacs Log*~ buffer on the right side of the window
 Here for informational purposes.
 #+begin_src elisp
@@ -266,15 +268,46 @@ Here for informational purposes.
 ;;        ;; previous entry with more actions.
 ;;      ("." nil (reusable-frames . visible))))
 #+end_src
-*** Delete unnecessary whitespace
+**** Delete unnecessary whitespace
 #+begin_src elisp
 (use-package simple
   :hook (before-save . delete-trailing-whitespace))
 #+end_src
-*** Restart emacs from within emacs
+**** Restart emacs from within emacs
 #+begin_src elisp
 (use-package restart-emacs
   :straight t)
+#+end_src
+**** Better yes/no prompts
+Because writing yes is too much work.
+
+#+begin_src elisp
+(fset 'yes-or-no-p 'y-or-n-p)
+#+end_src
+**** Show the column number
+#+begin_src elisp
+(column-number-mode 1)
+#+end_src
+**** Auto Fill and Visual fill
+***** Visual fill, e.g. the visual wrap of the lines
+#+begin_src elisp
+(defun nimor/org-mode-visual-fill ()
+  (setq visual-fill-column-width 120
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :straight t
+  :hook (org-mode . nimor/org-mode-visual-fill))
+#+end_src
+
+***** Auto fill, e.g. adding line breaks to lines
+#+begin_src elisp
+(use-package simple
+  :hook ((prog-mode . turn-on-auto-fill)
+         (text-mode . turn-on-auto-fill))
+  :config
+  (setq-default fill-column 112))
 #+end_src
 ** Keybindings
 Using ~general.el~ to define a leader key and various bindings with it. In modes (e.g. insert mode and emacs mode) where space is not applicable, it uses ctrl + space.
@@ -390,21 +423,11 @@ General keybindings
 
     "d" '(:ignore t :which-key "dired")
     "dd" 'dired
+    "dj" 'dired-jump
 
     "c" '(:ignore t :which-key "store link")
     "cc" 'sl-store-link
     "cp" 'sl-insert-link))
-#+end_src
-** Margins
-#+begin_src elisp
-(defun nimor/org-mode-visual-fill ()
-  (setq visual-fill-column-width 120
-        visual-fill-column-center-text t)
-  (visual-fill-column-mode 1))
-
-(use-package visual-fill-column
-  :straight t
-  :hook (org-mode . nimor/org-mode-visual-fill))
 #+end_src
 ** Modeline
 Doom modeline - it looks nice!
@@ -427,10 +450,13 @@ Ok I admit this is a little bloated, but I like something pretty to open when I 
   :straight t
   :config
   (setq dashboard-items '((recents  . 5)
-                          (bookmarks . 5)
-                          (projects . 5)
-                          (agenda . 5)))
+                          (projects . 5)))
   (dashboard-setup-startup-hook))
+#+end_src
+
+#+begin_src elisp
+(use-package dashboard-hackernews
+  :straight t)
 #+end_src
 ** Evil-mode
 Vim keybinds and goodness in emacs
@@ -547,7 +573,7 @@ Installing and configuring org-mode:
         "* TODO %a \n SCHEDULED: %t")))
 
   ;; TODO keywords that I use - the ones after the | are the done states
-  (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "IN PROGRESS(p)" "|" "DONE(d)" "CANCELLED(c)")))
+  (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "NEXT(n)" "|" "DONE(d)" "CANCELLED(c)")))
 
   ;; Clocking settings
   (setq org-pretty-entities t)
@@ -707,7 +733,6 @@ For your journaling needs.
   :after org
   :init
   (setq org-journal-enable-encryption t)
-  (setq org-journal-encrypt-journal t)
   :config
   (setq org-journal-dir "~/Nextcloud/journal")
   (setq org-journal-date-format "%A, %d %B %Y")
@@ -797,6 +822,20 @@ For a better way to group entries in the agenda.
   :config
   (setq org-tags-exclude-from-inheritance '("crypt")))
 #+end_src
+*** Org dashboard
+#+begin_src elisp
+(use-package org-dashboard
+  :straight t)
+#+end_src
+*** Org reveal for presentations
+#+begin_src elisp
+(use-package org-re-reveal
+  :straight t
+  :after org
+  :config
+  (setq org-reveal-mathjax t)
+  (setq org-re-reveal-root "https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2"))
+#+end_src
 ** Magit
 The git supercharge
 
@@ -810,36 +849,6 @@ Something weird with ~emacsclient~ being installed with nix and magit not findin
 
 #+begin_src elisp
 (setq-default with-editor-emacsclient-executable "emacsclient")
-#+end_src
-** Helm
-The completion god
-
-#+begin_src elisp
-;; (use-package helm
-;;   :init
-;;     (require 'helm-config)
-;;     (setq helm-split-window-in-side-p t
-;;           helm-move-to-line-cycle-in-source t)
-;;   :config
-;;     (helm-mode 1) ;; Most of Emacs prompts become helm-enabled
-;;     (helm-autoresize-mode 1) ;; Helm resizes according to the number of candidates
-;;     (global-set-key (kbd "C-x b") 'helm-buffers-list) ;; List buffers ( Emacs way )
-;;     (define-key evil-ex-map "b" 'helm-buffers-list) ;; List buffers ( Vim way )
-;;     (global-set-key (kbd "C-x r b") 'helm-bookmarks) ;; Bookmarks menu
-;;     (global-set-key (kbd "C-x C-f") 'helm-find-files) ;; Finding files with Helm
-;;     (global-set-key (kbd "M-c") 'helm-calcul-expression) ;; Use Helm for calculations
-;;     (global-set-key (kbd "C-s") 'helm-occur)  ;; Replaces the default isearch keybinding
-;;     (global-set-key (kbd "C-h a") 'helm-apropos)  ;; Helmized apropos interface
-;;     (global-set-key (kbd "M-x") 'helm-M-x)  ;; Improved M-x menu
-;;     (global-set-key (kbd "M-y") 'helm-show-kill-ring)  ;; Show kill ring, pick something to paste
-;;   :straight t)
-
-;; (use-package helm-lsp
-;;   :straight t
-;;   :commands helm-lsp-workspace-symbol)
-
-;; (use-package helm-projectile
-;;   :straight t)
 #+end_src
 ** Counsel
 Counsel is a customized set of commands to replace ~find-file~ with ~counsel-find-file~, etc which provide useful commands for each of the default completion commands.
@@ -898,11 +907,6 @@ Complete all the things!
   :straight t
   :hook
   (after-init . global-company-mode))
-
-(use-package company-lua
-  :straight t
-  :after (company)
-  :hook (lua-mode my-lua-mode-company-init))
 #+end_src
 ** Snippets
 Don't have a use for this at the moment really, it's only making my emacs startup slower and I'm not even using it. Commenting it out for now.
@@ -1059,6 +1063,19 @@ For those pesky shaders.
   :config (setq lsp-metals-treeview-show-when-views-received t))
 #+end_src
 
+SBT
+#+begin_src elisp
+(use-package sbt-mode
+  :straight t
+  :commands sbt-start sbt-command
+  :config
+  ;; WORKAROUND: allows using SPACE when in the minibuffer
+  (substitute-key-definition
+   'minibuffer-complete-word
+   'self-insert-command
+   minibuffer-local-completion-map))
+#+end_src
+
 *** GDScript
 #+begin_src elisp
 (use-package gdscript-mode
@@ -1163,19 +1180,6 @@ Helpful adds a lot of very helpful (get it?) information to Emacs’ describe- c
   ([remap describe-key] . helpful-key))
 #+end_src
 
-** Elisp repl
-#+begin_src elisp
-;; dependency of elpl
-;; (use-package edit-indirect
-;;   :straight t)
-
-;; (use-package elpl
-;;   :straight t
-;;   :config
-;;   (nimor/leader-keys
-;;     "rl" 'elpl-clean
-;;     "re" 'elpl-edit))
-#+end_src
 ** Better link opener
 #+begin_src elisp
 (use-package link-hint
@@ -1322,15 +1326,80 @@ Elfeed dashboard similar to mu4e one.
             (advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links)))
 #+end_src
 ** Dired
+#+begin_src elisp
+(use-package dired
+  :config
+
+  (defun dw/dired-link (path)
+    (lexical-let ((target path))
+      (lambda () (interactive) (message "Path: %s" target) (dired target))))
+
+  (nimor/leader-keys
+   "drm" `(,(dw/dired-link "/run/media/gbojinov") :which-key "Media")))
+#+end_src
+
 Adding fancy icons to dired items because why not.
 #+begin_src elisp
 (use-package all-the-icons-dired
   :straight t
-  :hook (dired-mode . all-the-icons-dired-mode))
+  :hook (dired-mode . all-the-icons-dired-mode)
+  :config
+  (setq dired-auto-revert-buffer t)
+  (setq dired-dwim-target t)
+  (setq dired-listing-switches "-lah"))
 #+end_src
 
+Open some files with external applications.
+#+begin_src elisp
+(use-package dired-open
+  :straight t
+  :config
+  (setq dired-open-extensions '(("png" . "feh")
+                                ("mkv" . "mpv")
+                                ("avi" . "mpv")
+                                ("mp4" . "mpv"))))
+#+end_src
 ** Snow
 #+begin_src elisp
 (use-package snow
   :straight (:host github :repo "alphapapa/snow.el" :branch "master"))
+#+end_src
+
+** Engine mode
+Search stuff from the comfort of your Emacs.
+#+begin_src elisp
+(use-package engine-mode
+  :straight (:host github :repo "hrs/engine-mode" :branch "main")
+  :defer t
+  :config
+  (defengine duckduckgo
+    "https://duckduckgo.com/?q=%s"
+    :keybinding "d")
+
+  (defengine github
+    "https://github.com/search?ref=simplesearch&q=%s"
+    :keybinding "g")
+
+  (defengine google-images
+    "http://www.google.com/images?hl=en&source=hp&biw=1440&bih=795&gbv=2&aq=f&aqi=&aql=&oq=&q=%s"
+    :keybinding "i")
+
+  (defengine google-maps
+    "http://maps.google.com/maps?q=%s"
+    :keybinding "m"
+    :docstring "Mappin' it up.")
+
+  (defengine stack-overflow
+    "https://stackoverflow.com/search?q=%s"
+    :keybinding "s")
+
+  (defengine youtube
+    "http://www.youtube.com/results?aq=f&oq=&search_query=%s"
+    :keybinding "y")
+
+  (defengine wikipedia
+    "http://www.wikipedia.org/search-redirect.php?language=en&go=Go&search=%s"
+    :keybinding "w"
+    :docstring "Searchin' the wikis.")
+  (engine-mode t))
 #+end_src
