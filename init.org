@@ -31,6 +31,7 @@
       - [[#better-yesno-prompts][Better yes/no prompts]]
       - [[#show-the-column-number][Show the column number]]
       - [[#auto-fill-and-visual-fill][Auto Fill and Visual fill]]
+      - [[#highlight-current-line][Highlight current line]]
   - [[#keybindings][Keybindings]]
   - [[#modeline][Modeline]]
   - [[#dashboard][Dashboard]]
@@ -56,6 +57,7 @@
     - [[#encryption-with-org-mode][Encryption with org-mode]]
     - [[#org-dashboard][Org dashboard]]
     - [[#org-reveal-for-presentations][Org reveal for presentations]]
+    - [[#org-projectile][Org projectile]]
   - [[#magit][Magit]]
   - [[#counsel][Counsel]]
   - [[#ivy][Ivy]]
@@ -218,6 +220,7 @@ This is seriously retarded.
 **** Display time in the bar
 #+begin_src elisp
 (setq display-time-format "%H:%M %a,%d %b %Y")
+(setq display-time-default-load-average nil)
 (display-time)
 #+end_src
 **** Use spaces instead of tabs
@@ -309,6 +312,10 @@ Because writing yes is too much work.
   :config
   (setq-default fill-column 112))
 #+end_src
+**** Highlight current line
+#+begin_src elisp
+(global-hl-line-mode)
+#+end_src
 ** Keybindings
 Using ~general.el~ to define a leader key and various bindings with it. In modes (e.g. insert mode and emacs mode) where space is not applicable, it uses ctrl + space.
 
@@ -359,8 +366,18 @@ General keybindings
     "SPC" 'find-file
     "/"  'swiper
 
-    "p"  '(:ignore t :which-key "file")
-    "pf"  (list (lambda () (interactive) (find-file user-init-file-org)) :which-key "config")
+    "fp"  (list (lambda () (interactive) (find-file user-init-file-org)) :which-key "config")
+
+    "p"   '(:ignore t :which-key "projectile")
+    "pp"  'counsel-projectile-switch-project
+    "pk"  'projectile-kill-buffers
+    "pa"  'projectile-add-known-project
+    "pr"  'projectile-remove-known-project
+    "psr" 'projectile-ripgred
+    "pxe" 'projectile-run-eshell
+    "pf"  'counsel-projectile-find-file
+    "pS"  'projectile-save-project-buffers
+    "pD"  'projectile-dired
 
     "em"  'mu4e
 
@@ -377,12 +394,13 @@ General keybindings
     "o"   '(:ignore t :which-key "org")
     "oc"  'org-capture
     "oa"  'org-agenda
-    "op"  'org-pomodoro
+    "opp"  'org-pomodoro
     "or"  'org-refile
     "os"  'org-archive-subtree
     "ok"  '(:ignore t :which-key "kanban")
     "oki" 'org-kanban/initialize-at-end
     "oks" 'org-kanban/shift
+    "opt" 'org-projectile-project-todo-completing-read
 
     "ot" '(:ignore t :which-key "timestamp")
     "otu" 'org-timestamp-up-day
@@ -627,7 +645,10 @@ Like org bullets, but supercharged?
 (use-package org-superstar
   :straight t
   :after org
-  :hook (org-mode . org-superstar-mode))
+  :hook (org-mode . org-superstar-mode)
+  :config
+  (setq org-hide-leading-stars nil)
+  (setq org-superstar-leading-bullet ?\s))
 #+end_src
 
 For inserting code snippets (with ~<s~ for example)
@@ -775,9 +796,9 @@ For your journaling needs.
   :straight t
   :after org
   :config
-  (setq org-pomodoro-finished-sound (concat user-emacs-directory "/eraser.mp3"))
-  (setq org-pomodoro-short-break-sound (concat user-emacs-directory "/eraser.mp3"))
-  (setq org-pomodoro-long-break-sound (concat user-emacs-directory "/eraser.mp3")))
+  (setq org-pomodoro-finished-sound (concat user-emacs-directory "/eraser.wav"))
+  (setq org-pomodoro-short-break-sound (concat user-emacs-directory "/eraser.wav"))
+  (setq org-pomodoro-long-break-sound (concat user-emacs-directory "/eraser.wav")))
 #+end_src
 *** Kanban
 #+begin_src elisp
@@ -804,12 +825,14 @@ For a better way to group entries in the agenda.
 *** Better? Linking
 #+begin_src elisp
 (use-package org-super-links
-  :straight (:host github :repo "toshism/org-super-links" :branch "master"))
+  :straight (:host github :repo "toshism/org-super-links" :branch "master")
+  :after org)
 #+end_src
 *** Web tools
 #+begin_src elisp
 (use-package org-web-tools
-  :straight t)
+  :straight t
+  :after org)
 #+end_src
 *** Encryption with org-mode
 #+begin_src elisp
@@ -823,9 +846,11 @@ For a better way to group entries in the agenda.
   (setq org-tags-exclude-from-inheritance '("crypt")))
 #+end_src
 *** Org dashboard
+For showing progress on org headings with multiple todos in them.
 #+begin_src elisp
 (use-package org-dashboard
-  :straight t)
+  :straight t
+  :after org)
 #+end_src
 *** Org reveal for presentations
 #+begin_src elisp
@@ -835,6 +860,18 @@ For a better way to group entries in the agenda.
   :config
   (setq org-reveal-mathjax t)
   (setq org-re-reveal-root "https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2"))
+#+end_src
+*** Org projectile
+For todos in projects managed by projectile.
+#+begin_src elisp
+(use-package org-projectile
+  :straight t
+  :after org
+  :init
+  (org-projectile-per-project)
+  :config
+  (setq org-projectile-per-project-filepath "todos.org")
+  (setq org-agenda-files (append org-agenda-files (org-projectile-todo-files))))
 #+end_src
 ** Magit
 The git supercharge
@@ -1179,7 +1216,6 @@ Helpful adds a lot of very helpful (get it?) information to Emacs’ describe- c
   ([remap describe-variable] . counsel-describe-variable)
   ([remap describe-key] . helpful-key))
 #+end_src
-
 ** Better link opener
 #+begin_src elisp
 (use-package link-hint
@@ -1201,7 +1237,7 @@ To read / sync email in emacs. Using this only on home computers.
   (setq mu4e-sent-messages-behaviour 'delete)
   (setq mu4e-get-mail-command "/usr/bin/mbsync -Va")
   (setq mu4e-change-filenames-when-moving t)
-  (setq mu4e-update-interval 60)
+  (setq mu4e-update-interval 300)
   (setq mu4e-use-fancy-chars t)
   (setq mu4e-view-show-addresses t)
   (setq mu4e-view-show-images t)

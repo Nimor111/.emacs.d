@@ -91,6 +91,7 @@
 (display-battery-mode t)
 
 (setq display-time-format "%H:%M %a,%d %b %Y")
+(setq display-time-default-load-average nil)
 (display-time)
 
 (setq-default indent-tabs-mode nil)
@@ -150,6 +151,8 @@
   :config
   (setq-default fill-column 112))
 
+(global-hl-line-mode)
+
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 (setq user-init-file-org "~/.emacs.d/init.org")
@@ -192,8 +195,18 @@
     "SPC" 'find-file
     "/"  'swiper
 
-    "p"  '(:ignore t :which-key "file")
-    "pf"  (list (lambda () (interactive) (find-file user-init-file-org)) :which-key "config")
+    "fp"  (list (lambda () (interactive) (find-file user-init-file-org)) :which-key "config")
+
+    "p"   '(:ignore t :which-key "projectile")
+    "pp"  'counsel-projectile-switch-project
+    "pk"  'projectile-kill-buffers
+    "pa"  'projectile-add-known-project
+    "pr"  'projectile-remove-known-project
+    "psr" 'projectile-ripgred
+    "pxe" 'projectile-run-eshell
+    "pf"  'counsel-projectile-find-file
+    "pS"  'projectile-save-project-buffers
+    "pD"  'projectile-dired
 
     "em"  'mu4e
 
@@ -210,12 +223,13 @@
     "o"   '(:ignore t :which-key "org")
     "oc"  'org-capture
     "oa"  'org-agenda
-    "op"  'org-pomodoro
+    "opp"  'org-pomodoro
     "or"  'org-refile
     "os"  'org-archive-subtree
     "ok"  '(:ignore t :which-key "kanban")
     "oki" 'org-kanban/initialize-at-end
     "oks" 'org-kanban/shift
+    "opt" 'org-projectile-project-todo-completing-read
 
     "ot" '(:ignore t :which-key "timestamp")
     "otu" 'org-timestamp-up-day
@@ -425,7 +439,10 @@
 (use-package org-superstar
   :straight t
   :after org
-  :hook (org-mode . org-superstar-mode))
+  :hook (org-mode . org-superstar-mode)
+  :config
+  (setq org-hide-leading-stars nil)
+  (setq org-superstar-leading-bullet ?\s))
 
 (use-package org-tempo
   :after org)
@@ -538,9 +555,9 @@
   :straight t
   :after org
   :config
-  (setq org-pomodoro-finished-sound (concat user-emacs-directory "/eraser.mp3"))
-  (setq org-pomodoro-short-break-sound (concat user-emacs-directory "/eraser.mp3"))
-  (setq org-pomodoro-long-break-sound (concat user-emacs-directory "/eraser.mp3")))
+  (setq org-pomodoro-finished-sound (concat user-emacs-directory "/eraser.wav"))
+  (setq org-pomodoro-short-break-sound (concat user-emacs-directory "/eraser.wav"))
+  (setq org-pomodoro-long-break-sound (concat user-emacs-directory "/eraser.wav")))
 
 (use-package org-kanban
   :straight t
@@ -560,10 +577,12 @@
                      (:todo "READING" :file-path "reading_list")))))))
 
 (use-package org-super-links
-  :straight (:host github :repo "toshism/org-super-links" :branch "master"))
+  :straight (:host github :repo "toshism/org-super-links" :branch "master")
+  :after org)
 
 (use-package org-web-tools
-  :straight t)
+  :straight t
+  :after org)
 
 (use-package org-crypt
   :after org
@@ -575,7 +594,8 @@
   (setq org-tags-exclude-from-inheritance '("crypt")))
 
 (use-package org-dashboard
-  :straight t)
+  :straight t
+  :after org)
 
 (use-package org-re-reveal
   :straight t
@@ -583,6 +603,15 @@
   :config
   (setq org-reveal-mathjax t)
   (setq org-re-reveal-root "https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.9.2"))
+
+(use-package org-projectile
+  :straight t
+  :after org
+  :init
+  (org-projectile-per-project)
+  :config
+  (setq org-projectile-per-project-filepath "todos.org")
+  (setq org-agenda-files (append org-agenda-files (org-projectile-todo-files))))
 
 (use-package magit
   :straight t
@@ -859,7 +888,7 @@
   (setq mu4e-sent-messages-behaviour 'delete)
   (setq mu4e-get-mail-command "/usr/bin/mbsync -Va")
   (setq mu4e-change-filenames-when-moving t)
-  (setq mu4e-update-interval 60)
+  (setq mu4e-update-interval 300)
   (setq mu4e-use-fancy-chars t)
   (setq mu4e-view-show-addresses t)
   (setq mu4e-view-show-images t)
