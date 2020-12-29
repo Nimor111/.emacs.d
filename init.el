@@ -611,7 +611,7 @@
   (org-projectile-per-project)
   :config
   (setq org-projectile-per-project-filepath "todos.org")
-  (setq org-agenda-files (append org-agenda-files (org-projectile-todo-files))))
+	(setq org-agenda-files (seq-filter 'file-readable-p (delete-dups (append org-agenda-files (org-projectile-todo-files))))))
 
 (use-package magit
   :straight t
