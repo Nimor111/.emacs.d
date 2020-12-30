@@ -247,6 +247,8 @@
     "otu" 'org-timestamp-up-day
     "otd" 'org-timestamp-down-day
 
+    "od" 'org-decrypt-entry
+
     "tn" (list (lambda () (interactive) (find-file tech-notebook-file)) :which-key "tech-notebook")
 
     "m" '(:ignore t :which-key "todo")
