@@ -10,28 +10,33 @@
     - [[#install-use-package-for-sane-package-configuration][Install use-package for sane package configuration]]
     - [[#ensure-system-packages-to-check-they-exist][Ensure system packages to check they exist]]
   - [[#general-configs][General configs]]
-      - [[#tangle-config-file-on-save][Tangle config file on save]]
-      - [[#custom-vars-file-so-it-doesnt-pollute-the-init-file][Custom vars file, so it doesn't pollute the init file]]
-      - [[#start-emacs-in-fullscreen-happens-when-everything-is-loaded][Start emacs in fullscreen, happens when everything is loaded.]]
-      - [[#set-the-emacs-user-directory-for-re-use-in-other-places][Set the emacs user directory for re-use in other places]]
-      - [[#set-the-default-font][Set the default font.]]
-      - [[#set-the-theme][Set the theme]]
-      - [[#no-scrollbar-toolbar-menubar-because-bloat][No scrollbar, toolbar, menubar, because bloat]]
-      - [[#line-numbers--relative-line-numbers][Line numbers + relative line numbers]]
-      - [[#display-battery-in-the-bar][Display battery in the bar]]
-      - [[#display-time-in-the-bar][Display time in the bar]]
-      - [[#use-spaces-instead-of-tabs][Use spaces instead of tabs]]
-      - [[#commenting][Commenting]]
-      - [[#command-log-mode][Command log mode]]
-      - [[#which-key][Which-key]]
-      - [[#undo-magic][Undo magic]]
-      - [[#buffer-display][Buffer display]]
-      - [[#delete-unnecessary-whitespace][Delete unnecessary whitespace]]
-      - [[#restart-emacs-from-within-emacs][Restart emacs from within emacs]]
-      - [[#better-yesno-prompts][Better yes/no prompts]]
-      - [[#show-the-column-number][Show the column number]]
-      - [[#auto-fill-and-visual-fill][Auto Fill and Visual fill]]
-      - [[#highlight-current-line][Highlight current line]]
+    - [[#tangle-config-file-on-save][Tangle config file on save]]
+    - [[#custom-vars-file-so-it-doesnt-pollute-the-init-file][Custom vars file, so it doesn't pollute the init file]]
+    - [[#start-emacs-in-fullscreen-happens-when-everything-is-loaded][Start emacs in fullscreen, happens when everything is loaded.]]
+    - [[#set-the-emacs-user-directory-for-re-use-in-other-places][Set the emacs user directory for re-use in other places]]
+    - [[#keeping-folders-clean][Keeping folders clean]]
+    - [[#set-the-default-font][Set the default font.]]
+    - [[#set-the-theme][Set the theme]]
+      - [[#doom-emacs-themes][Doom emacs themes]]
+      - [[#challenger-deep-theme][Challenger deep theme]]
+    - [[#no-scrollbar-toolbar-menubar-because-bloat][No scrollbar, toolbar, menubar, because bloat]]
+    - [[#line-numbers--relative-line-numbers][Line numbers + relative line numbers]]
+    - [[#display-battery-in-the-bar][Display battery in the bar]]
+    - [[#display-time-in-the-bar][Display time in the bar]]
+    - [[#use-spaces-instead-of-tabs][Use spaces instead of tabs]]
+    - [[#commenting][Commenting]]
+    - [[#command-log-mode][Command log mode]]
+    - [[#which-key][Which-key]]
+    - [[#undo-magic][Undo magic]]
+    - [[#buffer-display][Buffer display]]
+    - [[#delete-unnecessary-whitespace][Delete unnecessary whitespace]]
+    - [[#restart-emacs-from-within-emacs][Restart emacs from within emacs]]
+    - [[#better-yesno-prompts][Better yes/no prompts]]
+    - [[#show-the-column-number][Show the column number]]
+    - [[#auto-fill-and-visual-fill][Auto Fill and Visual fill]]
+      - [[#visual-fill-eg-the-visual-wrap-of-the-lines][Visual fill, e.g. the visual wrap of the lines]]
+      - [[#auto-fill-eg-adding-line-breaks-to-lines][Auto fill, e.g. adding line breaks to lines]]
+    - [[#highlight-current-line][Highlight current line]]
   - [[#keybindings][Keybindings]]
   - [[#modeline][Modeline]]
   - [[#dashboard][Dashboard]]
@@ -120,7 +125,7 @@ Must be in the beginning for ~use-package~ usage below.
   :straight t)
 #+end_src
 ** General configs
-**** Tangle config file on save
+*** Tangle config file on save
 Courtesy of the great emacs from scratch config: [[https://github.com/daviwil/emacs-from-scratch/blob/master/Emacs.org#auto-tangle-configuration-files][Link]]
 #+begin_src elisp
 (setq gtd-table-file "~/Nextcloud/org/gtd-notion/gtd.org")
@@ -147,7 +152,7 @@ Courtesy of the great emacs from scratch config: [[https://github.com/daviwil/em
 (add-hook 'org-mode-hook
   (lambda () (add-hook 'before-save-hook #'nimor/gtd-update-dblocks)))
 #+end_src
-**** Custom vars file, so it doesn't pollute the init file
+*** Custom vars file, so it doesn't pollute the init file
 #+begin_src elisp
 (setq-default
   custom-file "~/.emacs.d/custom.el")
@@ -155,25 +160,39 @@ Courtesy of the great emacs from scratch config: [[https://github.com/daviwil/em
 (when (file-exists-p custom-file)
   (load custom-file t))
 #+end_src
-**** Start emacs in fullscreen, happens when everything is loaded.
+*** Start emacs in fullscreen, happens when everything is loaded.
 #+begin_src elisp
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 #+end_src
-**** Set the emacs user directory for re-use in other places
+*** Set the emacs user directory for re-use in other places
 #+begin_src elisp
 (let* ((home-dir (getenv "HOME"))
      (custom-emacs-directory (concat home-dir "/.emacs.d")))
   (setq user-emacs-directory custom-emacs-directory))
 #+end_src
-**** Set the default font.
+*** Keeping folders clean
+#+begin_src elisp
+;; NOTE: If you want to move everything out of the ~/.emacs.d folder
+;; reliably, set `user-emacs-directory` before loading no-littering!
+;(setq user-emacs-directory "~/.cache/emacs")
+
+(use-package no-littering
+  :straight t)
+
+;; no-littering doesn't set this by default so we must place
+;; auto save files in the same path as it uses for sessions
+(setq auto-save-file-name-transforms
+      `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+#+end_src
+*** Set the default font.
 This is seriously retarded.
 #+begin_src elisp
 (if (eq system-type 'gnu/linux)
   (set-frame-font "Jet Brains Mono 18")
   (set-frame-font "JetBrains Mono 18"))
 #+end_src
-**** Set the theme
-***** Doom emacs themes
+*** Set the theme
+**** Doom emacs themes
 #+begin_src elisp
 ;; (use-package doom-themes
 ;;   :straight t
@@ -195,52 +214,52 @@ This is seriously retarded.
 ;;   ;; Corrects (and improves) org-mode's native fontification.
 ;;   (doom-themes-org-config))
 #+end_src
-***** Challenger deep theme
+**** Challenger deep theme
 #+begin_src elisp
 (use-package challenger-deep-theme
   :straight t
   :config
   (load-theme 'challenger-deep t))
 #+end_src
-**** No scrollbar, toolbar, menubar, because bloat
+*** No scrollbar, toolbar, menubar, because bloat
 #+begin_src elisp
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 #+end_src
-**** Line numbers + relative line numbers
+*** Line numbers + relative line numbers
 #+begin_src elisp
 (global-display-line-numbers-mode)
 (setq display-line-numbers-type 'relative)
 #+end_src
-**** Display battery in the bar
+*** Display battery in the bar
 #+begin_src elisp
 (display-battery-mode t)
 #+end_src
-**** Display time in the bar
+*** Display time in the bar
 #+begin_src elisp
 (setq display-time-format "%H:%M %a,%d %b %Y")
 (setq display-time-default-load-average nil)
 (display-time)
 #+end_src
-**** Use spaces instead of tabs
+*** Use spaces instead of tabs
 #+begin_src elisp
 (setq-default indent-tabs-mode nil)
 #+end_src
-**** Commenting
+*** Commenting
 #+begin_src elisp
 (use-package evil-nerd-commenter
   :straight t
   :config
   (evilnc-default-hotkeys))
 #+end_src
-**** Command log mode
+*** Command log mode
 Show command history in sidebar. Looks slick. Works good for demos and stuff.
 #+begin_src elisp
 (use-package command-log-mode
   :straight t)
 #+end_src
-**** Which-key
+*** Which-key
 Showing a popup for key combinations that follow the pressed key (like in Spacemacs and Doom)
 #+begin_src elisp
 (use-package which-key
@@ -248,14 +267,14 @@ Showing a popup for key combinations that follow the pressed key (like in Spacem
   :config
   (which-key-mode))
 #+end_src
-**** Undo magic
+*** Undo magic
 #+begin_src elisp
 (use-package undo-tree
   :straight t
   :init
   (global-undo-tree-mode))
 #+end_src
-**** Buffer display
+*** Buffer display
 When running ~display-buffer~, will show the ~*Emacs Log*~ buffer on the right side of the window
 Here for informational purposes.
 #+begin_src elisp
@@ -271,28 +290,28 @@ Here for informational purposes.
 ;;        ;; previous entry with more actions.
 ;;      ("." nil (reusable-frames . visible))))
 #+end_src
-**** Delete unnecessary whitespace
+*** Delete unnecessary whitespace
 #+begin_src elisp
 (use-package simple
   :hook (before-save . delete-trailing-whitespace))
 #+end_src
-**** Restart emacs from within emacs
+*** Restart emacs from within emacs
 #+begin_src elisp
 (use-package restart-emacs
   :straight t)
 #+end_src
-**** Better yes/no prompts
+*** Better yes/no prompts
 Because writing yes is too much work.
 
 #+begin_src elisp
 (fset 'yes-or-no-p 'y-or-n-p)
 #+end_src
-**** Show the column number
+*** Show the column number
 #+begin_src elisp
 (column-number-mode 1)
 #+end_src
-**** Auto Fill and Visual fill
-***** Visual fill, e.g. the visual wrap of the lines
+*** Auto Fill and Visual fill
+**** Visual fill, e.g. the visual wrap of the lines
 #+begin_src elisp
 (defun nimor/org-mode-visual-fill ()
   (setq visual-fill-column-width 120
@@ -304,7 +323,7 @@ Because writing yes is too much work.
   :hook (org-mode . nimor/org-mode-visual-fill))
 #+end_src
 
-***** Auto fill, e.g. adding line breaks to lines
+**** Auto fill, e.g. adding line breaks to lines
 #+begin_src elisp
 (use-package simple
   :hook ((prog-mode . turn-on-auto-fill)
@@ -312,7 +331,7 @@ Because writing yes is too much work.
   :config
   (setq-default fill-column 112))
 #+end_src
-**** Highlight current line
+*** Highlight current line
 #+begin_src elisp
 (global-hl-line-mode)
 #+end_src
@@ -546,7 +565,8 @@ Installing and configuring org-mode:
     "vd" 'org-agenda-day-view
     "vw" 'org-agenda-week-view
     "I"  'org-agenda-clock-in
-    "O"  'org-agenda-clock-out)
+    "O"  'org-agenda-clock-out
+    "vR" 'org-agenda-clockreport-mode)
 
   ;; files that org-agenda will read from
   (setq org-agenda-files
@@ -636,7 +656,24 @@ Installing and configuring org-mode:
        (html (format yt-iframe-format
                    path (or desc "")))
        (latex (format "\href{%s}{%s}"
-                    path (or desc "video")))))))
+                    path (or desc "video"))))))
+
+  ;; clocking
+  ;; Resume clocking task when emacs is restarted
+  (org-clock-persistence-insinuate)
+  ;; Save the running clock and all clock history when exiting Emacs, load it on startup
+  (setq org-clock-persist t)
+  ;; Resume clocking task on clock-in if the clock is open
+  (setq org-clock-in-resume t)
+  ;; Do not prompt to resume an active clock, just resume it
+  (setq org-clock-persist-query-resume nil)
+  ;; If idle for more than 15 minutes, resolve the things by asking what to do
+  ;; with the clock time
+  (setq org-clock-idle-time 15)
+
+  ;; Agenda clock report parameters
+  (setq org-agenda-clockreport-parameter-plist
+    '(:link t :maxlevel 6 :fileskip0 t :compact t :narrow 60 :score 0)))
 #+end_src
 
 Like org bullets, but supercharged?
@@ -771,6 +808,22 @@ For your journaling needs.
       '((python . t)
         (shell  . t)
       )))
+#+end_src
+
+Google translate
+#+begin_src elisp
+(use-package google-translate
+  :straight t
+  :custom
+  (google-translate-backend-method 'curl)
+  :config
+  (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130)))
+#+end_src
+
+Translate in org src blocks
+#+begin_src elisp
+(use-package ob-translate
+  :straight t)
 #+end_src
 *** Notifications
 #+begin_src elisp
@@ -1371,7 +1424,8 @@ Elfeed dashboard similar to mu4e one.
       (lambda () (interactive) (message "Path: %s" target) (dired target))))
 
   (nimor/leader-keys
-   "drm" `(,(dw/dired-link "/run/media/gbojinov") :which-key "Media")))
+   "drm" `(,(dw/dired-link "/run/media/gbojinov") :which-key "Media")
+   "fin" `(,(dw/dired-link "~/Nextcloud/org/finnish") :which-key "Finnish")))
 #+end_src
 
 Adding fancy icons to dired items because why not.

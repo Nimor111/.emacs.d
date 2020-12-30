@@ -52,6 +52,18 @@
      (custom-emacs-directory (concat home-dir "/.emacs.d")))
   (setq user-emacs-directory custom-emacs-directory))
 
+;; NOTE: If you want to move everything out of the ~/.emacs.d folder
+;; reliably, set `user-emacs-directory` before loading no-littering!
+;(setq user-emacs-directory "~/.cache/emacs")
+
+(use-package no-littering
+  :straight t)
+
+;; no-littering doesn't set this by default so we must place
+;; auto save files in the same path as it uses for sessions
+(setq auto-save-file-name-transforms
+      `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+
 (if (eq system-type 'gnu/linux)
   (set-frame-font "Jet Brains Mono 18")
   (set-frame-font "JetBrains Mono 18"))
@@ -344,7 +356,8 @@
     "vd" 'org-agenda-day-view
     "vw" 'org-agenda-week-view
     "I"  'org-agenda-clock-in
-    "O"  'org-agenda-clock-out)
+    "O"  'org-agenda-clock-out
+    "vR" 'org-agenda-clockreport-mode)
 
   ;; files that org-agenda will read from
   (setq org-agenda-files
@@ -434,7 +447,24 @@
        (html (format yt-iframe-format
                    path (or desc "")))
        (latex (format "\href{%s}{%s}"
-                    path (or desc "video")))))))
+                    path (or desc "video"))))))
+
+  ;; clocking
+  ;; Resume clocking task when emacs is restarted
+  (org-clock-persistence-insinuate)
+  ;; Save the running clock and all clock history when exiting Emacs, load it on startup
+  (setq org-clock-persist t)
+  ;; Resume clocking task on clock-in if the clock is open
+  (setq org-clock-in-resume t)
+  ;; Do not prompt to resume an active clock, just resume it
+  (setq org-clock-persist-query-resume nil)
+  ;; If idle for more than 15 minutes, resolve the things by asking what to do
+  ;; with the clock time
+  (setq org-clock-idle-time 15)
+
+  ;; Agenda clock report parameters
+  (setq org-agenda-clockreport-parameter-plist
+    '(:link t :maxlevel 6 :fileskip0 t :compact t :narrow 60 :score 0)))
 
 (use-package org-superstar
   :straight t
@@ -534,6 +564,16 @@
       '((python . t)
         (shell  . t)
       )))
+
+(use-package google-translate
+  :straight t
+  :custom
+  (google-translate-backend-method 'curl)
+  :config
+  (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130)))
+
+(use-package ob-translate
+  :straight t)
 
 (use-package alert
   :straight t
@@ -995,7 +1035,8 @@
       (lambda () (interactive) (message "Path: %s" target) (dired target))))
 
   (nimor/leader-keys
-   "drm" `(,(dw/dired-link "/run/media/gbojinov") :which-key "Media")))
+   "drm" `(,(dw/dired-link "/run/media/gbojinov") :which-key "Media")
+   "fin" `(,(dw/dired-link "~/Nextcloud/org/finnish") :which-key "Finnish")))
 
 (use-package all-the-icons-dired
   :straight t
