@@ -165,6 +165,78 @@
 
 (global-hl-line-mode)
 
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+
+(global-display-line-numbers-mode)
+(setq display-line-numbers-type 'relative)
+
+(display-battery-mode t)
+
+(setq display-time-format "%H:%M %a,%d %b %Y")
+(setq display-time-default-load-average nil)
+(display-time)
+
+(setq-default indent-tabs-mode nil)
+
+(use-package evil-nerd-commenter
+  :straight t
+  :config
+  (evilnc-default-hotkeys))
+
+(use-package command-log-mode
+  :straight t)
+
+(use-package which-key
+  :straight t
+  :config
+  (which-key-mode))
+
+(use-package undo-tree
+  :straight t
+  :init
+  (global-undo-tree-mode))
+
+;; (setq display-buffer-alist
+;;   `(;; Messages, errors, processes, Calendar in the bottom side window
+;;      (,(rx bos (or "*Emacs Log*"))  ; interaction log *Emacs Log*
+;;        (display-buffer-reuse-window display-buffer-in-side-window)
+;;        (side . right)
+;;        (reusable-frames . visible)
+;;        (window-height . 0.45))
+;;        ;; Let `display-buffer' reuse visible frames for all buffers. This must
+;;        ;; be the last entry in `display-buffer-alist', because it overrides any
+;;        ;; previous entry with more actions.
+;;      ("." nil (reusable-frames . visible))))
+
+(use-package simple
+  :hook (before-save . delete-trailing-whitespace))
+
+(use-package restart-emacs
+  :straight t)
+
+(fset 'yes-or-no-p 'y-or-n-p)
+
+(column-number-mode 1)
+
+(defun nimor/org-mode-visual-fill ()
+  (setq visual-fill-column-width 120
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :straight t
+  :hook (org-mode . nimor/org-mode-visual-fill))
+
+(use-package simple
+  :hook ((prog-mode . turn-on-auto-fill)
+         (text-mode . turn-on-auto-fill))
+  :config
+  (setq-default fill-column 112))
+
+(global-hl-line-mode)
+
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 (setq user-init-file-org "~/.emacs.d/init.org")
@@ -232,20 +304,32 @@
 
     "fw"  (list (lambda () (interactive) (find-file work-file)) :which-key "work")
 
-    "o"   '(:ignore t :which-key "org")
-    "oc"  'org-capture
-    "oa"  'org-agenda
+    "o"    '(:ignore t :which-key "org")
+    "oa"   'org-agenda
     "opp"  'org-pomodoro
-    "or"  'org-refile
-    "os"  'org-archive-subtree
-    "ok"  '(:ignore t :which-key "kanban")
-    "oki" 'org-kanban/initialize-at-end
-    "oks" 'org-kanban/shift
-    "opt" 'org-projectile-project-todo-completing-read
+    "or"   'org-refile
+    "os"   'org-archive-subtree
+
+    "oc"   '(:ignore t :which-key "org-clock")
+    "occ"  'org-capture
+    "oci"  'org-clock-in
+    "oco"  'org-clock-out
+    "ocl"  'org-clock-in-last
+    "ocr"  'org-clock-report
+    "ocg"  'org-clock-goto
+
+    "ok"   '(:ignore t :which-key "kanban")
+    "oki"  'org-kanban/initialize-at-end
+    "oks"  'org-kanban/shift
+
+    "op"   '(:ignoer t :which-key "org-projectile")
+    "opt"  'org-projectile-project-todo-completing-read
+    "opg"  'org-projectile-goto-location-for-project
 
     "ot" '(:ignore t :which-key "timestamp")
     "otu" 'org-timestamp-up-day
     "otd" 'org-timestamp-down-day
+    "otl" 'org-toggle-link-display
 
     "od" 'org-decrypt-entry
 
@@ -256,13 +340,18 @@
     "ms" 'org-schedule
     "md" 'org-deadline
 
-    "w" '(:ignore t :which-key "window")
+    "w"  '(:ignore t :which-key "window")
     "wh" 'evil-window-left
     "wl" 'evil-window-right
     "wk" 'evil-window-up
     "wj" 'evil-window-down
 
-    "hd" 'howdoyou-query
+    "q"  'howdoyou-query
+
+    "h"  '(:ignore t :which-key "describe")
+    "hf" 'counsel-describe-function
+    "hv" 'counsel-describe-variable
+    "hk" 'helpful-key
 
     "x"   '(:ignore t :which-key "buffer")
     "xh"  'previous-buffer
@@ -341,6 +430,9 @@
   :config
   (evil-collection-init))
 
+(use-package ov
+  :straight t)
+
 (defun nimor/org-mode-setup ()
   (org-indent-mode)
   (visual-line-mode 1))
@@ -350,59 +442,6 @@
   :hook
   (org-mode . nimor/org-mode-setup)
   :config
-  ;; make org-agenda respect evil
-  (evil-set-initial-state 'org-agenda-mode 'normal)
-
-  ;; org-agenda custom bindings
-  (evil-define-key 'normal org-agenda-mode-map
-    "vd" 'org-agenda-day-view
-    "vw" 'org-agenda-week-view
-    "I"  'org-agenda-clock-in
-    "O"  'org-agenda-clock-out
-    "vR" 'org-agenda-clockreport-mode)
-
-  ;; files that org-agenda will read from
-  (setq org-agenda-files
-  '("~/Nextcloud/Orgzly/gtd.org"
-    "~/Nextcloud/Orgzly/tickler.org"
-    "~/Nextcloud/Orgzly/inbox.org"
-    "~/Nextcloud/Orgzly/daily.org"
-    "~/Nextcloud/org/work/work.org"
-    "~/Nextcloud/org/reading_list.org"))
-
-  (setq org-agenda-start-with-log-mode t)
-  ;; org-agenda custom views
-  (setq org-agenda-custom-commands
-    '(("g" "GTD" tags-todo "@gtd"
-      ((org-agenda-overriding-header "GTD")))))
-
-  ;; files to refile to
-  (setq org-refile-targets
-    '(("~/Nextcloud/Orgzly/gtd.org"     :maxlevel . 9)
-      ("~/Nextcloud/Orgzly/someday.org" :maxlevel . 9)
-      ("~/Nextcloud/Orgzly/tickler.org" :maxlevel . 9)))
-
-  ;; quick templates for org files
-  (setq org-capture-templates
-    '(("t" "Todo [inbox]" entry
-      (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
-      "* TODO %i%? \n SCHEDULED: %t")
-      ("T" "Tickler" entry
-      (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
-      "* TODO %i%? \n SCHEDULED: %T")
-      ("M" "Mail Todo with link" entry
-      (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
-      "* TODO %i%? \n:PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
-      ("W" "Finnish word of the day" entry
-      (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
-      "* TODO Word of the day - %t \n:PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
-      ("d" "Todo [daily]" entry
-        (file+olp+datetree "~/Nextcloud/Orgzly/daily.org")
-        "* TODO %i%? \n SCHEDULED: %t")
-      ("D" "Todo with link [daily]" entry
-        (file+olp+datetree "~/Nextcloud/Orgzly/daily.org")
-        "* TODO %a \n SCHEDULED: %t")))
-
   ;; TODO keywords that I use - the ones after the | are the done states
   (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "NEXT(n)" "|" "DONE(d)" "CANCELLED(c)")))
 
@@ -451,22 +490,8 @@
        (latex (format "\href{%s}{%s}"
                     path (or desc "video"))))))
 
-  ;; clocking
-  ;; Resume clocking task when emacs is restarted
-  (org-clock-persistence-insinuate)
-  ;; Save the running clock and all clock history when exiting Emacs, load it on startup
-  (setq org-clock-persist t)
-  ;; Resume clocking task on clock-in if the clock is open
-  (setq org-clock-in-resume t)
-  ;; Do not prompt to resume an active clock, just resume it
-  (setq org-clock-persist-query-resume nil)
-  ;; If idle for more than 15 minutes, resolve the things by asking what to do
-  ;; with the clock time
-  (setq org-clock-idle-time 15)
-
-  ;; Agenda clock report parameters
-  (setq org-agenda-clockreport-parameter-plist
-    '(:link t :maxlevel 6 :fileskip0 t :compact t :narrow 60 :score 0)))
+  ;; coloured text
+  (load-file (concat user-emacs-directory "/lisp/org-colored-text.el")))
 
 (use-package org-superstar
   :straight t
@@ -480,6 +505,90 @@
   :after org)
 
 (add-hook 'org-mode-hook (lambda () (display-line-numbers-mode 0)))
+
+(use-package org-capture
+  :after org
+  :config
+  ;; quick templates for org files
+  (setq org-capture-templates
+    '(("t" "Todo [inbox]" entry
+      (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
+      "* TODO %i%? \n SCHEDULED: %t")
+      ("T" "Tickler" entry
+      (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
+      "* TODO %i%? \n SCHEDULED: %T")
+      ("M" "Mail Todo with link" entry
+      (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
+      "* TODO %i%? \n:PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
+      ("W" "Finnish word of the day" entry
+      (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
+      "* TODO Word of the day - %t \n:PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
+      ("d" "Todo [daily]" entry
+        (file+olp+datetree "~/Nextcloud/Orgzly/daily.org")
+        "* TODO %i%? \n SCHEDULED: %t")
+      ("D" "Todo with link [daily]" entry
+        (file+olp+datetree "~/Nextcloud/Orgzly/daily.org")
+        "* TODO %a \n SCHEDULED: %t"))))
+
+(use-package org-agenda
+  :after org
+  :config
+  ;; make org-agenda respect evil
+  (evil-set-initial-state 'org-agenda-mode 'normal)
+
+  ;; org-agenda custom bindings
+  (evil-define-key 'normal org-agenda-mode-map
+    "vd" 'org-agenda-day-view
+    "vw" 'org-agenda-week-view
+    "I"  'org-agenda-clock-in
+    "O"  'org-agenda-clock-out
+    "vR" 'org-agenda-clockreport-mode)
+
+  ;; files that org-agenda will read from
+  (setq org-agenda-files
+  '("~/Nextcloud/Orgzly/gtd.org"
+    "~/Nextcloud/Orgzly/tickler.org"
+    "~/Nextcloud/Orgzly/inbox.org"
+    "~/Nextcloud/Orgzly/daily.org"
+    "~/Nextcloud/org/work/work.org"
+    "~/Nextcloud/org/reading_list.org"))
+
+  ;; show logs during the day - closed tasks and times, clocks
+  (setq org-agenda-start-with-log-mode t))
+
+(use-package org-refile
+  :after org
+  :config
+  ;; files to refile to
+  (setq org-refile-targets
+    '(("~/Nextcloud/Orgzly/gtd.org"     :maxlevel . 9)
+      ("~/Nextcloud/Orgzly/someday.org" :maxlevel . 9)
+      ("~/Nextcloud/Orgzly/tickler.org" :maxlevel . 9))))
+
+(use-package org-clock
+  :after org
+  :config
+  ;; Resume clocking task when emacs is restarted
+  (org-clock-persistence-insinuate)
+  ;; Save the running clock and all clock history when exiting Emacs, load it on startup
+  (setq org-clock-persist t)
+  ;; Resume clocking task on clock-in if the clock is open
+  (setq org-clock-in-resume t)
+  ;; Do not prompt to resume an active clock, just resume it
+  (setq org-clock-persist-query-resume nil)
+  ;; If idle for more than 15 minutes, resolve the things by asking what to do
+  ;; with the clock time
+  (setq org-clock-idle-time 15)
+  ;; remove zero time clocks
+  (setq org-clock-out-remove-zero-time-clocks t)
+  ;; Include current clocking task in clock reports
+  (setq org-clock-report-include-clocking-task t)
+  ;; Regular clock report parameters
+  (setq org-clock-clocktable-default-properties
+    '(:block day :maxlevel 9 :scope agenda :link t :compact t :step day :narrow 80 :fileskip0 t :stepskip0 t))
+  ;; Agenda clock report parameters
+  (setq org-agenda-clockreport-parameter-plist
+    '(:link t :maxlevel 6 :fileskip0 t :compact t :narrow 60 :score 0)))
 
 (use-package org-roam
   :straight
@@ -497,7 +606,8 @@
     "ng" 'org-roam-graph-show
     "ni" 'org-roam-insert
     "nI" 'org-roam-insert-immediate
-    "no" 'org-roam-dailies-capture-today)
+    "no" 'org-roam-dailies-capture-today
+    "nt" 'org-roam-dailies-find-today)
 
   (setq org-roam-completion-everywhere t)
 
@@ -557,21 +667,17 @@
   (nimor/leader-keys
     "nj" 'org-journal-new-entry))
 
-(use-package ob
-  :defer t
-  :after org
-  :config
-  (org-babel-do-load-languages
-    'org-babel-load-languages
-      '((python . t)
-        (shell  . t)
-      )))
+(use-package ob-python   :after org)
+(use-package ob-shell    :after org)
+(use-package ob-js       :after org)
+(use-package ob-java     :after org)
 
 (use-package google-translate
   :straight t
   :custom
   (google-translate-backend-method 'curl)
   :config
+  ;; some weird workaround so google translate will actually work
   (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130)))
 
 (use-package ob-translate
