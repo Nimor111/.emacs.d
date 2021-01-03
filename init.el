@@ -18,7 +18,7 @@
 
 (setq gtd-table-file "~/Nextcloud/org/gtd-notion/gtd.org")
 
-(defun nimor/org-babel-tangle-config ()
+(defun my/org-babel-tangle-config ()
   "Tangles the org config file to init.el"
   (when (string-equal (buffer-file-name)
                       (expand-file-name "~/.emacs.d/init.org"))
@@ -26,7 +26,7 @@
     (let ((org-confirm-babel-evaluate nil))
       (org-babel-tangle))))
 
-(defun nimor/gtd-update-dblocks ()
+(defun my/gtd-update-dblocks ()
   "Updates the org-columns dynamic blocks in the gtd file"
   (interactive)
   (when (string-equal (buffer-file-name)
@@ -35,10 +35,10 @@
       (org-update-all-dblocks))))
 
 (add-hook 'org-mode-hook
-  (lambda () (add-hook 'after-save-hook #'nimor/org-babel-tangle-config)))
+  (lambda () (add-hook 'after-save-hook #'my/org-babel-tangle-config)))
 
 (add-hook 'org-mode-hook
-  (lambda () (add-hook 'before-save-hook #'nimor/gtd-update-dblocks)))
+  (lambda () (add-hook 'before-save-hook #'my/gtd-update-dblocks)))
 
 (setq-default
   custom-file "~/.emacs.d/custom.el")
@@ -148,14 +148,14 @@
 
 (column-number-mode 1)
 
-(defun nimor/org-mode-visual-fill ()
+(defun my/org-mode-visual-fill ()
   (setq visual-fill-column-width 120
         visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
 (use-package visual-fill-column
   :straight t
-  :hook (org-mode . nimor/org-mode-visual-fill))
+  :hook (org-mode . my/org-mode-visual-fill))
 
 (use-package simple
   :hook ((prog-mode . turn-on-auto-fill)
@@ -220,14 +220,14 @@
 
 (column-number-mode 1)
 
-(defun nimor/org-mode-visual-fill ()
+(defun my/org-mode-visual-fill ()
   (setq visual-fill-column-width 120
         visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
 (use-package visual-fill-column
   :straight t
-  :hook (org-mode . nimor/org-mode-visual-fill))
+  :hook (org-mode . my/org-mode-visual-fill))
 
 (use-package simple
   :hook ((prog-mode . turn-on-auto-fill)
@@ -249,7 +249,7 @@
 (setq work-file "~/Nextcloud/org/work/work.org")
 
 ;; would love to be able to do it like this but it doesn't work for some reason
-(defun nimor/open-file (file-name)
+(defun my/open-file (file-name)
   "Open a specific file"
   (lambda ()
     (interactive)
@@ -261,20 +261,20 @@
   (general-evil-setup t)
 
   ;; general leader key
-  (general-create-definer nimor/leader-keys
+  (general-create-definer my/leader-keys
     :keymaps '(normal insert visual emacs)
     :prefix "SPC"
     :global-prefix "C-SPC")
 
   ;; leader key for language specific bindings
-  (general-create-definer nimor/language-leader-def
+  (general-create-definer my/language-leader-def
     :keymaps '(normal insert visual emacs)
     :prefix "SPC l"
     ;; for insert mode
     :global-prefix "C-SPC l"
     "" '(:ignore t :which-key "language"))
 
-  (nimor/leader-keys
+  (my/leader-keys
     "b"  'counsel-bookmark
     "SPC" 'find-file
     "/"  'swiper
@@ -433,14 +433,14 @@
 (use-package ov
   :straight t)
 
-(defun nimor/org-mode-setup ()
+(defun my/org-mode-setup ()
   (org-indent-mode)
   (visual-line-mode 1))
 
 (use-package org
   :straight t
   :hook
-  (org-mode . nimor/org-mode-setup)
+  (org-mode . my/org-mode-setup)
   :config
   ;; TODO keywords that I use - the ones after the | are the done states
   (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "NEXT(n)" "|" "DONE(d)" "CANCELLED(c)")))
@@ -599,7 +599,7 @@
   (org-roam-directory "~/Nextcloud/org-roam")
   :config
   (setq org-roam-directory "~/Nextcloud/org-roam")
-  (nimor/leader-keys
+  (my/leader-keys
     "n" '(:ignore t :which-key "org-roam")
     "nl" 'org-roam
     "nf" 'org-roam-find-file
@@ -664,7 +664,7 @@
   :config
   (setq org-journal-dir "~/Nextcloud/journal")
   (setq org-journal-date-format "%A, %d %B %Y")
-  (nimor/leader-keys
+  (my/leader-keys
     "nj" 'org-journal-new-entry))
 
 (use-package ob-python   :after org)
@@ -968,7 +968,7 @@
   (venv-initialize-interactive-shells)
   (venv-initialize-eshell))
 
-(nimor/language-leader-def
+(my/language-leader-def
   "p" '(:ignore t :which-key "python")
   "pf" 'elpy-autopep8-fix-code)
 
@@ -1023,7 +1023,7 @@
 (use-package link-hint
   :straight t
   :config
-  (nimor/leader-keys
+  (my/leader-keys
     "fo" 'link-hint-open-link))
 
 (if (eq system-type 'gnu/linux)
@@ -1142,7 +1142,7 @@
     (lexical-let ((target path))
       (lambda () (interactive) (message "Path: %s" target) (dired target))))
 
-  (nimor/leader-keys
+  (my/leader-keys
    "drm" `(,(dw/dired-link "/run/media/gbojinov") :which-key "Media")
    "fin" `(,(dw/dired-link "~/Nextcloud/org/finnish") :which-key "Finnish")))
 
