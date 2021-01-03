@@ -306,7 +306,6 @@
 
     "o"    '(:ignore t :which-key "org")
     "oa"   'org-agenda
-    "opp"  'org-pomodoro
     "or"   'org-refile
     "os"   'org-archive-subtree
 
@@ -322,9 +321,10 @@
     "oki"  'org-kanban/initialize-at-end
     "oks"  'org-kanban/shift
 
-    "op"   '(:ignoer t :which-key "org-projectile")
+    "op"   '(:ignore t :which-key "org-projectile")
     "opt"  'org-projectile-project-todo-completing-read
     "opg"  'org-projectile-goto-location-for-project
+    "opp"  'org-pomodoro
 
     "ot" '(:ignore t :which-key "timestamp")
     "otu" 'org-timestamp-up-day
