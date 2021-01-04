@@ -553,7 +553,7 @@
   '("~/Nextcloud/Orgzly/gtd.org"
     "~/Nextcloud/Orgzly/tickler.org"
     "~/Nextcloud/Orgzly/inbox.org"
-    "~/Nextcloud/Orgzly/daily.org"
+    "~/Nextcloud/Orgzly/hobbies.org"
     "~/Nextcloud/org/work/work.org"
     "~/Nextcloud/org/reading_list.org"))
 
@@ -589,7 +589,7 @@
   (setq org-clock-report-include-clocking-task t)
   ;; Regular clock report parameters
   (setq org-clock-clocktable-default-properties
-    '(:block day :maxlevel 9 :scope agenda :link t :compact t :step day :narrow 80 :fileskip0 t :stepskip0 t))
+    '(:block day :maxlevel 9 :scope agenda :link t :compact t :step day :narrow 80 :fileskip0 t :stepskip0 t :formula %))
   ;; Agenda clock report parameters
   (setq org-agenda-clockreport-parameter-plist
     '(:link t :maxlevel 6 :fileskip0 t :compact t :narrow 60 :score 0)))
@@ -748,10 +748,6 @@
   :config
   (setq org-tags-exclude-from-inheritance '("crypt")))
 
-(use-package org-dashboard
-  :straight t
-  :after org)
-
 (use-package org-re-reveal
   :straight t
   :after org
@@ -770,6 +766,10 @@
 
 (use-package org-archive-hierarchically
   :straight (:host gitlab :repo "andersjohansson/org-archive-hierarchically" :branch "master"))
+
+(use-package anki-editor
+  :ensure-system-package anki
+  :straight t)
 
 (use-package magit
   :straight t
@@ -869,10 +869,6 @@
   (gdscript-mode . lsp)
   (scala-mode    . lsp)
   :commands lsp)
-
-(use-package lsp-ui
-  :straight t
-  :commands lsp-ui-mode)
 
 (defun lsp--gdscript-ignore-errors (original-function &rest args)
   "Ignore the error message resulting from Godot not replying to the `JSONRPC' request."
@@ -1125,12 +1121,6 @@
   ;; don't try to follow symlinks in straight.el repos
   (setq esup-depth 0)
   (setq esup-user-init-file (file-truename "~/.emacs.d/init.el")))
-
-(use-package emms
-  :straight t
-  :config
-  (emms-all)
-  (emms-default-players))
 
 (use-package elfeed
   :straight t)

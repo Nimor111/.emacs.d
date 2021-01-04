@@ -82,10 +82,10 @@
     - [[#better-linking][Better? Linking]]
     - [[#web-tools][Web tools]]
     - [[#encryption-with-org-mode][Encryption with org-mode]]
-    - [[#org-dashboard][Org dashboard]]
     - [[#org-reveal-for-presentations][Org reveal for presentations]]
     - [[#org-projectile][Org projectile]]
     - [[#org-archive-hierarchically][Org archive hierarchically]]
+    - [[#flashcards-with-anki][Flashcards with Anki]]
   - [[#magit][Magit]]
   - [[#counsel][Counsel]]
   - [[#ivy][Ivy]]
@@ -114,7 +114,6 @@
   - [[#email][Email]]
   - [[#persistent-scratch][Persistent scratch]]
   - [[#esup][Esup]]
-  - [[#emms][EMMS]]
   - [[#elfeed][Elfeed]]
   - [[#dired][Dired]]
   - [[#snow][Snow]]
@@ -848,7 +847,7 @@ Disable line numbers in org-mode
   '("~/Nextcloud/Orgzly/gtd.org"
     "~/Nextcloud/Orgzly/tickler.org"
     "~/Nextcloud/Orgzly/inbox.org"
-    "~/Nextcloud/Orgzly/daily.org"
+    "~/Nextcloud/Orgzly/hobbies.org"
     "~/Nextcloud/org/work/work.org"
     "~/Nextcloud/org/reading_list.org"))
 
@@ -888,7 +887,7 @@ Disable line numbers in org-mode
   (setq org-clock-report-include-clocking-task t)
   ;; Regular clock report parameters
   (setq org-clock-clocktable-default-properties
-    '(:block day :maxlevel 9 :scope agenda :link t :compact t :step day :narrow 80 :fileskip0 t :stepskip0 t))
+    '(:block day :maxlevel 9 :scope agenda :link t :compact t :step day :narrow 80 :fileskip0 t :stepskip0 t :formula %))
   ;; Agenda clock report parameters
   (setq org-agenda-clockreport-parameter-plist
     '(:link t :maxlevel 6 :fileskip0 t :compact t :narrow 60 :score 0)))
@@ -1098,13 +1097,6 @@ For a better way to group entries in the agenda.
   :config
   (setq org-tags-exclude-from-inheritance '("crypt")))
 #+end_src
-*** Org dashboard
-For showing progress on org headings with multiple todos in them.
-#+begin_src elisp
-(use-package org-dashboard
-  :straight t
-  :after org)
-#+end_src
 *** Org reveal for presentations
 #+begin_src elisp
 (use-package org-re-reveal
@@ -1131,6 +1123,12 @@ Creates the heading before an archived heading in the archive file
 #+begin_src elisp
 (use-package org-archive-hierarchically
   :straight (:host gitlab :repo "andersjohansson/org-archive-hierarchically" :branch "master"))
+#+end_src
+*** Flashcards with Anki
+#+begin_src elisp
+(use-package anki-editor
+  :ensure-system-package anki
+  :straight t)
 #+end_src
 ** Magit
 The git supercharge
@@ -1271,10 +1269,6 @@ For your general language needs.
   (gdscript-mode . lsp)
   (scala-mode    . lsp)
   :commands lsp)
-
-(use-package lsp-ui
-  :straight t
-  :commands lsp-ui-mode)
 
 (defun lsp--gdscript-ignore-errors (original-function &rest args)
   "Ignore the error message resulting from Godot not replying to the `JSONRPC' request."
@@ -1579,7 +1573,6 @@ Alerts for emails
   :config
   (persistent-scratch-setup-default))
 #+end_src
-
 ** Esup
 Profiling.
 #+begin_src elisp
@@ -1590,17 +1583,6 @@ Profiling.
   (setq esup-depth 0)
   (setq esup-user-init-file (file-truename "~/.emacs.d/init.el")))
 #+end_src
-
-** EMMS
-For the music and stuff.
-#+begin_src elisp
-(use-package emms
-  :straight t
-  :config
-  (emms-all)
-  (emms-default-players))
-#+end_src
-
 ** Elfeed
 For the sweet RSS (data :scream:) feeds.
 #+begin_src elisp
