@@ -307,7 +307,7 @@
     "o"    '(:ignore t :which-key "org")
     "oa"   'org-agenda
     "or"   'org-refile
-    "os"   'org-archive-subtree
+    "os"   'org-archive-hierarchically
 
     "oc"   '(:ignore t :which-key "org-clock")
     "occ"  'org-capture
@@ -760,6 +760,9 @@
   :config
   (setq org-projectile-per-project-filepath "todos.org")
 	(setq org-agenda-files (seq-filter 'file-readable-p (delete-dups (append org-agenda-files (org-projectile-todo-files))))))
+
+(use-package org-archive-hierarchically
+  :straight (:host gitlab :repo "andersjohansson/org-archive-hierarchically" :branch "master"))
 
 (use-package magit
   :straight t

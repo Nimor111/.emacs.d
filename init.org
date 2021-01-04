@@ -85,6 +85,7 @@
     - [[#org-dashboard][Org dashboard]]
     - [[#org-reveal-for-presentations][Org reveal for presentations]]
     - [[#org-projectile][Org projectile]]
+    - [[#org-archive-hierarchically][Org archive hierarchically]]
   - [[#magit][Magit]]
   - [[#counsel][Counsel]]
   - [[#ivy][Ivy]]
@@ -553,7 +554,7 @@ General keybindings
     "o"    '(:ignore t :which-key "org")
     "oa"   'org-agenda
     "or"   'org-refile
-    "os"   'org-archive-subtree
+    "os"   'org-archive-hierarchically
 
     "oc"   '(:ignore t :which-key "org-clock")
     "occ"  'org-capture
@@ -1113,6 +1114,12 @@ For todos in projects managed by projectile.
   :config
   (setq org-projectile-per-project-filepath "todos.org")
 	(setq org-agenda-files (seq-filter 'file-readable-p (delete-dups (append org-agenda-files (org-projectile-todo-files))))))
+#+end_src
+*** Org archive hierarchically
+Creates the heading before an archived heading in the archive file
+#+begin_src elisp
+(use-package org-archive-hierarchically
+  :straight (:host gitlab :repo "andersjohansson/org-archive-hierarchically" :branch "master"))
 #+end_src
 ** Magit
 The git supercharge
