@@ -466,6 +466,10 @@
   ;; log when an item is rescheduled
   (setq org-log-reschedule (quote time))
 
+  ;; some safeguards against accidentally deleting entire sections of an org file
+  (setq org-catch-invisible-edits 'smart)
+  (setq org-ctrl-k-protect-subtree t)
+
   (setq org-src-fontify-natively t
         org-src-preserve-indentation t ;; do not put two spaces on the left
         org-src-tab-acts-natively t)
@@ -589,6 +593,9 @@
   ;; Agenda clock report parameters
   (setq org-agenda-clockreport-parameter-plist
     '(:link t :maxlevel 6 :fileskip0 t :compact t :narrow 60 :score 0)))
+
+(use-package counsel-org-clock
+  :straight t)
 
 (use-package org-roam
   :straight
@@ -782,6 +789,9 @@
   :straight t
   :config
   (counsel-projectile-mode 1))
+
+(use-package counsel-web
+  :straight t)
 
 (use-package ivy
   :straight t
