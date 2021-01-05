@@ -1127,6 +1127,10 @@ Creates the heading before an archived heading in the archive file
 *** Flashcards with Anki
 #+begin_src elisp
 (use-package anki-editor
+  :if (eq system-type 'darwin)
+  :ensure-system-package
+  ("/Applications/Anki.app" . "brew install anki")
+  :if (eq system-type 'gnu/linux)
   :ensure-system-package anki
   :straight t)
 #+end_src

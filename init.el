@@ -768,6 +768,10 @@
   :straight (:host gitlab :repo "andersjohansson/org-archive-hierarchically" :branch "master"))
 
 (use-package anki-editor
+  :if (eq system-type 'darwin)
+  :ensure-system-package
+  ("/Applications/Anki.app" . "brew install anki")
+  :if (eq system-type 'gnu/linux)
   :ensure-system-package anki
   :straight t)
 
