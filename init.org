@@ -60,6 +60,7 @@
   - [[#dashboard][Dashboard]]
   - [[#evil-mode][Evil-mode]]
     - [[#evil-mode-configs][Evil mode configs]]
+    - [[#evil-visual-line-mode-better][Evil visual line mode (better?)]]
     - [[#org-mode-integration-with-evil][Org mode integration with evil]]
     - [[#evil-collection-mode][Evil collection mode]]
   - [[#org-mode][Org-mode]]
@@ -118,6 +119,7 @@
   - [[#dired][Dired]]
   - [[#snow][Snow]]
   - [[#engine-mode][Engine mode]]
+  - [[#ledger][Ledger]]
 
 ** Package manager
 Must be in the beginning for ~use-package~ usage below.
@@ -667,11 +669,17 @@ Vim keybinds and goodness in emacs
   :config
   (evil-mode 1)
   (evil-set-initial-state 'dashboard-mode 'normal)
-  (evil-set-undo-system 'undo-tree)
-  (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
-  (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line))
+  (evil-set-undo-system 'undo-tree))
+  ;;(define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
+  ;;(define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line))
 #+end_src
-
+*** Evil visual line mode (better?)
+#+begin_src elisp
+(use-package evil-better-visual-line
+  :straight t
+  :config
+  (evil-better-visual-line-on))
+#+end_src
 *** Org mode integration with evil
 #+begin_src elisp
 (use-package evil-org
@@ -1690,4 +1698,17 @@ Search stuff from the comfort of your Emacs.
     :keybinding "w"
     :docstring "Searchin' the wikis.")
   (engine-mode t))
+#+end_src
+
+** Ledger
+#+begin_src elisp
+(use-package ledger-mode
+  :ensure-system-package ledger
+  :straight t
+  :init
+  (setq ledger-clear-whole-transactions 1)
+  :config
+  ;; so bindings don't conflict
+  (add-to-list 'evil-emacs-state-modes 'ledger-report-mode)
+  :mode "\\.dat\\'")
 #+end_src

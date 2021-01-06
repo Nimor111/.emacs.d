@@ -408,9 +408,14 @@
   :config
   (evil-mode 1)
   (evil-set-initial-state 'dashboard-mode 'normal)
-  (evil-set-undo-system 'undo-tree)
-  (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
-  (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line))
+  (evil-set-undo-system 'undo-tree))
+  ;;(define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
+  ;;(define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line))
+
+(use-package evil-better-visual-line
+  :straight t
+  :config
+  (evil-better-visual-line-on))
 
 (use-package evil-org
   :straight t
@@ -1206,3 +1211,13 @@
     :keybinding "w"
     :docstring "Searchin' the wikis.")
   (engine-mode t))
+
+(use-package ledger-mode
+  :ensure-system-package ledger
+  :straight t
+  :init
+  (setq ledger-clear-whole-transactions 1)
+  :config
+  ;; so bindings don't conflict
+  (add-to-list 'evil-emacs-state-modes 'ledger-report-mode)
+  :mode "\\.dat\\'")
