@@ -244,7 +244,6 @@
 (setq gtd-file "~/Nextcloud/Orgzly/gtd.org")
 (setq gtd-someday-file "~/Nextcloud/Orgzly/someday.org")
 (setq gtd-tickler-file "~/Nextcloud/Orgzly/tickler.org")
-(setq daily-file "~/Nextcloud/Orgzly/daily.org")
 (setq tech-notebook-file "~/Nextcloud/org/tech_notebook.org")
 (setq work-file "~/Nextcloud/org/work/work.org")
 
@@ -275,9 +274,11 @@
     "" '(:ignore t :which-key "language"))
 
   (my/leader-keys
-    "b"  'counsel-bookmark
+    "s"   'save-buffer
+
+    "b"   'counsel-bookmark
     "SPC" 'find-file
-    "/"  'swiper
+    "/"   'swiper
 
     "fp"  (list (lambda () (interactive) (find-file user-init-file-org)) :which-key "config")
 
@@ -308,6 +309,7 @@
     "oa"   'org-agenda
     "or"   'org-refile
     "os"   'org-archive-hierarchically
+    "og"   'counsel-org-goto
 
     "oc"   '(:ignore t :which-key "org-clock")
     "occ"  'org-capture
@@ -351,10 +353,13 @@
     "h"  '(:ignore t :which-key "describe")
     "hf" 'counsel-describe-function
     "hv" 'counsel-describe-variable
+    "hl" 'counsel-find-library
     "hk" 'helpful-key
+    "a"  'counsel-linux-app
 
     "x"   '(:ignore t :which-key "buffer")
     "xh"  'previous-buffer
+    "xa"  'ibuffer-list-buffers
     "xl"  'next-buffer
     "xk"  'kill-buffer
     "xs"  '(:ignore t :which-key "split-window")
@@ -408,14 +413,9 @@
   :config
   (evil-mode 1)
   (evil-set-initial-state 'dashboard-mode 'normal)
-  (evil-set-undo-system 'undo-tree))
-  ;;(define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
-  ;;(define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line))
-
-(use-package evil-better-visual-line
-  :straight t
-  :config
-  (evil-better-visual-line-on))
+  (evil-set-undo-system 'undo-tree)
+  (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
+  (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line))
 
 (use-package evil-org
   :straight t
@@ -478,6 +478,8 @@
   (setq org-src-fontify-natively t
         org-src-preserve-indentation t ;; do not put two spaces on the left
         org-src-tab-acts-natively t)
+
+  (setq org-pretty-entities-include-sub-superscripts nil)
 
   (setq yt-iframe-format
     (concat "<iframe width=\"440\""
@@ -619,7 +621,8 @@
     "ni" 'org-roam-insert
     "nI" 'org-roam-insert-immediate
     "no" 'org-roam-dailies-capture-today
-    "nt" 'org-roam-dailies-find-today)
+    "nt" 'org-roam-dailies-find-today
+    "ny" 'org-roam-dailies-find-yesterday)
 
   (setq org-roam-completion-everywhere t)
 

@@ -5,8 +5,10 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    '("aaf300544667970333366f2bad847899f193fcfe96172ec325dbc3195b797220" default))
+ '(helm-minibuffer-history-key "M-p")
  '(safe-local-variable-values
-   '((encoding . utf-8)
+   '((org-roam-directory . "~/Nextcloud/org/finnish/")
+     (encoding . utf-8)
      (org-roam-dailies-directory "~/Nextcloud/org/finnish/daily/")
      (org-roam-index-file . "~/Nextcloud/org/finnish/index.org")
      (deft-directory . "~/Nextcloud/org/finnish")
