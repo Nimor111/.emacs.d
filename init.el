@@ -1224,3 +1224,15 @@
   ;; so bindings don't conflict
   (add-to-list 'evil-emacs-state-modes 'ledger-report-mode)
   :mode "\\.dat\\'")
+
+(use-package writegood-mode
+  :straight t
+  :config
+  (my/leader-keys
+    "wg" 'writegood-mode))
+
+(use-package writeroom-mode
+  :straight t
+  :config
+  (my/leader-keys
+     "wr" 'writeroom-mode))

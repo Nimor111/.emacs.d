@@ -119,6 +119,9 @@
   - [[#snow][Snow]]
   - [[#engine-mode][Engine mode]]
   - [[#ledger][Ledger]]
+  - [[#writing][Writing]]
+    - [[#writegood-mode][Writegood mode]]
+    - [[#writeroom-mode][Writeroom mode]]
 
 ** Package manager
 Must be in the beginning for ~use-package~ usage below.
@@ -1711,4 +1714,27 @@ Search stuff from the comfort of your Emacs.
   ;; so bindings don't conflict
   (add-to-list 'evil-emacs-state-modes 'ledger-report-mode)
   :mode "\\.dat\\'")
+#+end_src
+
+** Writing
+*** Writegood mode
+A mode that checks your writing for common problems (in English)
+- Weasel words - that add no value to the text
+- Passive voice - it's often confusing and is best left out (best irony here)
+- Duplicates - self-explanatory
+#+begin_src elisp
+(use-package writegood-mode
+  :straight t
+  :config
+  (my/leader-keys
+    "wg" 'writegood-mode))
+#+end_src
+*** Writeroom mode
+For distraction free writing
+#+begin_src elisp
+(use-package writeroom-mode
+  :straight t
+  :config
+  (my/leader-keys
+     "wr" 'writeroom-mode))
 #+end_src
