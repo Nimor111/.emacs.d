@@ -980,18 +980,11 @@
   :straight t
   :defer t
   :init
-  (advice-add 'python-mode :before 'elpy-enable))
-
-(use-package virtualenvwrapper
-  :straight t
-  :defer t
-  :init
-  (venv-initialize-interactive-shells)
-  (venv-initialize-eshell))
-
-(my/language-leader-def
-  "p" '(:ignore t :which-key "python")
-  "pf" 'elpy-autopep8-fix-code)
+  (advice-add 'python-mode :before 'elpy-enable)
+  :config
+  (my/language-leader-def
+    "p" '(:ignore t :which-key "python")
+    "pf" 'elpy-autopep8-fix-code))
 
 (use-package cider
   :straight t)
