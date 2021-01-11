@@ -137,6 +137,7 @@
  ("typescript.el" . "54f14c482701c4f937bf51469f70812624e07f87")
  ("undo-tree" . "e326c6135e62f5fe8536528d3acd5e798f847407")
  ("use-package" . "caa92f1d64fc25480551757d854b4b49981dfa6b")
+ ("virtualenvwrapper.el" . "107e7e0bf923f44d217712772cd58b414d0065cb")
  ("visual-fill-column" . "141eaf1d1b71a92d7752bf0efdb27ae85e43d3f2")
  ("web-mode" . "a3ce21f795e03c7a5489a24b2b3c4fce2d7a2f59")
  ("with-editor" . "6735180e73e787b79535c245b162249b70dbf841")
