@@ -69,7 +69,6 @@
     - [[#refiling][Refiling]]
     - [[#clocking][Clocking]]
     - [[#org-roam][Org-roam]]
-      - [[#deft-for-viewing-roam-files][Deft for viewing roam files]]
     - [[#ox-hugo][Ox-hugo]]
     - [[#org-reading-list][Org reading list]]
     - [[#toc][Toc]]
@@ -904,21 +903,6 @@ The notes (zettelkasten) god
        :file-name "daily/%<%Y-%m-%d>"
        :head "#+title: %<%Y-%m-%d>\n"
        :olp ("Journal")))))
-#+end_src
-
-**** Deft for viewing roam files
-
-#+begin_src elisp
-(use-package deft
-  :straight t
-  :after org
-  :bind
-  ("C-c n d" . deft)
-  :custom
-  (deft-recursive t)
-  (deft-use-filter-string-for-filename t)
-  (deft-default-extension "org")
-  (deft-directory "~/Nextcloud/org-roam"))
 #+end_src
 *** Ox-hugo
 Export org mode files to Hugo markdown.

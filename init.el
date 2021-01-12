@@ -598,17 +598,6 @@
        :head "#+title: %<%Y-%m-%d>\n"
        :olp ("Journal")))))
 
-(use-package deft
-  :straight t
-  :after org
-  :bind
-  ("C-c n d" . deft)
-  :custom
-  (deft-recursive t)
-  (deft-use-filter-string-for-filename t)
-  (deft-default-extension "org")
-  (deft-directory "~/Nextcloud/org-roam"))
-
 (use-package ox-hugo
   :straight t
   :after ox)

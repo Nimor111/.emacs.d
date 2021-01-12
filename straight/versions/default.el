@@ -17,7 +17,6 @@
  ("counsel-web" . "35c648b4cdd9f266ab54512a0fec2a3ca55d5bc6")
  ("dap-mode" . "041db8eb7f0ceb9477ffff1730b5940814001158")
  ("dash.el" . "f800e2e6537f0a16a4041f488b14f10706a61dff")
- ("deft" . "fca9ea05ef4fdac825e2ad3921baa7042f6b82c8")
  ("dired-hacks" . "d6d4d1930969bbc22fd0551d5195887bf92cab3e")
  ("doom-modeline" . "af5f61888e7eb0aa521d2d29b42221302b717915")
  ("elfeed" . "de4b64b3f5d9fd41d9dc72023632ae535dc912e2")
