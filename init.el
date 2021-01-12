@@ -89,7 +89,7 @@
     "gg"  (list (lambda () (interactive) (find-file gtd-file))         :which-key "gtd")
     "gs"  (list (lambda () (interactive) (find-file gtd-someday-file)) :which-key "someday")
     "gt"  (list (lambda () (interactive) (find-file gtd-tickler-file)) :which-key "tickler")
-    "gh"  (list (lambda () (interactive) (find-file gtd-tickler-file)) :which-key "hobbies")
+    "gh"  (list (lambda () (interactive) (find-file gtd-hobbies-file)) :which-key "hobbies")
 
     "fw"  (list (lambda () (interactive) (find-file work-file)) :which-key "work")
 
