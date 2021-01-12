@@ -40,6 +40,70 @@
 (add-hook 'org-mode-hook
   (lambda () (add-hook 'before-save-hook #'my/gtd-update-dblocks)))
 
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+(setq user-init-file-org "~/.emacs.d/init.org")
+(setq gtd-inbox-file "~/Nextcloud/Orgzly/inbox.org")
+(setq gtd-file "~/Nextcloud/Orgzly/gtd.org")
+(setq gtd-someday-file "~/Nextcloud/Orgzly/someday.org")
+(setq gtd-tickler-file "~/Nextcloud/Orgzly/tickler.org")
+(setq gtd-hobbies-file "~/Nextcloud/Orgzly/hobbies.org")
+(setq tech-notebook-file "~/Nextcloud/org/tech_notebook.org")
+(setq work-file "~/Nextcloud/org/work/work.org")
+
+;; would love to be able to do it like this but it doesn't work for some reason
+(defun my/open-file (file-name)
+  "Open a specific file"
+  (lambda ()
+    (interactive)
+    (find-file file-name)))
+
+(use-package general
+  :straight t
+  :config
+  (general-evil-setup t)
+
+  ;; general leader key
+  (general-create-definer my/leader-keys
+    :keymaps '(normal insert visual emacs)
+    :prefix "SPC"
+    :global-prefix "C-SPC")
+
+  ;; leader key for language specific bindings
+  (general-create-definer my/language-leader-def
+    :keymaps '(normal insert visual emacs)
+    :prefix "SPC l"
+    ;; for insert mode
+    :global-prefix "C-SPC l"
+    "" '(:ignore t :which-key "language"))
+
+  (my/leader-keys
+    "s"   'save-buffer
+
+    "SPC" 'find-file
+
+    "fp"  (list (lambda () (interactive) (find-file user-init-file-org)) :which-key "config")
+
+    "g"  '(:ignore t :which-key "gtd")
+    "gi"  (list (lambda () (interactive) (find-file gtd-inbox-file))   :which-key "inbox")
+    "gg"  (list (lambda () (interactive) (find-file gtd-file))         :which-key "gtd")
+    "gs"  (list (lambda () (interactive) (find-file gtd-someday-file)) :which-key "someday")
+    "gt"  (list (lambda () (interactive) (find-file gtd-tickler-file)) :which-key "tickler")
+    "gh"  (list (lambda () (interactive) (find-file gtd-tickler-file)) :which-key "hobbies")
+
+    "fw"  (list (lambda () (interactive) (find-file work-file)) :which-key "work")
+
+    "tn"  (list (lambda () (interactive) (find-file tech-notebook-file)) :which-key "tech-notebook")
+
+    "x"   '(:ignore t :which-key "buffer")
+    "xh"  'previous-buffer
+    "xa"  'ibuffer-list-buffers
+    "xl"  'next-buffer
+    "xk"  'kill-buffer
+    "xs"  '(:ignore t :which-key "split-window")
+    "xsr" 'split-window-right
+    "xsb" 'split-window-below))
+
 (setq-default
   custom-file "~/.emacs.d/custom.el")
 
@@ -142,7 +206,10 @@
   :hook (before-save . delete-trailing-whitespace))
 
 (use-package restart-emacs
-  :straight t)
+  :straight t
+  :config
+  (my/leader-keys
+    "re" 'restart-emacs))
 
 (fset 'yes-or-no-p 'y-or-n-p)
 
@@ -237,153 +304,6 @@
 
 (global-hl-line-mode)
 
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-
-(setq user-init-file-org "~/.emacs.d/init.org")
-(setq gtd-inbox-file "~/Nextcloud/Orgzly/inbox.org")
-(setq gtd-file "~/Nextcloud/Orgzly/gtd.org")
-(setq gtd-someday-file "~/Nextcloud/Orgzly/someday.org")
-(setq gtd-tickler-file "~/Nextcloud/Orgzly/tickler.org")
-(setq tech-notebook-file "~/Nextcloud/org/tech_notebook.org")
-(setq work-file "~/Nextcloud/org/work/work.org")
-
-;; would love to be able to do it like this but it doesn't work for some reason
-(defun my/open-file (file-name)
-  "Open a specific file"
-  (lambda ()
-    (interactive)
-    (find-file file-name)))
-
-(use-package general
-  :straight t
-  :config
-  (general-evil-setup t)
-
-  ;; general leader key
-  (general-create-definer my/leader-keys
-    :keymaps '(normal insert visual emacs)
-    :prefix "SPC"
-    :global-prefix "C-SPC")
-
-  ;; leader key for language specific bindings
-  (general-create-definer my/language-leader-def
-    :keymaps '(normal insert visual emacs)
-    :prefix "SPC l"
-    ;; for insert mode
-    :global-prefix "C-SPC l"
-    "" '(:ignore t :which-key "language"))
-
-  (my/leader-keys
-    "s"   'save-buffer
-
-    "b"   'counsel-bookmark
-    "SPC" 'find-file
-    "/"   'swiper
-
-    "fp"  (list (lambda () (interactive) (find-file user-init-file-org)) :which-key "config")
-
-    "p"   '(:ignore t :which-key "projectile")
-    "pp"  'counsel-projectile-switch-project
-    "pk"  'projectile-kill-buffers
-    "pa"  'projectile-add-known-project
-    "pr"  'projectile-remove-known-project
-    "psr" 'projectile-ripgred
-    "pxe" 'projectile-run-eshell
-    "pf"  'counsel-projectile-find-file
-    "pS"  'projectile-save-project-buffers
-    "pD"  'projectile-dired
-
-    "em"  'mu4e
-
-    "g"  '(:ignore t :which-key "gtd")
-    "gi"  (list (lambda () (interactive) (find-file gtd-inbox-file))   :which-key "inbox")
-    "gg"  (list (lambda () (interactive) (find-file gtd-file))         :which-key "gtd")
-    "gs"  (list (lambda () (interactive) (find-file gtd-someday-file)) :which-key "someday")
-    "gt"  (list (lambda () (interactive) (find-file gtd-tickler-file)) :which-key "tickler")
-
-    "fd"  (list (lambda () (interactive) (find-file daily-file)) :which-key "daily")
-
-    "fw"  (list (lambda () (interactive) (find-file work-file)) :which-key "work")
-
-    "o"    '(:ignore t :which-key "org")
-    "oa"   'org-agenda
-    "or"   'org-refile
-    "os"   'org-archive-hierarchically
-    "og"   'counsel-org-goto
-
-    "oc"   '(:ignore t :which-key "org-clock")
-    "occ"  'org-capture
-    "oci"  'org-clock-in
-    "oco"  'org-clock-out
-    "ocl"  'org-clock-in-last
-    "ocr"  'org-clock-report
-    "ocg"  'org-clock-goto
-
-    "ok"   '(:ignore t :which-key "kanban")
-    "oki"  'org-kanban/initialize-at-end
-    "oks"  'org-kanban/shift
-
-    "op"   '(:ignore t :which-key "org-projectile")
-    "opt"  'org-projectile-project-todo-completing-read
-    "opg"  'org-projectile-goto-location-for-project
-    "opp"  'org-pomodoro
-
-    "ot" '(:ignore t :which-key "timestamp")
-    "otu" 'org-timestamp-up-day
-    "otd" 'org-timestamp-down-day
-    "otl" 'org-toggle-link-display
-
-    "od" 'org-decrypt-entry
-
-    "tn" (list (lambda () (interactive) (find-file tech-notebook-file)) :which-key "tech-notebook")
-
-    "m" '(:ignore t :which-key "todo")
-    "mt" 'org-todo
-    "ms" 'org-schedule
-    "md" 'org-deadline
-
-    "w"  '(:ignore t :which-key "window")
-    "wh" 'evil-window-left
-    "wl" 'evil-window-right
-    "wk" 'evil-window-up
-    "wj" 'evil-window-down
-
-    "q"  'howdoyou-query
-
-    "h"  '(:ignore t :which-key "describe")
-    "hf" 'counsel-describe-function
-    "hv" 'counsel-describe-variable
-    "hl" 'counsel-find-library
-    "hk" 'helpful-key
-    "a"  'counsel-linux-app
-
-    "x"   '(:ignore t :which-key "buffer")
-    "xh"  'previous-buffer
-    "xa"  'ibuffer-list-buffers
-    "xl"  'next-buffer
-    "xk"  'kill-buffer
-    "xs"  '(:ignore t :which-key "split-window")
-    "xsr" 'split-window-right
-    "xsb" 'split-window-below
-
-    "ie"  'emojify-insert-emoji
-
-    "re"  'restart-emacs
-
-    "eli" 'ielm
-
-    "ed"  '(:ignore t :which-key "elfeed-dashboard")
-    "edd" 'elfeed-dashboard
-    "edi" 'elfeed-dashboard-edit
-
-    "d" '(:ignore t :which-key "dired")
-    "dd" 'dired
-    "dj" 'dired-jump
-
-    "c" '(:ignore t :which-key "store link")
-    "cc" 'sl-store-link
-    "cp" 'sl-insert-link))
-
 ;; dependency
 (use-package all-the-icons
   :straight t)
@@ -411,6 +331,14 @@
   (setq evil-want-integration t)
   (setq evil-want-keybinding nil)
   :config
+  ;; Keybindings
+  (my/leader-keys
+    "w"  '(:ignore t :which-key "window")
+    "wh" 'evil-window-left
+    "wl" 'evil-window-right
+    "wk" 'evil-window-up
+    "wj" 'evil-window-down)
+
   (evil-mode 1)
   (evil-set-initial-state 'dashboard-mode 'normal)
   (evil-set-undo-system 'undo-tree)
@@ -447,6 +375,25 @@
   :hook
   (org-mode . my/org-mode-setup)
   :config
+  ;; Keybindings for org-mode
+  (my/leader-keys
+    "o"    '(:ignore t :which-key "org")
+    "oa"   'org-agenda
+    "or"   'org-refile
+    "os"   'org-archive-hierarchically
+    "og"   'counsel-org-goto
+
+    "ot" '(:ignore t :which-key "timestamp")
+    "otu" 'org-timestamp-up-day
+    "otd" 'org-timestamp-down-day
+    "otl" 'org-toggle-link-display
+
+    "od"  'org-decrypt-entry
+
+    "m" '(:ignore t :which-key "todo")
+    "mt" 'org-todo
+    "ms" 'org-schedule
+    "md" 'org-deadline)
   ;; TODO keywords that I use - the ones after the | are the done states
   (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "NEXT(n)" "|" "DONE(d)" "CANCELLED(c)")))
 
@@ -520,6 +467,9 @@
 (use-package org-capture
   :after org
   :config
+  ;; keybindings
+  (my/leader-keys
+    "occ"  'org-capture)
   ;; quick templates for org files
   (setq org-capture-templates
     '(("t" "Todo [inbox]" entry
@@ -579,6 +529,14 @@
 (use-package org-clock
   :after org
   :config
+  ;; Keybindings
+  (my/leader-keys
+    "oc"   '(:ignore t :which-key "org-clock")
+    "oci"  'org-clock-in
+    "oco"  'org-clock-out
+    "ocl"  'org-clock-in-last
+    "ocr"  'org-clock-report
+    "ocg"  'org-clock-goto)
   ;; Resume clocking task when emacs is restarted
   (org-clock-persistence-insinuate)
   ;; Save the running clock and all clock history when exiting Emacs, load it on startup
@@ -600,9 +558,6 @@
   ;; Agenda clock report parameters
   (setq org-agenda-clockreport-parameter-plist
     '(:link t :maxlevel 6 :fileskip0 t :compact t :narrow 60 :score 0)))
-
-(use-package counsel-org-clock
-  :straight t)
 
 (use-package org-roam
   :straight
@@ -696,7 +651,8 @@
   (defun google-translate--search-tkk () "Search TKK." (list 430675 2721866130)))
 
 (use-package ob-translate
-  :straight t)
+  :straight t
+  :after org)
 
 (use-package alert
   :straight t
@@ -718,13 +674,22 @@
   :straight t
   :after org
   :config
+  ;; keybindings
+  (my/leader-keys
+    "opp"  'org-pomodoro)
+
   (setq org-pomodoro-finished-sound (concat user-emacs-directory "/eraser.wav"))
   (setq org-pomodoro-short-break-sound (concat user-emacs-directory "/eraser.wav"))
   (setq org-pomodoro-long-break-sound (concat user-emacs-directory "/eraser.wav")))
 
 (use-package org-kanban
   :straight t
-  :after org)
+  :after org
+  :config
+  (my/leader-keys
+    "ok"   '(:ignore t :which-key "kanban")
+    "oki"  'org-kanban/initialize-at-end
+    "oks"  'org-kanban/shift))
 
 (use-package org-super-agenda
   :straight t
@@ -741,7 +706,12 @@
 
 (use-package org-super-links
   :straight (:host github :repo "toshism/org-super-links" :branch "master")
-  :after org)
+  :after org
+  :config
+  (my/leader-keys
+    "c" '(:ignore t :which-key "store link")
+    "cc" 'sl-store-link
+    "cp" 'sl-insert-link))
 
 (use-package org-web-tools
   :straight t
@@ -769,11 +739,18 @@
   :init
   (org-projectile-per-project)
   :config
+  ;; Keybindings
+  (my/leader-keys
+    "op"   '(:ignore t :which-key "org-projectile")
+    "opt"  'org-projectile-project-todo-completing-read
+    "opg"  'org-projectile-goto-location-for-project)
+
   (setq org-projectile-per-project-filepath "todos.org")
 	(setq org-agenda-files (seq-filter 'file-readable-p (delete-dups (append org-agenda-files (org-projectile-todo-files))))))
 
 (use-package org-archive-hierarchically
-  :straight (:host gitlab :repo "andersjohansson/org-archive-hierarchically" :branch "master"))
+  :straight (:host gitlab :repo "andersjohansson/org-archive-hierarchically" :branch "master")
+  :after org)
 
 (use-package anki-editor
   :if (eq system-type 'darwin)
@@ -782,6 +759,20 @@
   :if (eq system-type 'gnu/linux)
   :ensure-system-package anki
   :straight t)
+
+(use-package org-wiki
+  :defer 2
+  :straight (:host github :repo "caiorss/org-wiki" :branch "master")
+  :config
+  (setq org-wiki-location "~/Nextcloud/org/wiki")
+  (my/leader-keys
+    "ow" '(:ignore t :which-key "wiki")
+
+    "owi" 'org-wiki-index
+    "owl" 'org-wiki-insert-link
+    "own" 'org-wiki-insert-new
+    "owh" 'org-wiki-helm
+    "owc" 'org-wiki-close))
 
 (use-package magit
   :straight t
@@ -795,7 +786,16 @@
          :map minibuffer-local-map
          ("C-r" . 'counsel-minibuffer-history))
   :config
-  (counsel-mode 1))
+  (counsel-mode 1)
+
+  (my/leader-keys
+    "b"   'counsel-bookmark
+
+    "h"  '(:ignore t :which-key "describe")
+    "hf" 'counsel-describe-function
+    "hv" 'counsel-describe-variable
+    "hl" 'counsel-find-library
+    "a"  'counsel-linux-app))
 
 (use-package counsel-projectile
   :straight t
@@ -808,17 +808,9 @@
 (use-package ivy
   :straight t
   :diminish
-  :bind (("C-s" . swiper)
-         :map ivy-minibuffer-map
-         ("TAB" . ivy-alt-done)
-         ("C-l" . ivy-alt-done)
-         :map ivy-switch-buffer-map
-         ("C-k" . ivy-previous-line)
-         ("C-l" . ivy-done)
-         ("C-d" . ivy-switch-buffer-kill)
-         :map ivy-reverse-i-search-map
-         ("C-k" . ivy-previous-line)
-         ("C-d" . ivy-reverse-i-search-kill))
+  :bind
+  (:map ivy-minibuffer-map
+   ("TAB" . ivy-alt-done))
   :config
   (setq ivy-use-virtual-buffers t)
   (setq ivy-count-format "%d/%d ")
@@ -828,6 +820,10 @@
   (ivy-set-actions
     'counsel-find-file
     '(("d" delete-file "delete")))
+
+  (my/leader-keys
+    "/"   'swiper)
+
   (ivy-mode 1))
 
 (use-package ivy-rich
@@ -853,7 +849,10 @@
 
 (use-package howdoyou
   :straight t
-  :defer t)
+  :defer t
+  :config
+  (my/leader-keys
+    "q"  'howdoyou-query))
 
 (use-package web-mode
   :straight t
@@ -1005,6 +1004,19 @@
   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   (setq projectile-track-known-projects-automatically nil)
+
+  (my/leader-keys
+    "p"   '(:ignore t :which-key "projectile")
+    "pp"  'counsel-projectile-switch-project
+    "pk"  'projectile-kill-buffers
+    "pa"  'projectile-add-known-project
+    "pr"  'projectile-remove-known-project
+    "psr" 'projectile-ripgred
+    "pxe" 'projectile-run-eshell
+    "pf"  'counsel-projectile-find-file
+    "pS"  'projectile-save-project-buffers
+    "pD"  'projectile-dired)
+
   (projectile-mode +1))
 
 (use-package rainbow-delimiters
@@ -1028,7 +1040,10 @@
 
 (use-package emojify
   :straight t
-  :init (global-emojify-mode))
+  :init (global-emojify-mode)
+  :config
+  (my/leader-keys
+    "ie"  'emojify-insert-emoji))
 
 (use-package helpful
   :straight t
@@ -1039,7 +1054,10 @@
   ([remap describe-function] . counsel-describe-function)
   ([remap describe-command] . helpful-command)
   ([remap describe-variable] . counsel-describe-variable)
-  ([remap describe-key] . helpful-key))
+  ([remap describe-key] . helpful-key)
+  :config
+  (my/leader-keys
+    "hk" 'helpful-key))
 
 (use-package link-hint
   :straight t
@@ -1051,9 +1069,13 @@
     (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e"))
 
 (use-package mu4e
+  :defer 1
   :if (eq system-type 'gnu/linux)
   :ensure-system-package mu
   :config
+  (my/leader-keys
+    "em"  'mu4e)
+
   (setq mu4e-sent-messages-behaviour 'delete)
   (setq mu4e-get-mail-command "/usr/bin/mbsync -Va")
   (setq mu4e-change-filenames-when-moving t)
@@ -1124,6 +1146,7 @@
 
 (use-package persistent-scratch
   :straight t
+  :defer 1
   :config
   (persistent-scratch-setup-default))
 
@@ -1135,20 +1158,30 @@
   (setq esup-user-init-file (file-truename "~/.emacs.d/init.el")))
 
 (use-package elfeed
+  :defer 3
   :straight t)
 
 (use-package elfeed-org
   :straight t
+  :after elfeed
   :config
   (elfeed-org)
   (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org")))
 
 (use-package elfeed-dashboard
   :load-path "~/.emacs.d/lisp/elfeed-dashboard/"
-  :config (progn
-            (setq elfeed-dashboard-file "~/.emacs.d/lisp/elfeed-dashboard/elfeed-dashboard.org")
-             ;; to update feed counts automatically
-            (advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links)))
+  :after elfeed
+  :config
+  ;; Keybindings
+  (my/leader-keys
+    "ed"  '(:ignore t :which-key "elfeed-dashboard")
+    "edd" 'elfeed-dashboard
+    "edi" 'elfeed-dashboard-edit)
+
+  (progn
+     (setq elfeed-dashboard-file "~/.emacs.d/lisp/elfeed-dashboard/elfeed-dashboard.org")
+     ;; to update feed counts automatically
+     (advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links)))
 
 (use-package dired
   :config
@@ -1158,8 +1191,12 @@
       (lambda () (interactive) (message "Path: %s" target) (dired target))))
 
   (my/leader-keys
-   "drm" `(,(dw/dired-link "/run/media/gbojinov") :which-key "Media")
-   "fin" `(,(dw/dired-link "~/Nextcloud/org/finnish") :which-key "Finnish")))
+    "d" '(:ignore t :which-key "dired")
+    "dd" 'dired
+    "dj" 'dired-jump
+
+    "drm" `(,(dw/dired-link "/run/media/gbojinov") :which-key "Media")
+    "fin" `(,(dw/dired-link "~/Nextcloud/org/finnish") :which-key "Finnish")))
 
 (use-package all-the-icons-dired
   :straight t
@@ -1236,3 +1273,8 @@
   :config
   (my/leader-keys
      "wr" 'writeroom-mode))
+
+(use-package ielm
+  :config
+  (my/leader-keys
+    "eli" 'ielm))
