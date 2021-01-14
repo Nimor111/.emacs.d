@@ -232,6 +232,8 @@
 
 (global-hl-line-mode)
 
+(global-auto-revert-mode 1)
+
 ;; dependency
 (use-package all-the-icons
   :straight t)
@@ -570,6 +572,14 @@
 (use-package ob-translate
   :straight t
   :after org)
+
+(use-package ein
+  :straight t)
+
+(use-package ob-ein  :after org)
+
+(use-package ox-ipynb
+  :straight t)
 
 (use-package alert
   :straight t

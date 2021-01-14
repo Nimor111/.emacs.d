@@ -38,6 +38,7 @@
       - [[#visual-fill-eg-the-visual-wrap-of-the-lines][Visual fill, e.g. the visual wrap of the lines]]
       - [[#auto-fill-eg-adding-line-breaks-to-lines][Auto fill, e.g. adding line breaks to lines]]
     - [[#highlight-current-line][Highlight current line]]
+    - [[#global-revert-mode][Global revert mode]]
   - [[#modeline][Modeline]]
   - [[#dashboard][Dashboard]]
   - [[#evil-mode][Evil-mode]]
@@ -410,7 +411,6 @@ Because writing yes is too much work.
   :straight t
   :hook (org-mode . my/org-mode-visual-fill))
 #+end_src
-
 **** Auto fill, e.g. adding line breaks to lines
 #+begin_src elisp
 (use-package simple
@@ -422,6 +422,11 @@ Because writing yes is too much work.
 *** Highlight current line
 #+begin_src elisp
 (global-hl-line-mode)
+#+end_src
+*** Global revert mode
+Revert buffers automatically when they change on disk.
+#+begin_src elisp
+(global-auto-revert-mode 1)
 #+end_src
 ** Modeline
 Doom modeline - it looks nice!
@@ -840,6 +845,17 @@ Translate in org src blocks
 (use-package ob-translate
   :straight t
   :after org)
+#+end_src
+
+Emacs ipython notebook
+#+begin_src elisp
+(use-package ein
+  :straight t)
+
+(use-package ob-ein  :after org)
+
+(use-package ox-ipynb
+  :straight t)
 #+end_src
 *** Notifications
 #+begin_src elisp
