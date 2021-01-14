@@ -854,8 +854,8 @@ Emacs ipython notebook
 
 (use-package ob-ein  :after org)
 
-(use-package ox-ipynb
-  :straight t)
+;; (use-package ox-ipynb
+;;   :straight t)
 #+end_src
 *** Notifications
 #+begin_src elisp

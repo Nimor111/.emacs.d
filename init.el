@@ -578,8 +578,8 @@
 
 (use-package ob-ein  :after org)
 
-(use-package ox-ipynb
-  :straight t)
+;; (use-package ox-ipynb
+;;   :straight t)
 
 (use-package alert
   :straight t
