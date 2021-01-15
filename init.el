@@ -998,7 +998,6 @@
     (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e"))
 
 (use-package mu4e
-  :defer 1
   :if (eq system-type 'gnu/linux)
   :ensure-system-package mu
   :config
