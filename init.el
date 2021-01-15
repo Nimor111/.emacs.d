@@ -553,6 +553,8 @@
   :config
   (setq org-journal-dir "~/Nextcloud/journal")
   (setq org-journal-date-format "%A, %d %B %Y")
+  (setq org-journal-file-format "%Y%m%d.org")
+  (setq org-journal-enable-agenda-integration t)
   (my/leader-keys
     "nj" 'org-journal-new-entry))
 
