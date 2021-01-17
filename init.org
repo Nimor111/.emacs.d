@@ -69,6 +69,7 @@
     - [[#org-archive-hierarchically][Org archive hierarchically]]
     - [[#flashcards-with-anki][Flashcards with Anki]]
     - [[#wiki][Wiki]]
+    - [[#org-mime][Org-mime]]
   - [[#magit][Magit]]
   - [[#counsel][Counsel]]
   - [[#ivy][Ivy]]
@@ -106,6 +107,7 @@
     - [[#writegood-mode][Writegood mode]]
     - [[#writeroom-mode][Writeroom mode]]
   - [[#ielm][Ielm]]
+  - [[#tramp][Tramp]]
 
 ** Package manager
 Must be in the beginning for ~use-package~ usage below.
@@ -527,9 +529,12 @@ Dependency of the org-colored-text file
   (visual-line-mode 1))
 
 (use-package org
-  :straight t
+  :straight org-plus-contrib
   :hook
   (org-mode . my/org-mode-setup)
+  :mode
+  ("\\.org\\'"         . org-mode)
+  ("\\.org_archive\\'" . org-mode)
   :config
   ;; Keybindings for org-mode
   (my/leader-keys
@@ -1006,6 +1011,12 @@ Creates the heading before an archived heading in the archive file
     "owh" 'org-wiki-helm
     "owc" 'org-wiki-close))
 #+end_src
+*** Org-mime
+For sending emails with org mode files
+#+begin_src elisp
+(use-package org-mime
+  :straight t)
+#+end_src
 ** Magit
 The git supercharge
 
@@ -1269,11 +1280,13 @@ SBT
 #+end_src
 *** Python
 #+begin_src elisp
-(use-package elpy
+(defun my/python-mode-hook ()
+  (add-to-list 'company-backends 'company-jedi))
+
+(use-package company-jedi
   :straight t
-  :defer t
-  :init
-  (advice-add 'python-mode :before 'elpy-enable))
+  :hook ((python-mode . jedi:setup)
+         (python-mode . my/python-mode-hook)))
 
 (use-package virtualenvwrapper
   :straight t
@@ -1476,7 +1489,6 @@ Alerts for emails
 #+begin_src elisp
 (use-package persistent-scratch
   :straight t
-  :defer 1
   :config
   (persistent-scratch-setup-default))
 #+end_src
@@ -1653,4 +1665,12 @@ A built-in elisp repl in emacs
   :config
   (my/leader-keys
     "eli" 'ielm))
+#+end_src
+
+** Tramp
+To ssh into remote machines
+#+begin_src elisp
+(use-package tramp
+  :config
+  (setq tramp-default-method "ssh"))
 #+end_src

@@ -301,9 +301,12 @@
   (visual-line-mode 1))
 
 (use-package org
-  :straight t
+  :straight org-plus-contrib
   :hook
   (org-mode . my/org-mode-setup)
+  :mode
+  ("\\.org\\'"         . org-mode)
+  ("\\.org_archive\\'" . org-mode)
   :config
   ;; Keybindings for org-mode
   (my/leader-keys
@@ -703,6 +706,9 @@
     "owh" 'org-wiki-helm
     "owc" 'org-wiki-close))
 
+(use-package org-mime
+  :straight t)
+
 (use-package magit
   :straight t
   :defer t)
@@ -904,11 +910,13 @@
      :repo "GDQuest/emacs-gdscript-mode")
   :defer t)
 
-(use-package elpy
+(defun my/python-mode-hook ()
+  (add-to-list 'company-backends 'company-jedi))
+
+(use-package company-jedi
   :straight t
-  :defer t
-  :init
-  (advice-add 'python-mode :before 'elpy-enable))
+  :hook ((python-mode . jedi:setup)
+         (python-mode . my/python-mode-hook)))
 
 (use-package virtualenvwrapper
   :straight t
@@ -1074,7 +1082,6 @@
 
 (use-package persistent-scratch
   :straight t
-  :defer 1
   :config
   (persistent-scratch-setup-default))
 
@@ -1206,3 +1213,7 @@
   :config
   (my/leader-keys
     "eli" 'ielm))
+
+(use-package tramp
+  :config
+  (setq tramp-default-method "ssh"))
