@@ -108,6 +108,7 @@
     - [[#writeroom-mode][Writeroom mode]]
   - [[#ielm][Ielm]]
   - [[#tramp][Tramp]]
+  - [[#direnv][Direnv]]
 
 ** Package manager
 Must be in the beginning for ~use-package~ usage below.
@@ -739,6 +740,14 @@ Disable line numbers in org-mode
   (setq org-agenda-clockreport-parameter-plist
     '(:link t :maxlevel 6 :fileskip0 t :compact t :narrow 60 :score 0)))
 #+end_src
+
+Export clock entries to csv
+Use ~org-clock-csv-to-file~ to export all entries in org agenda files to a csv file chosen by you.
+
+#+begin_src elisp
+(use-package org-clock-csv
+  :straight t)
+#+end_src
 *** Org-roam
 The notes (zettelkasten) god
 
@@ -777,9 +786,9 @@ The notes (zettelkasten) god
 
       ("j" "journal" entry
        #'org-roam-capture--get-point
-       "* %<%H:%M> %?"
+       "* %<%H:%M> :crypt: %?"
        :file-name "daily/%<%Y-%m-%d>"
-       :head "#+title: %<%Y-%m-%d>\n"
+       :head "#+title: %<%Y-%m-%d>\n#+ROAM_TAGS: private\n"
        :olp ("Journal")))))
 #+end_src
 *** Ox-hugo
@@ -1673,4 +1682,13 @@ To ssh into remote machines
 (use-package tramp
   :config
   (setq tramp-default-method "ssh"))
+#+end_src
+
+** Direnv
+For using direnv inside emacs.
+#+begin_src elisp
+(use-package direnv
+  :straight t
+  :config
+  (direnv-mode))
 #+end_src

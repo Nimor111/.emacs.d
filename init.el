@@ -492,6 +492,9 @@
   (setq org-agenda-clockreport-parameter-plist
     '(:link t :maxlevel 6 :fileskip0 t :compact t :narrow 60 :score 0)))
 
+(use-package org-clock-csv
+  :straight t)
+
 (use-package org-roam
   :straight
   (:host github :repo "org-roam/org-roam" :branch "master")
@@ -526,9 +529,9 @@
 
       ("j" "journal" entry
        #'org-roam-capture--get-point
-       "* %<%H:%M> %?"
+       "* %<%H:%M> :crypt: %?"
        :file-name "daily/%<%Y-%m-%d>"
-       :head "#+title: %<%Y-%m-%d>\n"
+       :head "#+title: %<%Y-%m-%d>\n#+ROAM_TAGS: private\n"
        :olp ("Journal")))))
 
 (use-package ox-hugo
@@ -1217,3 +1220,8 @@
 (use-package tramp
   :config
   (setq tramp-default-method "ssh"))
+
+(use-package direnv
+  :straight t
+  :config
+  (direnv-mode))
