@@ -59,7 +59,6 @@
     - [[#org-babel][Org babel]]
     - [[#notifications][Notifications]]
     - [[#pomodoro][Pomodoro]]
-    - [[#kanban][Kanban]]
     - [[#org-super-agenda][Org super agenda]]
     - [[#better-linking][Better? Linking]]
     - [[#web-tools][Web tools]]
@@ -141,8 +140,6 @@ Must be in the beginning for ~use-package~ usage below.
 *** Tangle config file on save
 Courtesy of the great emacs from scratch config: [[https://github.com/daviwil/emacs-from-scratch/blob/master/Emacs.org#auto-tangle-configuration-files][Link]]
 #+begin_src elisp
-(setq gtd-table-file "~/Nextcloud/org/gtd-notion/gtd.org")
-
 (defun my/org-babel-tangle-config ()
   "Tangles the org config file to init.el"
   (when (string-equal (buffer-file-name)
@@ -151,19 +148,24 @@ Courtesy of the great emacs from scratch config: [[https://github.com/daviwil/em
     (let ((org-confirm-babel-evaluate nil))
       (org-babel-tangle))))
 
-(defun my/gtd-update-dblocks ()
-  "Updates the org-columns dynamic blocks in the gtd file"
-  (interactive)
-  (when (string-equal (buffer-file-name)
-                      (expand-file-name gtd-table-file))
-    (progn
-      (org-update-all-dblocks))))
-
 (add-hook 'org-mode-hook
   (lambda () (add-hook 'after-save-hook #'my/org-babel-tangle-config)))
+#+end_src
 
-(add-hook 'org-mode-hook
-  (lambda () (add-hook 'before-save-hook #'my/gtd-update-dblocks)))
+Update all dynamic blocks in a file (this is not used, just keeping around for reference)
+#+begin_src elisp
+;; (setq gtd-table-file "~/Nextcloud/org/gtd-notion/gtd.org")
+
+;; (defun my/gtd-update-dblocks ()
+;;   "Updates the org-columns dynamic blocks in the gtd file"
+;;   (interactive)
+;;   (when (string-equal (buffer-file-name)
+;;                       (expand-file-name gtd-table-file))
+;;     (progn
+;;       (org-update-all-dblocks))))
+
+;; (add-hook 'org-mode-hook
+;;   (lambda () (add-hook 'before-save-hook #'my/gtd-update-dblocks)))
 #+end_src
 *** Keybindings
 Using ~general.el~ to define a leader key and various bindings with it. In modes (e.g. insert mode and emacs mode) where space is not applicable, it uses ctrl + space.
@@ -904,17 +906,6 @@ Emacs ipython notebook
   (setq org-pomodoro-finished-sound (concat user-emacs-directory "/eraser.wav"))
   (setq org-pomodoro-short-break-sound (concat user-emacs-directory "/eraser.wav"))
   (setq org-pomodoro-long-break-sound (concat user-emacs-directory "/eraser.wav")))
-#+end_src
-*** Kanban
-#+begin_src elisp
-(use-package org-kanban
-  :straight t
-  :after org
-  :config
-  (my/leader-keys
-    "ok"   '(:ignore t :which-key "kanban")
-    "oki"  'org-kanban/initialize-at-end
-    "oks"  'org-kanban/shift))
 #+end_src
 *** Org super agenda
 For a better way to group entries in the agenda.

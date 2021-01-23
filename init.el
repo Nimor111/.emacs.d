@@ -16,8 +16,6 @@
 (use-package use-package-ensure-system-package
   :straight t)
 
-(setq gtd-table-file "~/Nextcloud/org/gtd-notion/gtd.org")
-
 (defun my/org-babel-tangle-config ()
   "Tangles the org config file to init.el"
   (when (string-equal (buffer-file-name)
@@ -26,19 +24,21 @@
     (let ((org-confirm-babel-evaluate nil))
       (org-babel-tangle))))
 
-(defun my/gtd-update-dblocks ()
-  "Updates the org-columns dynamic blocks in the gtd file"
-  (interactive)
-  (when (string-equal (buffer-file-name)
-                      (expand-file-name gtd-table-file))
-    (progn
-      (org-update-all-dblocks))))
-
 (add-hook 'org-mode-hook
   (lambda () (add-hook 'after-save-hook #'my/org-babel-tangle-config)))
 
-(add-hook 'org-mode-hook
-  (lambda () (add-hook 'before-save-hook #'my/gtd-update-dblocks)))
+;; (setq gtd-table-file "~/Nextcloud/org/gtd-notion/gtd.org")
+
+;; (defun my/gtd-update-dblocks ()
+;;   "Updates the org-columns dynamic blocks in the gtd file"
+;;   (interactive)
+;;   (when (string-equal (buffer-file-name)
+;;                       (expand-file-name gtd-table-file))
+;;     (progn
+;;       (org-update-all-dblocks))))
+
+;; (add-hook 'org-mode-hook
+;;   (lambda () (add-hook 'before-save-hook #'my/gtd-update-dblocks)))
 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
@@ -616,15 +616,6 @@
   (setq org-pomodoro-finished-sound (concat user-emacs-directory "/eraser.wav"))
   (setq org-pomodoro-short-break-sound (concat user-emacs-directory "/eraser.wav"))
   (setq org-pomodoro-long-break-sound (concat user-emacs-directory "/eraser.wav")))
-
-(use-package org-kanban
-  :straight t
-  :after org
-  :config
-  (my/leader-keys
-    "ok"   '(:ignore t :which-key "kanban")
-    "oki"  'org-kanban/initialize-at-end
-    "oks"  'org-kanban/shift))
 
 (use-package org-super-agenda
   :straight t
