@@ -16,7 +16,7 @@
     - [[#start-emacs-in-fullscreen-happens-when-everything-is-loaded][Start emacs in fullscreen, happens when everything is loaded.]]
     - [[#set-the-emacs-user-directory-for-re-use-in-other-places][Set the emacs user directory for re-use in other places]]
     - [[#keeping-folders-clean][Keeping folders clean]]
-    - [[#set-the-default-font][Set the default font.]]
+    - [[#set-the-default-font][Set the default font]]
     - [[#set-the-theme][Set the theme]]
       - [[#doom-emacs-themes][Doom emacs themes]]
       - [[#challenger-deep-theme][Challenger deep theme]]
@@ -269,7 +269,7 @@ General keybindings
 (setq auto-save-file-name-transforms
       `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
 #+end_src
-*** Set the default font.
+*** Set the default font
 This is seriously retarded.
 #+begin_src elisp
 (if (eq system-type 'gnu/linux)
