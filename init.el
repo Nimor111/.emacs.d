@@ -50,6 +50,9 @@
 (setq gtd-hobbies-file "~/Nextcloud/Orgzly/hobbies.org")
 (setq tech-notebook-file "~/Nextcloud/org/tech_notebook.org")
 (setq work-file "~/Nextcloud/org/work/work.org")
+(setq weekly-reviews-file "~/Nextcloud/org/weekly_reviews.org")
+(setq daily-reviews-file "~/Nextcloud/org/daily_reviews.org")
+(setq monthly-reviews-file "~/Nextcloud/org/monthly_reviews.org")
 
 ;; would love to be able to do it like this but it doesn't work for some reason
 (defun my/open-file (file-name)
@@ -85,11 +88,14 @@
     "fp"  (list (lambda () (interactive) (find-file user-init-file-org)) :which-key "config")
 
     "g"  '(:ignore t :which-key "gtd")
-    "gi"  (list (lambda () (interactive) (find-file gtd-inbox-file))   :which-key "inbox")
-    "gg"  (list (lambda () (interactive) (find-file gtd-file))         :which-key "gtd")
-    "gs"  (list (lambda () (interactive) (find-file gtd-someday-file)) :which-key "someday")
-    "gt"  (list (lambda () (interactive) (find-file gtd-tickler-file)) :which-key "tickler")
-    "gh"  (list (lambda () (interactive) (find-file gtd-hobbies-file)) :which-key "hobbies")
+    "gi"  (list (lambda () (interactive) (find-file gtd-inbox-file))       :which-key "inbox")
+    "gg"  (list (lambda () (interactive) (find-file gtd-file))             :which-key "gtd")
+    "gs"  (list (lambda () (interactive) (find-file gtd-someday-file))     :which-key "someday")
+    "gt"  (list (lambda () (interactive) (find-file gtd-tickler-file))     :which-key "tickler")
+    "gh"  (list (lambda () (interactive) (find-file gtd-hobbies-file))     :which-key "hobbies")
+    "gm"  (list (lambda () (interactive) (find-file monthly-reviews-file)) :which-key "monthly")
+    "gd"  (list (lambda () (interactive) (find-file daily-reviews-file))   :which-key "daily")
+    "gw"  (list (lambda () (interactive) (find-file weekly-reviews-file))  :which-key "weekly")
 
     "fw"  (list (lambda () (interactive) (find-file work-file)) :which-key "work")
 
@@ -422,12 +428,12 @@
       ("W" "Finnish word of the day" entry
       (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
       "* TODO Word of the day - %t \n:PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
-      ("d" "Todo [daily]" entry
-        (file+olp+datetree "~/Nextcloud/Orgzly/daily.org")
-        "* TODO %i%? \n SCHEDULED: %t")
-      ("D" "Todo with link [daily]" entry
-        (file+olp+datetree "~/Nextcloud/Orgzly/daily.org")
-        "* TODO %a \n SCHEDULED: %t"))))
+      ("d" "Daily review" entry (file+olp+datetree "~/Nextcloud/org/daily_reviews.org")
+      (file "~/Nextcloud/org/templates/daily_review.org"))
+      ("w" "Weekly review" entry (file+olp+datetree "~/Nextcloud/org/weekly_reviews.org")
+      (file "~/Nextcloud/org/templates/weekly_review.org"))
+      ("m" "Monthly review" entry (file+olp+datetree "~/Nextcloud/org/monthly_reviews.org")
+      (file "~/Nextcloud/org/templates/monthly_review.org")))))
 
 (use-package org-agenda
   :after org
@@ -460,9 +466,10 @@
   :config
   ;; files to refile to
   (setq org-refile-targets
-    '(("~/Nextcloud/Orgzly/gtd.org"     :maxlevel . 9)
-      ("~/Nextcloud/Orgzly/someday.org" :maxlevel . 9)
-      ("~/Nextcloud/Orgzly/tickler.org" :maxlevel . 9))))
+    '(("~/Nextcloud/Orgzly/gtd.org"      :maxlevel . 9)
+      ("~/Nextcloud/Orgzly/someday.org"  :maxlevel . 9)
+      ("~/Nextcloud/Orgzly/tickler.org"  :maxlevel . 9)
+      ("~/Nextcloud/Orgzly/ukulele.org"  :maxlevel . 9))))
 
 (use-package org-clock
   :after org
@@ -529,14 +536,14 @@
        #'org-roam-capture--get-point
        "* %<%H:%M> %?"
        :file-name "daily/%<%Y-%m-%d>"
-       :head "#+title: %<%Y-%m-%d>\n"
+       :head "#+title: %<%Y-%m-%d>\n#+ROAM_TAGS: private\n\n"
        :olp ("Daily notes"))
 
       ("j" "journal" entry
        #'org-roam-capture--get-point
        "* %<%H:%M> :crypt: %?"
        :file-name "daily/%<%Y-%m-%d>"
-       :head "#+title: %<%Y-%m-%d>\n#+ROAM_TAGS: private\n"
+       :head "#+title: %<%Y-%m-%d>\n#+ROAM_TAGS: private\n\n"
        :olp ("Journal")))))
 
 (use-package ox-hugo
@@ -1130,7 +1137,8 @@
     "dj" 'dired-jump
 
     "drm" `(,(dw/dired-link "/run/media/gbojinov") :which-key "Media")
-    "fin" `(,(dw/dired-link "~/Nextcloud/org/finnish") :which-key "Finnish")))
+    "fin" `(,(dw/dired-link "~/Nextcloud/org/finnish") :which-key "Finnish")
+    "do"  `(,(dw/dired-link "~/Nextcloud/org") :which-key "Org")))
 
 (use-package all-the-icons-dired
   :straight t
