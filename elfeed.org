@@ -9,7 +9,6 @@
 ** Org-mode
 *** [[https://reddit.com/r/orgmode/.rss][r/org-mode]] :orgmode:
 ** Linux
-*** [[https://distrowatch.com/news/dwd.xml][DistroWatch]] :linux:
 *** [[https://xkcd.com/rss.xml][XKCD]] :linux:jokes:
 ** Emacs
 *** [[https://emacsredux.com/atom.xml][Emacs Redux]] :emacs:

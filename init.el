@@ -261,44 +261,6 @@
 (use-package dashboard-hackernews
   :straight t)
 
-(use-package evil
-  :straight t
-  :init
-  (setq evil-want-integration t)
-  (setq evil-want-keybinding nil)
-  :config
-  ;; Keybindings
-  (my/leader-keys
-    "w"  '(:ignore t :which-key "window")
-    "wh" 'evil-window-left
-    "wl" 'evil-window-right
-    "wk" 'evil-window-up
-    "wj" 'evil-window-down)
-
-  (evil-mode 1)
-  (evil-set-initial-state 'dashboard-mode 'normal)
-  (evil-set-undo-system 'undo-tree)
-  (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
-  (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line))
-
-(use-package evil-org
-  :straight t
-  :after (evil org)
-  :config
-  (add-hook 'org-mode-hook 'evil-org-mode)
-  (add-hook 'evil-org-mode-hook
-            (lambda ()
-              (evil-org-set-key-theme '(navigation insert textobjects additional calendar))))
-  (require 'evil-org-agenda)
-  (evil-org-agenda-set-keys)
-  (define-key evil-ex-map "e" 'counsel-find-file))
-
-(use-package evil-collection
-  :straight t
-  :after evil
-  :config
-  (evil-collection-init))
-
 (use-package ov
   :straight t)
 
@@ -438,17 +400,6 @@
 (use-package org-agenda
   :after org
   :config
-  ;; make org-agenda respect evil
-  (evil-set-initial-state 'org-agenda-mode 'normal)
-
-  ;; org-agenda custom bindings
-  (evil-define-key 'normal org-agenda-mode-map
-    "vd" 'org-agenda-day-view
-    "vw" 'org-agenda-week-view
-    "I"  'org-agenda-clock-in
-    "O"  'org-agenda-clock-out
-    "vR" 'org-agenda-clockreport-mode)
-
   ;; files that org-agenda will read from
   (setq org-agenda-files
   '("~/Nextcloud/Orgzly/gtd.org"
@@ -500,6 +451,8 @@
   ;; Regular clock report parameters
   (setq org-clock-clocktable-default-properties
     '(:block day :maxlevel 9 :scope agenda :link t :compact t :step day :narrow 80 :fileskip0 t :stepskip0 t :formula %))
+  ;; org clock history items to remember
+  (setq org-clock-history-length 17)
   ;; Agenda clock report parameters
   (setq org-agenda-clockreport-parameter-plist
     '(:link t :maxlevel 6 :fileskip0 t :compact t :narrow 60 :score 0)))
@@ -576,10 +529,17 @@
   (my/leader-keys
     "nj" 'org-journal-new-entry))
 
+(use-package jupyter
+  :straight t)
+
+(use-package ox-ipynb
+  :straight (:host github :repo "jkitchin/ox-ipynb" :branch "master"))
+
 (use-package ob-python   :after org)
 (use-package ob-shell    :after org)
 (use-package ob-js       :after org)
 (use-package ob-java     :after org)
+(use-package ob-jupyter  :after org)
 
 (use-package google-translate
   :straight t
@@ -592,14 +552,6 @@
 (use-package ob-translate
   :straight t
   :after org)
-
-(use-package ein
-  :straight t)
-
-(use-package ob-ein  :after org)
-
-;; (use-package ox-ipynb
-;;   :straight t)
 
 (use-package alert
   :straight t
@@ -648,8 +600,8 @@
   :config
   (my/leader-keys
     "c" '(:ignore t :which-key "store link")
-    "cc" 'sl-store-link
-    "cp" 'sl-insert-link))
+    "cc" 'org-super-links-store-link
+    "cp" 'org-super-links-insert-link))
 
 (use-package org-web-tools
   :straight t
@@ -703,6 +655,8 @@
   :straight (:host github :repo "caiorss/org-wiki" :branch "master")
   :config
   (setq org-wiki-location "~/Nextcloud/org/wiki")
+  (setq org-wiki-template "#+TITLE:%n\n#+DESCRIPTION:\n#+KEYWORDS:\n#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup\n#+STARTUP:  content\n\n\n- [[wiki:index][Index]]\n\n- Related: \n\n* %n\n")
+
   (my/leader-keys
     "ow" '(:ignore t :which-key "wiki")
 
@@ -710,10 +664,64 @@
     "owl" 'org-wiki-insert-link
     "own" 'org-wiki-insert-new
     "owh" 'org-wiki-helm
-    "owc" 'org-wiki-close))
+    "owc" 'org-wiki-close
+    "owg" 'org-wiki-rgrep))
 
 (use-package org-mime
   :straight t)
+
+(use-package org-fragtog
+  :straight t
+  :hook (org-mode . org-fragtog-mode))
+
+(use-package evil
+  :straight t
+  :init
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
+  :config
+  ;; Keybindings
+  (my/leader-keys
+    "w"  '(:ignore t :which-key "window")
+    "wh" 'evil-window-left
+    "wl" 'evil-window-right
+    "wk" 'evil-window-up
+    "wj" 'evil-window-down)
+
+  (evil-mode 1)
+  (evil-set-initial-state 'dashboard-mode 'normal)
+  (evil-set-undo-system 'undo-tree)
+  (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
+  (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line))
+
+(use-package evil-org
+  :straight t
+  :after (evil org)
+  :config
+  (add-hook 'org-mode-hook 'evil-org-mode)
+  (add-hook 'evil-org-mode-hook
+            (lambda ()
+              (evil-org-set-key-theme '(navigation insert textobjects additional calendar))))
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys)
+  (define-key evil-ex-map "e" 'counsel-find-file)
+
+  ;; make org-agenda respect evil
+  (evil-set-initial-state 'org-agenda-mode 'normal)
+
+  ;; org-agenda custom bindings
+  (evil-define-key 'normal org-agenda-mode-map
+    "vd" 'org-agenda-day-view
+    "vw" 'org-agenda-week-view
+    "I"  'org-agenda-clock-in
+    "O"  'org-agenda-clock-out
+    "vR" 'org-agenda-clockreport-mode))
+
+(use-package evil-collection
+  :straight t
+  :after evil
+  :config
+  (evil-collection-init))
 
 (use-package magit
   :straight t
@@ -1202,7 +1210,8 @@
   :config
   ;; so bindings don't conflict
   (add-to-list 'evil-emacs-state-modes 'ledger-report-mode)
-  :mode "\\.dat\\'")
+  :mode (("\\.dat\\'" . ledger-mode)
+         ("\\.journal\\'" . ledger-mode)))
 
 (use-package writegood-mode
   :straight t
@@ -1229,3 +1238,64 @@
   :straight t
   :config
   (direnv-mode))
+
+(use-package cheatsheet
+  :straight t
+  :config
+  (my/leader-keys
+    "ch" 'cheatsheet-show)
+
+  (cheatsheet-add-group 'Cheatsheet
+                        '(:key "SPC c h" :description "Show cheatsheet")
+                        '(:key "C-q"     :description "Close cheatsheet buffer"))
+
+
+  (cheatsheet-add-group 'GTD
+                        '(:key "SPC g g" :description "Open gtd.org")
+                        '(:key "SPC g t" :description "Open tickler.org")
+                        '(:key "SPC g i" :description "Open inbox.org")
+                        '(:key "SPC g h" :description "Open hobbies.org")
+                        '(:key "SPC g s" :description "Open someday.org")
+                        '(:key "SPC g d" :description "Open daily_reviews.org")
+                        '(:key "SPC g w" :description "Open weekly_reviews.org")
+                        '(:key "SPC g m" :description "Open monthly_reviews.org"))
+
+  (cheatsheet-add-group 'Projects
+                        '(:key "SPC p p"   :description "Select project")
+                        '(:key "SPC p f"   :description "Find file in project")
+                        '(:key "SPC p x e" :description "Open eshell in project root")
+                        '(:key "SPC p D"   :description "Open dired in project root")
+                        '(:key "SPC p k"   :description "Kill all project buffers")
+                        '(:key "SPC p a"   :description "Add new project to projectile")
+                        '(:key "SPC p r"   :description "Remove project from projectile")
+                        '(:key "SPC p S"   :description "Save all project buffers")
+                        '(:key "SPC o p g" :description "Select project todos to open"))
+
+  (cheatsheet-add-group 'Org
+                        '(:key "SPC m t"   :description "Change org todo state")
+                        '(:key "SPC m s"   :description "Schedule an org todo heading")
+                        '(:key "SPC m d"   :description "Make a deadline for an org todo heading")
+                        '(:key "SPC o a a" :description "Open org agenda")
+                        '(:key "SPC o c i" :description "Clock into task")
+                        '(:key "SPC o c o" :description "Clock out of task")
+                        '(:key "SPC o c l" :description "Clock into last clocked task")
+                        '(:key "SPC o c g" :description "Go to currently clocked task")
+                        '(:key "SPC o g"   :description "Search through headings in an org file")
+                        '(:key "SPC o d"   :description "Decrypt org file")
+                        '(:key "SPC o r"   :description "Refile heading in org file")
+                        '(:key "SPC o s"   :description "Archive heading in org file")
+                        '(:key "SPC o w i" :description "Org wiki index")
+                        '(:key "SPC o w c" :description "Close all org wiki buffers")
+                        '(:key "SPC o w h" :description "Helm search through org wiki file names")
+                        '(:key "SPC o w l" :description "Insert link into an org wiki file to another org wiki file")
+                        '(:key "SPC o w n" :description "Insert a link to and create a new org wiki file")
+                        '(:key "SPC o t u" :description "Bump up org timestamp by a day")
+                        '(:key "SPC o t d" :description "Down org timestamp by a day")
+                        '(:key "SPC o t l" :description "Toggle link display in org mode (shows what stuff is linked to)")
+                        '(:key "SPC n f"   :description "Find a file in org roam")
+                        '(:key "SPC n i"   :description "Insert a link to a file in an org roam file and open it. Creates a backlink")
+                        '(:key "SPC n I"   :description "Insert a link to a new file in an org roam file but don't open it. Creates a backlink")
+                        '(:key "SPC n l"   :description "Open org roam backlinks sidebuffer")
+                        '(:key "SPC n o"   :description "Capture a new org roam daily entry")
+                        '(:key "SPC n t"   :description "Go to today's daily file in org roam")
+                        '(:key "SPC n y"   :description "Go to yesterday's daily file in org roam")))
