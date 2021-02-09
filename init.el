@@ -1254,12 +1254,12 @@
                         '(:key "SPC c h" :description "Show cheatsheet")
                         '(:key "C-q"     :description "Close cheatsheet buffer"))
 
-
   (cheatsheet-add-group 'GTD
                         '(:key "SPC g g" :description "Open gtd.org")
                         '(:key "SPC g t" :description "Open tickler.org")
                         '(:key "SPC g i" :description "Open inbox.org")
                         '(:key "SPC g h" :description "Open hobbies.org")
+                        '(:key "SPC g u" :description "Open ukulele.org")
                         '(:key "SPC g s" :description "Open someday.org")
                         '(:key "SPC g d" :description "Open daily_reviews.org")
                         '(:key "SPC g w" :description "Open weekly_reviews.org")
@@ -1294,6 +1294,7 @@
                         '(:key "SPC o w h" :description "Helm search through org wiki file names")
                         '(:key "SPC o w l" :description "Insert link into an org wiki file to another org wiki file")
                         '(:key "SPC o w n" :description "Insert a link to and create a new org wiki file")
+                        '(:key "SPC o w g" :description "Grep through the wiki directory inside Emacs")
                         '(:key "SPC o t u" :description "Bump up org timestamp by a day")
                         '(:key "SPC o t d" :description "Down org timestamp by a day")
                         '(:key "SPC o t l" :description "Toggle link display in org mode (shows what stuff is linked to)")
