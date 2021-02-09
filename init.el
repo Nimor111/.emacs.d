@@ -723,6 +723,9 @@
   :config
   (evil-collection-init))
 
+(use-package eshell-autojump
+  :straight t)
+
 (use-package magit
   :straight t
   :defer t)

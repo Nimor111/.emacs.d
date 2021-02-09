@@ -70,6 +70,7 @@
     - [[#evil-mode-configs][Evil mode configs]]
     - [[#org-mode-integration-with-evil][Org mode integration with evil]]
     - [[#evil-collection-mode][Evil collection mode]]
+  - [[#eshell][Eshell]]
   - [[#magit][Magit]]
   - [[#counsel][Counsel]]
   - [[#ivy][Ivy]]
@@ -1043,6 +1044,14 @@ Sets up various other emacs modes with evil-mode bindings
   :after evil
   :config
   (evil-collection-init))
+#+end_src
+** Eshell
+The Emacs shell.
+Autojump for eshell to go to most visited directories
+
+#+begin_src elisp
+(use-package eshell-autojump
+  :straight t)
 #+end_src
 ** Magit
 The git supercharge
