@@ -83,6 +83,7 @@
 
   (my/leader-keys
     "s"   'save-buffer
+    "eb"  'eval-buffer
 
     "SPC" 'find-file
 
@@ -386,9 +387,9 @@
       ("T" "Tickler" entry
       (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
       "* TODO %i%? \n SCHEDULED: %T")
-      ("M" "Mail Todo with link" entry
+      ("M" "Todo with link" entry
       (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
-      "* TODO %i%? \n:PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
+      "* TODO %i%? \n SCHEDULED: %t \n :PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
       ("W" "Finnish word of the day" entry
       (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
       "* TODO Word of the day - %t \n:PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
@@ -665,6 +666,7 @@
     "owi" 'org-wiki-index
     "owl" 'org-wiki-insert-link
     "own" 'org-wiki-insert-new
+    "owN" 'org-wiki-new
     "owh" 'org-wiki-helm
     "owc" 'org-wiki-close
     "owg" 'org-wiki-rgrep))
@@ -675,6 +677,9 @@
 (use-package org-fragtog
   :straight t
   :hook (org-mode . org-fragtog-mode))
+
+(use-package org-tree-slide
+  :straight t)
 
 (use-package evil
   :straight t
@@ -1294,6 +1299,7 @@
                         '(:key "SPC o w h" :description "Helm search through org wiki file names")
                         '(:key "SPC o w l" :description "Insert link into an org wiki file to another org wiki file")
                         '(:key "SPC o w n" :description "Insert a link to and create a new org wiki file")
+                        '(:key "SPC o w N" :description "Create a new org wiki file without inserting a link to it")
                         '(:key "SPC o w g" :description "Grep through the wiki directory inside Emacs")
                         '(:key "SPC o t u" :description "Bump up org timestamp by a day")
                         '(:key "SPC o t d" :description "Down org timestamp by a day")
@@ -1305,3 +1311,9 @@
                         '(:key "SPC n o"   :description "Capture a new org roam daily entry")
                         '(:key "SPC n t"   :description "Go to today's daily file in org roam")
                         '(:key "SPC n y"   :description "Go to yesterday's daily file in org roam")))
+
+(use-package demo-it
+  :straight (:host github :repo "howardabrams/demo-it" :branch "master")
+  :config
+  (my/leader-keys
+     "des" 'demo-it-step))

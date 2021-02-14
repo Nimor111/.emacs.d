@@ -66,6 +66,7 @@
     - [[#wiki][Wiki]]
     - [[#org-mime][Org-mime]]
     - [[#automatic-toggle-of-latex-previews][Automatic toggle of latex previews]]
+    - [[#org-tree-slide][Org tree slide]]
   - [[#evil-mode][Evil-mode]]
     - [[#evil-mode-configs][Evil mode configs]]
     - [[#org-mode-integration-with-evil][Org mode integration with evil]]
@@ -111,6 +112,7 @@
   - [[#tramp][Tramp]]
   - [[#direnv][Direnv]]
   - [[#cheatsheet][Cheatsheet]]
+  - [[#demo-it][Demo it]]
 
 ** Package manager
 Must be in the beginning for ~use-package~ usage below.
@@ -221,6 +223,7 @@ General keybindings
 
   (my/leader-keys
     "s"   'save-buffer
+    "eb"  'eval-buffer
 
     "SPC" 'find-file
 
@@ -250,6 +253,10 @@ General keybindings
     "xsr" 'split-window-right
     "xsb" 'split-window-below))
 #+end_src
+
+#+RESULTS:
+: t
+
 *** Custom vars file, so it doesn't pollute the init file
 #+begin_src elisp
 (setq-default
@@ -623,9 +630,9 @@ Disable line numbers in org-mode
       ("T" "Tickler" entry
       (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
       "* TODO %i%? \n SCHEDULED: %T")
-      ("M" "Mail Todo with link" entry
+      ("M" "Todo with link" entry
       (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
-      "* TODO %i%? \n:PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
+      "* TODO %i%? \n SCHEDULED: %t \n :PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
       ("W" "Finnish word of the day" entry
       (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
       "* TODO Word of the day - %t \n:PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
@@ -972,6 +979,7 @@ Creates the heading before an archived heading in the archive file
     "owi" 'org-wiki-index
     "owl" 'org-wiki-insert-link
     "own" 'org-wiki-insert-new
+    "owN" 'org-wiki-new
     "owh" 'org-wiki-helm
     "owc" 'org-wiki-close
     "owg" 'org-wiki-rgrep))
@@ -987,6 +995,12 @@ For sending emails with org mode files
 (use-package org-fragtog
   :straight t
   :hook (org-mode . org-fragtog-mode))
+#+end_src
+*** Org tree slide
+For simpler presentation in org files
+#+begin_src elisp
+(use-package org-tree-slide
+  :straight t)
 #+end_src
 ** Evil-mode
 Vim keybinds and goodness in emacs
@@ -1774,6 +1788,7 @@ For using direnv inside emacs.
                         '(:key "SPC o w h" :description "Helm search through org wiki file names")
                         '(:key "SPC o w l" :description "Insert link into an org wiki file to another org wiki file")
                         '(:key "SPC o w n" :description "Insert a link to and create a new org wiki file")
+                        '(:key "SPC o w N" :description "Create a new org wiki file without inserting a link to it")
                         '(:key "SPC o w g" :description "Grep through the wiki directory inside Emacs")
                         '(:key "SPC o t u" :description "Bump up org timestamp by a day")
                         '(:key "SPC o t d" :description "Down org timestamp by a day")
@@ -1785,4 +1800,14 @@ For using direnv inside emacs.
                         '(:key "SPC n o"   :description "Capture a new org roam daily entry")
                         '(:key "SPC n t"   :description "Go to today's daily file in org roam")
                         '(:key "SPC n y"   :description "Go to yesterday's daily file in org roam")))
+#+end_src
+
+** Demo it
+Interesting collection of functions for performing demos and presentations in steps, programatically.
+#+begin_src elisp
+(use-package demo-it
+  :straight (:host github :repo "howardabrams/demo-it" :branch "master")
+  :config
+  (my/leader-keys
+     "des" 'demo-it-step))
 #+end_src
