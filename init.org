@@ -453,6 +453,8 @@ Revert buffers automatically when they change on disk.
 #+end_src
 ** Modeline
 Doom modeline - it looks nice!
+Pro-tip, when installing this for the first time, the =M-x all-the-icons-install-fonts= command to get the fancy
+icons showing!
 #+begin_src elisp
 ;; dependency
 (use-package all-the-icons
