@@ -54,6 +54,7 @@
 (setq weekly-reviews-file "~/Nextcloud/org/weekly_reviews.org")
 (setq daily-reviews-file "~/Nextcloud/org/daily_reviews.org")
 (setq monthly-reviews-file "~/Nextcloud/org/monthly_reviews.org")
+(setq reading-inbox-file "~/Nextcloud/org-roam/20210214211549-reading_inbox.org")
 
 ;; would love to be able to do it like this but it doesn't work for some reason
 (defun my/open-file (file-name)
@@ -89,16 +90,16 @@
 
     "fp"  (list (lambda () (interactive) (find-file user-init-file-org)) :which-key "config")
 
-    "g"  '(:ignore t :which-key "gtd")
-    "gi"  (list (lambda () (interactive) (find-file gtd-inbox-file))       :which-key "inbox")
-    "gg"  (list (lambda () (interactive) (find-file gtd-file))             :which-key "gtd")
-    "gs"  (list (lambda () (interactive) (find-file gtd-someday-file))     :which-key "someday")
-    "gt"  (list (lambda () (interactive) (find-file gtd-tickler-file))     :which-key "tickler")
-    "gh"  (list (lambda () (interactive) (find-file gtd-hobbies-file))     :which-key "hobbies")
-    "gu"  (list (lambda () (interactive) (find-file ukulele-file))         :which-key "ukulele")
-    "gm"  (list (lambda () (interactive) (find-file monthly-reviews-file)) :which-key "monthly")
-    "gd"  (list (lambda () (interactive) (find-file daily-reviews-file))   :which-key "daily")
-    "gw"  (list (lambda () (interactive) (find-file weekly-reviews-file))  :which-key "weekly")
+    "g"   '(:ignore t :which-key "gtd")
+    "gi"   (list (lambda () (interactive) (find-file gtd-inbox-file))       :which-key "inbox")
+    "gg"   (list (lambda () (interactive) (find-file gtd-file))             :which-key "gtd")
+    "gs"   (list (lambda () (interactive) (find-file gtd-someday-file))     :which-key "someday")
+    "gt"   (list (lambda () (interactive) (find-file gtd-tickler-file))     :which-key "tickler")
+    "gh"   (list (lambda () (interactive) (find-file gtd-hobbies-file))     :which-key "hobbies")
+    "gu"   (list (lambda () (interactive) (find-file ukulele-file))         :which-key "ukulele")
+    "gm"   (list (lambda () (interactive) (find-file monthly-reviews-file)) :which-key "monthly")
+    "gd"   (list (lambda () (interactive) (find-file daily-reviews-file))   :which-key "daily")
+    "gw"   (list (lambda () (interactive) (find-file weekly-reviews-file))  :which-key "weekly")
 
     "fw"  (list (lambda () (interactive) (find-file work-file)) :which-key "work")
 
@@ -410,7 +411,8 @@
     "~/Nextcloud/Orgzly/inbox.org"
     "~/Nextcloud/Orgzly/hobbies.org"
     "~/Nextcloud/org/work/work.org"
-    "~/Nextcloud/org/reading_list.org"))
+    "~/Nextcloud/org/reading_list.org"
+    "~/Nextcloud/org-roam/20210214211549-reading_inbox.org"))
 
   ;; show logs during the day - closed tasks and times, clocks
   (setq org-agenda-start-with-log-mode t))
