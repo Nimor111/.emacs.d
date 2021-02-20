@@ -15,6 +15,8 @@
     - [[#custom-vars-file-so-it-doesnt-pollute-the-init-file][Custom vars file, so it doesn't pollute the init file]]
     - [[#start-emacs-in-fullscreen-happens-when-everything-is-loaded][Start emacs in fullscreen, happens when everything is loaded.]]
     - [[#set-the-emacs-user-directory-for-re-use-in-other-places][Set the emacs user directory for re-use in other places]]
+    - [[#add-binaries-installed-with-nix-to-the-exec-path][Add binaries installed with nix to the exec path]]
+    - [[#exec-path-from-shell][Exec path from shell]]
     - [[#keeping-folders-clean][Keeping folders clean]]
     - [[#set-the-default-font][Set the default font]]
     - [[#set-the-theme][Set the theme]]
@@ -67,6 +69,7 @@
     - [[#org-mime][Org-mime]]
     - [[#automatic-toggle-of-latex-previews][Automatic toggle of latex previews]]
     - [[#org-tree-slide][Org tree slide]]
+    - [[#org-cv][Org CV]]
   - [[#evil-mode][Evil-mode]]
     - [[#evil-mode-configs][Evil mode configs]]
     - [[#org-mode-integration-with-evil][Org mode integration with evil]]
@@ -91,6 +94,8 @@
     - [[#python][Python]]
     - [[#clojure][Clojure]]
     - [[#nix][Nix]]
+    - [[#common-lisp][Common Lisp]]
+    - [[#zig][Zig]]
   - [[#projectile][Projectile]]
   - [[#parens][Parens]]
   - [[#flycheck][Flycheck]]
@@ -272,6 +277,18 @@ General keybindings
      (custom-emacs-directory (concat home-dir "/.emacs.d")))
   (setq user-emacs-directory custom-emacs-directory))
 #+end_src
+*** Add binaries installed with nix to the exec path
+#+begin_src elisp
+(add-to-list 'exec-path (concat user-emacs-directory ".nix-profile/bin"))
+#+end_src
+*** Exec path from shell
+#+begin_src elisp
+(use-package exec-path-from-shell
+  :straight t
+  :config
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)))
+#+end_src
 *** Keeping folders clean
 #+begin_src elisp
 ;; NOTE: If you want to move everything out of the ~/.emacs.d folder
@@ -290,9 +307,13 @@ General keybindings
 This is seriously retarded.
 #+begin_src elisp
 (if (eq system-type 'gnu/linux)
-  (set-frame-font "Jet Brains Mono 18")
+  ;;(set-frame-font "Jet Brains Mono 18")
+  (set-frame-font "mononoki Nerd Font Mono 18")
   (set-frame-font "JetBrains Mono 18"))
 #+end_src
+
+#+RESULTS:
+
 *** Set the theme
 **** Doom emacs themes
 #+begin_src elisp
@@ -655,7 +676,8 @@ Disable line numbers in org-mode
     "~/Nextcloud/Orgzly/hobbies.org"
     "~/Nextcloud/org/work/work.org"
     "~/Nextcloud/org/reading_list.org"
-    "~/Nextcloud/org-roam/20210214211549-reading_inbox.org"))
+    "~/Nextcloud/org-roam/20210214211549-reading_inbox.org"
+    "~/Nextcloud/org-roam/20210215222848-archive.org"))
 
   ;; show logs during the day - closed tasks and times, clocks
   (setq org-agenda-start-with-log-mode t))
@@ -724,6 +746,8 @@ The notes (zettelkasten) god
 (use-package org-roam
   :straight
   (:host github :repo "org-roam/org-roam" :branch "master")
+  ;; currently checkout out at 06e5814898bbf2b506fe7e1eb88bb4069e7c46c2
+  ;; due to https://org-roam.discourse.group/t/backlinks-title-not-at-top-of-buffer/1209
   :hook
   (after-init . org-roam-mode)
   :custom
@@ -1002,6 +1026,14 @@ For simpler presentation in org files
 (use-package org-tree-slide
   :straight t)
 #+end_src
+*** Org CV
+#+begin_src elisp
+(use-package ox-altacv
+  :straight (:host gitlab :repo "Titan-C/org-cv" :branch "master")
+  :init (require 'ox-altacv)
+  :config
+  (setq org-latex-compiler "lualatex"))
+#+end_src
 ** Evil-mode
 Vim keybinds and goodness in emacs
 
@@ -1067,7 +1099,18 @@ Autojump for eshell to go to most visited directories
 
 #+begin_src elisp
 (use-package eshell-autojump
-  :straight t)
+  :straight t
+  :config
+  (my/leader-keys
+    "es" 'eshell))
+#+end_src
+
+Lambda prompt
+#+begin_src elisp
+(use-package eshell-prompt-extras
+  :straight t
+  :custom (eshell-highlight-prompt nil)
+	        (eshell-prompt-function 'epe-theme-lambda))
 #+end_src
 ** Magit
 The git supercharge
@@ -1361,6 +1404,16 @@ SBT
 (use-package nix-mode
   :straight t)
 #+end_src
+*** Common Lisp
+#+begin_src elisp
+(use-package sly
+  :straight t)
+#+end_src
+*** Zig
+#+begin_src elisp
+(use-package zig-mode
+  :straight t)
+#+end_src
 ** Projectile
 #+begin_src elisp
 (use-package projectile
@@ -1629,6 +1682,16 @@ Open some files with external applications.
                                 ("mkv" . "mpv")
                                 ("avi" . "mpv")
                                 ("mp4" . "mpv"))))
+#+end_src
+
+Avoiding creating a new buffer every time a new directory is opened
+This is done by navigating to prev/next directory with h/l
+#+begin_src elisp
+(use-package dired-single
+  :straight t
+  :config (evil-collection-define-key 'normal 'dired-mode-map
+            "h" 'dired-single-up-directory
+            "l" 'dired-single-buffer))
 #+end_src
 ** Snow
 #+begin_src elisp

@@ -126,6 +126,14 @@
      (custom-emacs-directory (concat home-dir "/.emacs.d")))
   (setq user-emacs-directory custom-emacs-directory))
 
+(add-to-list 'exec-path (concat user-emacs-directory ".nix-profile/bin"))
+
+(use-package exec-path-from-shell
+  :straight t
+  :config
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)))
+
 ;; NOTE: If you want to move everything out of the ~/.emacs.d folder
 ;; reliably, set `user-emacs-directory` before loading no-littering!
 ;(setq user-emacs-directory "~/.cache/emacs")
@@ -139,7 +147,8 @@
       `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
 
 (if (eq system-type 'gnu/linux)
-  (set-frame-font "Jet Brains Mono 18")
+  ;;(set-frame-font "Jet Brains Mono 18")
+  (set-frame-font "mononoki Nerd Font Mono 18")
   (set-frame-font "JetBrains Mono 18"))
 
 ;; (use-package doom-themes
@@ -412,7 +421,8 @@
     "~/Nextcloud/Orgzly/hobbies.org"
     "~/Nextcloud/org/work/work.org"
     "~/Nextcloud/org/reading_list.org"
-    "~/Nextcloud/org-roam/20210214211549-reading_inbox.org"))
+    "~/Nextcloud/org-roam/20210214211549-reading_inbox.org"
+    "~/Nextcloud/org-roam/20210215222848-archive.org"))
 
   ;; show logs during the day - closed tasks and times, clocks
   (setq org-agenda-start-with-log-mode t))
@@ -468,6 +478,8 @@
 (use-package org-roam
   :straight
   (:host github :repo "org-roam/org-roam" :branch "master")
+  ;; currently checkout out at 06e5814898bbf2b506fe7e1eb88bb4069e7c46c2
+  ;; due to https://org-roam.discourse.group/t/backlinks-title-not-at-top-of-buffer/1209
   :hook
   (after-init . org-roam-mode)
   :custom
@@ -683,6 +695,12 @@
 (use-package org-tree-slide
   :straight t)
 
+(use-package ox-altacv
+  :straight (:host gitlab :repo "Titan-C/org-cv" :branch "master")
+  :init (require 'ox-altacv)
+  :config
+  (setq org-latex-compiler "lualatex"))
+
 (use-package evil
   :straight t
   :init
@@ -733,7 +751,15 @@
   (evil-collection-init))
 
 (use-package eshell-autojump
-  :straight t)
+  :straight t
+  :config
+  (my/leader-keys
+    "es" 'eshell))
+
+(use-package eshell-prompt-extras
+  :straight t
+  :custom (eshell-highlight-prompt nil)
+	        (eshell-prompt-function 'epe-theme-lambda))
 
 (use-package magit
   :straight t
@@ -961,6 +987,12 @@
 (use-package nix-mode
   :straight t)
 
+(use-package sly
+  :straight t)
+
+(use-package zig-mode
+  :straight t)
+
 (use-package projectile
   :straight t
   :config
@@ -1175,6 +1207,12 @@
                                 ("mkv" . "mpv")
                                 ("avi" . "mpv")
                                 ("mp4" . "mpv"))))
+
+(use-package dired-single
+  :straight t
+  :config (evil-collection-define-key 'normal 'dired-mode-map
+            "h" 'dired-single-up-directory
+            "l" 'dired-single-buffer))
 
 (use-package snow
   :straight (:host github :repo "alphapapa/snow.el" :branch "master"))
