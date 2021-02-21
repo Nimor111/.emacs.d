@@ -761,6 +761,11 @@
   :custom (eshell-highlight-prompt nil)
 	        (eshell-prompt-function 'epe-theme-lambda))
 
+(use-package eshell-syntax-highlighting
+  :straight t
+  :config
+  (eshell-syntax-highlighting-global-mode 1))
+
 (use-package magit
   :straight t
   :defer t)
