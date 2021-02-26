@@ -121,6 +121,7 @@
   (load custom-file t))
 
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
+(add-to-list 'default-frame-alist '(cursor-color . "palegoldenrod"))
 
 (let* ((home-dir (getenv "HOME"))
      (custom-emacs-directory (concat home-dir "/.emacs.d")))
@@ -146,10 +147,11 @@
 (setq auto-save-file-name-transforms
       `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
 
-(if (eq system-type 'gnu/linux)
-  ;;(set-frame-font "Jet Brains Mono 18")
-  (set-frame-font "mononoki Nerd Font Mono 18")
-  (set-frame-font "JetBrains Mono 18"))
+(add-to-list 'default-frame-alist '(font . "mononoki Nerd Font Mono 18"))
+;; (if (eq system-type 'gnu/linux)
+;;   ;;(set-frame-font "Jet Brains Mono 18")
+;;   (set-frame-font "mononoki Nerd Font Mono 18")
+;;   (set-frame-font "JetBrains Mono 18"))
 
 ;; (use-package doom-themes
 ;;   :straight t
@@ -262,7 +264,13 @@
   :init (doom-modeline-mode 1)
   :config
   ;; Whether display the mu4e notifications. It requires `mu4e-alert' package.
-  (setq doom-modeline-mu4e t))
+  (setq doom-modeline-mu4e t)
+
+  (defun enable-doom-modeline-icons (_frame)
+    (setq doom-modeline-icon t))
+
+  (add-hook 'after-make-frame-functions
+            #'enable-doom-modeline-icons))
 
 (use-package dashboard
   :straight t
@@ -296,6 +304,8 @@
     "or"   'org-refile
     "os"   'org-archive-hierarchically
     "og"   'counsel-org-goto
+
+    "oo"   'org-open-at-point
 
     "ot" '(:ignore t :which-key "timestamp")
     "otu" 'org-timestamp-up-day
@@ -700,6 +710,14 @@
   :init (require 'ox-altacv)
   :config
   (setq org-latex-compiler "lualatex"))
+
+(use-package reddigg
+  :straight (:host github :repo "thanhvg/emacs-reddigg" :branch "master")
+  :config
+  (setq reddigg-subs '(haskell scala orgmode emacs ukulele))
+  (my/leader-keys
+    "ovm" 'reddigg-view-main
+    "ovs" 'reddigg-view-sub))
 
 (use-package evil
   :straight t
@@ -1345,6 +1363,7 @@
                         '(:key "SPC o c o" :description "Clock out of task")
                         '(:key "SPC o c l" :description "Clock into last clocked task")
                         '(:key "SPC o c g" :description "Go to currently clocked task")
+                        '(:key "SPC o o"   :description "Org open link at point")
                         '(:key "SPC o g"   :description "Search through headings in an org file")
                         '(:key "SPC o d"   :description "Decrypt org file")
                         '(:key "SPC o r"   :description "Refile heading in org file")
@@ -1359,6 +1378,8 @@
                         '(:key "SPC o t u" :description "Bump up org timestamp by a day")
                         '(:key "SPC o t d" :description "Down org timestamp by a day")
                         '(:key "SPC o t l" :description "Toggle link display in org mode (shows what stuff is linked to)")
+                        '(:key "SPC o v m" :description "Open custom reddit reddigg main screen")
+                        '(:key "SPC o v s" :description "Open specific sub reddit with reddigg")
                         '(:key "SPC n f"   :description "Find a file in org roam")
                         '(:key "SPC n i"   :description "Insert a link to a file in an org roam file and open it. Creates a backlink")
                         '(:key "SPC n I"   :description "Insert a link to a new file in an org roam file but don't open it. Creates a backlink")
