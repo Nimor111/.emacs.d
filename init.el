@@ -766,6 +766,16 @@
   :config
   (eshell-syntax-highlighting-global-mode 1))
 
+(defun eshell-clear-buffer ()
+  "Clear terminal"
+  (interactive)
+  (let ((inhibit-read-only t))
+    (erase-buffer)
+    (eshell-send-input)))
+(add-hook 'eshell-mode-hook
+      '(lambda()
+          (local-set-key (kbd "C-l") 'eshell-clear-buffer)))
+
 (use-package magit
   :straight t
   :defer t)
@@ -1362,3 +1372,14 @@
   :config
   (my/leader-keys
      "des" 'demo-it-step))
+
+(use-package neato-graph-bar
+  :straight t)
+
+(use-package yasnippet
+  :straight t
+  :config
+  (yas-global-mode 1))
+
+(use-package yasnippet-snippets
+  :straight t)

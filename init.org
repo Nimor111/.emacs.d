@@ -118,6 +118,8 @@
   - [[#direnv][Direnv]]
   - [[#cheatsheet][Cheatsheet]]
   - [[#demo-it][Demo it]]
+  - [[#graph-bar][Graph bar]]
+  - [[#snippets-1][Snippets]]
 
 ** Package manager
 Must be in the beginning for ~use-package~ usage below.
@@ -1015,6 +1017,7 @@ For sending emails with org mode files
   :straight t)
 #+end_src
 *** Automatic toggle of latex previews
+For LaTex to work, the =texlive=, =dvipng=, and =texlive-latex-extra= must be present on the system
 #+begin_src elisp
 (use-package org-fragtog
   :straight t
@@ -1119,6 +1122,19 @@ Syntax highlighting
   :straight t
   :config
   (eshell-syntax-highlighting-global-mode 1))
+#+end_src
+
+Ctrl-l in eshell
+#+begin_src elisp
+(defun eshell-clear-buffer ()
+  "Clear terminal"
+  (interactive)
+  (let ((inhibit-read-only t))
+    (erase-buffer)
+    (eshell-send-input)))
+(add-hook 'eshell-mode-hook
+      '(lambda()
+          (local-set-key (kbd "C-l") 'eshell-clear-buffer)))
 #+end_src
 ** Magit
 The git supercharge
@@ -1881,4 +1897,21 @@ Interesting collection of functions for performing demos and presentations in st
   :config
   (my/leader-keys
      "des" 'demo-it-step))
+#+end_src
+
+** Graph bar
+#+begin_src elisp
+(use-package neato-graph-bar
+  :straight t)
+#+end_src
+
+** Snippets
+#+begin_src elisp
+(use-package yasnippet
+  :straight t
+  :config
+  (yas-global-mode 1))
+
+(use-package yasnippet-snippets
+  :straight t)
 #+end_src
