@@ -511,6 +511,21 @@
 
   (setq org-roam-dailies-directory "daily/")
 
+  (setq org-roam-capture-templates
+    '(("s" "source" plain
+       #'org-roam-capture--get-point
+       "%?"
+       :file-name "%<%Y%m%d%H%M%S>-${slug}"
+       :head "#+title: ${title}\n#+date: %t\n#+ROAM_TAGS: source\n\n* Notes\n* Resources"
+       :unnarrowed t)
+
+      ("l" "literary" plain
+       #'org-roam-capture--get-point
+       "%?"
+       :file-name "%<%Y%m%d%H%M%S>-${slug}"
+       :head "#+title: ${title}\n#+date: %t\n#+ROAM_TAGS: literary\n\n* Note"
+       :unnarrowed t)))
+
   (setq org-roam-dailies-capture-templates
     '(("d" "daily" entry
        #'org-roam-capture--get-point
@@ -1404,3 +1419,16 @@
 
 (use-package yasnippet-snippets
   :straight t)
+
+(use-package crux
+  :straight t
+  :config
+  (my/leader-keys
+    "rw" 'crux-open-with
+    "ro" 'crux-smart-open-line
+    "ru" 'crux-view-url
+    "rd" 'crux-delete-file-and-buffer
+    "rr" 'crux-rename-file-and-buffer
+    "re" 'crux-eval-and-replace
+    "rs" 'crux-create-scratch-buffer
+    "rb" 'crux-other-window-or-switch-buffer))

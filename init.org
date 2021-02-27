@@ -121,6 +121,7 @@
   - [[#demo-it][Demo it]]
   - [[#graph-bar][Graph bar]]
   - [[#snippets-1][Snippets]]
+  - [[#crux][Crux]]
 
 ** Package manager
 Must be in the beginning for ~use-package~ usage below.
@@ -781,6 +782,21 @@ The notes (zettelkasten) god
   (setq org-roam-completion-everywhere t)
 
   (setq org-roam-dailies-directory "daily/")
+
+  (setq org-roam-capture-templates
+    '(("s" "source" plain
+       #'org-roam-capture--get-point
+       "%?"
+       :file-name "%<%Y%m%d%H%M%S>-${slug}"
+       :head "#+title: ${title}\n#+date: %t\n#+ROAM_TAGS: source\n\n* Notes\n* Resources"
+       :unnarrowed t)
+
+      ("l" "literary" plain
+       #'org-roam-capture--get-point
+       "%?"
+       :file-name "%<%Y%m%d%H%M%S>-${slug}"
+       :head "#+title: ${title}\n#+date: %t\n#+ROAM_TAGS: literary\n\n* Note"
+       :unnarrowed t)))
 
   (setq org-roam-dailies-capture-templates
     '(("d" "daily" entry
@@ -1938,4 +1954,21 @@ Interesting collection of functions for performing demos and presentations in st
 
 (use-package yasnippet-snippets
   :straight t)
+#+end_src
+
+** Crux
+A Collection of Ridiculously Useful eXtensions
+#+begin_src elisp
+(use-package crux
+  :straight t
+  :config
+  (my/leader-keys
+    "rw" 'crux-open-with
+    "ro" 'crux-smart-open-line
+    "ru" 'crux-view-url
+    "rd" 'crux-delete-file-and-buffer
+    "rr" 'crux-rename-file-and-buffer
+    "re" 'crux-eval-and-replace
+    "rs" 'crux-create-scratch-buffer
+    "rb" 'crux-other-window-or-switch-buffer))
 #+end_src
