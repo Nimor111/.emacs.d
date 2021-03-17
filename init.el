@@ -734,6 +734,14 @@
     "ovm" 'reddigg-view-main
     "ovs" 'reddigg-view-sub))
 
+(use-package nroam
+  :straight '(nroam :host github
+                    :branch "master"
+                    :repo "NicolasPetton/nroam")
+  :after org-roam
+  :config
+  (add-hook 'org-mode-hook #'nroam-setup-maybe))
+
 (use-package evil
   :straight t
   :init

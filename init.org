@@ -1074,6 +1074,17 @@ For simpler presentation in org files
     "ovm" 'reddigg-view-main
     "ovs" 'reddigg-view-sub))
 #+end_src
+
+Nroam - replace backlinks buffer
+#+begin_src elisp
+(use-package nroam
+  :straight '(nroam :host github
+                    :branch "master"
+                    :repo "NicolasPetton/nroam")
+  :after org-roam
+  :config
+  (add-hook 'org-mode-hook #'nroam-setup-maybe))
+#+end_src
 ** Evil-mode
 Vim keybinds and goodness in emacs
 
