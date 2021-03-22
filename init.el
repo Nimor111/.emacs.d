@@ -1487,6 +1487,9 @@
     "rs" 'crux-create-scratch-buffer
     "rb" 'crux-other-window-or-switch-buffer))
 
+(use-package xah-get-thing
+  :straight t)
+
 (use-package neuron-mode
   :straight t
   :config

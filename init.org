@@ -2045,6 +2045,11 @@ A Collection of Ridiculously Useful eXtensions
 
 ** Neuron mode
 #+begin_src elisp
+(use-package xah-get-thing
+  :straight t)
+#+end_src
+
+#+begin_src elisp
 (use-package neuron-mode
   :straight t
   :config
