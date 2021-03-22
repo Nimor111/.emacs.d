@@ -541,6 +541,14 @@
        :head "#+title: %<%Y-%m-%d>\n#+ROAM_TAGS: private\n\n"
        :olp ("Journal")))))
 
+(use-package nroam
+  :straight '(nroam :host github
+                    :branch "master"
+                    :repo "NicolasPetton/nroam")
+  :after org-roam
+  :config
+  (add-hook 'org-mode-hook #'nroam-setup-maybe))
+
 (use-package ox-hugo
   :straight t
   :after ox)
@@ -734,13 +742,20 @@
     "ovm" 'reddigg-view-main
     "ovs" 'reddigg-view-sub))
 
-(use-package nroam
-  :straight '(nroam :host github
-                    :branch "master"
-                    :repo "NicolasPetton/nroam")
-  :after org-roam
+(use-package org-recur
+  :hook ((org-mode . org-recur-mode)
+         (org-agenda-mode . org-recur-agenda-mode))
+  :straight t
+  :demand t
   :config
-  (add-hook 'org-mode-hook #'nroam-setup-maybe))
+  (define-key org-recur-mode-map (kbd "C-c d") 'org-recur-finish)
+
+  ;; Rebind the 'd' key in org-agenda (default: `org-agenda-day-view').
+  (define-key org-recur-agenda-mode-map (kbd "d") 'org-recur-finish)
+  (define-key org-recur-agenda-mode-map (kbd "C-c d") 'org-recur-finish)
+
+  (setq org-recur-finish-done t
+        org-recur-finish-archive t))
 
 (use-package evil
   :straight t
@@ -832,8 +847,6 @@
   (counsel-mode 1)
 
   (my/leader-keys
-    "b"   'counsel-bookmark
-
     "h"  '(:ignore t :which-key "describe")
     "hf" 'counsel-describe-function
     "hv" 'counsel-describe-variable
@@ -922,7 +935,9 @@
   (ruby-mode     . lsp)
   (gdscript-mode . lsp)
   (scala-mode    . lsp)
-  :commands lsp)
+  :commands lsp
+  :config
+  (advice-add 'lsp :before #'direnv-update-environment))
 
 (defun lsp--gdscript-ignore-errors (original-function &rest args)
   "Ignore the error message resulting from Godot not replying to the `JSONRPC' request."
@@ -1009,6 +1024,12 @@
    'self-insert-command
    minibuffer-local-completion-map))
 
+(use-package ob-ammonite
+  :straight t
+  :config
+  (setq ammonite-term-repl-auto-detect-predef-file nil)
+  (setq ammonite-term-repl-program-args '("--no-default-predef" "--no-home-predef")))
+
 (use-package gdscript-mode
   :ensure-system-package godot
   :straight
@@ -1049,6 +1070,29 @@
 (use-package zig-mode
   :straight t)
 
+(use-package poetry
+  :straight t)
+
+(use-package haskell-mode
+  :straight t)
+
+(use-package lsp-haskell
+  :straight t
+  :init
+  (add-hook 'haskell-mode-hook
+            (lambda ()
+              (lsp)
+              (setq evil-shift-width 2)))
+  (add-hook 'haskell-mode-hook #'lsp)
+  (add-hook 'haskell-literate-mode-hook #'lsp))
+
+(use-package lsp-ui
+  :straight t
+  :hook (prog-mode . lsp-ui-mode)
+  :config
+  ;;(evil-leader/set-key "x m" #'lsp-ui-imenu)
+  (setq lsp-ui-doc-position 'bottom))
+
 (use-package projectile
   :straight t
   :config
@@ -1066,7 +1110,8 @@
     "pxe" 'projectile-run-eshell
     "pf"  'counsel-projectile-find-file
     "pS"  'projectile-save-project-buffers
-    "pD"  'projectile-dired)
+    "pD"  'projectile-dired
+    "pg"  'counsel-projectile-grep)
 
   (projectile-mode +1))
 
@@ -1329,7 +1374,8 @@
   :straight t
   :config
   (my/leader-keys
-     "wr" 'writeroom-mode))
+     "wr" 'writeroom-mode
+     "wi" 'writeroom-increase-width))
 
 (use-package ielm
   :config
@@ -1440,3 +1486,14 @@
     "re" 'crux-eval-and-replace
     "rs" 'crux-create-scratch-buffer
     "rb" 'crux-other-window-or-switch-buffer))
+
+(use-package neuron-mode
+  :straight t
+  :config
+  (load-file (concat user-emacs-directory "/lisp/neuron-org/neuron-org.el"))
+  (my/leader-keys
+     "n n f" 'neuron-edit-zettel
+     "n n r" 'neuron-refresh
+     "n n n" 'neuron-org-new-zettel
+     "n n l" 'neuron-org-insert-zettel-link
+     "n n o" 'neuron-org-follow-link))

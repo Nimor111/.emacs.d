@@ -14,3 +14,5 @@
 *** [[https://emacsredux.com/atom.xml][Emacs Redux]] :emacs:
 *** [[https://reddit.com/r/emacs/.rss][r/emacs]] :emacs:
 *** [[https://melpa.org/updates.rss][Melpa updates]] :emacs:
+** Zettelkasten
+*** [[https://forum.zettelkasten.de/discussions/feed.rss][Zettelkasten.de forum]] :zettelkasten:

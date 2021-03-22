@@ -71,6 +71,7 @@
     - [[#org-tree-slide][Org tree slide]]
     - [[#org-cv][Org CV]]
     - [[#org-reddit-viewer][Org reddit viewer]]
+    - [[#org-recur][Org recur]]
   - [[#evil-mode][Evil-mode]]
     - [[#evil-mode-configs][Evil mode configs]]
     - [[#org-mode-integration-with-evil][Org mode integration with evil]]
@@ -97,6 +98,7 @@
     - [[#nix][Nix]]
     - [[#common-lisp][Common Lisp]]
     - [[#zig][Zig]]
+    - [[#haskell][Haskell]]
   - [[#projectile][Projectile]]
   - [[#parens][Parens]]
   - [[#flycheck][Flycheck]]
@@ -122,6 +124,7 @@
   - [[#graph-bar][Graph bar]]
   - [[#snippets-1][Snippets]]
   - [[#crux][Crux]]
+  - [[#neuron-mode][Neuron mode]]
 
 ** Package manager
 Must be in the beginning for ~use-package~ usage below.
@@ -813,6 +816,17 @@ The notes (zettelkasten) god
        :head "#+title: %<%Y-%m-%d>\n#+ROAM_TAGS: private\n\n"
        :olp ("Journal")))))
 #+end_src
+
+Nroam - replace backlinks buffer
+#+begin_src elisp
+(use-package nroam
+  :straight '(nroam :host github
+                    :branch "master"
+                    :repo "NicolasPetton/nroam")
+  :after org-roam
+  :config
+  (add-hook 'org-mode-hook #'nroam-setup-maybe))
+#+end_src
 *** Ox-hugo
 Export org mode files to Hugo markdown.
 
@@ -1075,15 +1089,22 @@ For simpler presentation in org files
     "ovs" 'reddigg-view-sub))
 #+end_src
 
-Nroam - replace backlinks buffer
+*** Org recur
 #+begin_src elisp
-(use-package nroam
-  :straight '(nroam :host github
-                    :branch "master"
-                    :repo "NicolasPetton/nroam")
-  :after org-roam
+(use-package org-recur
+  :hook ((org-mode . org-recur-mode)
+         (org-agenda-mode . org-recur-agenda-mode))
+  :straight t
+  :demand t
   :config
-  (add-hook 'org-mode-hook #'nroam-setup-maybe))
+  (define-key org-recur-mode-map (kbd "C-c d") 'org-recur-finish)
+
+  ;; Rebind the 'd' key in org-agenda (default: `org-agenda-day-view').
+  (define-key org-recur-agenda-mode-map (kbd "d") 'org-recur-finish)
+  (define-key org-recur-agenda-mode-map (kbd "C-c d") 'org-recur-finish)
+
+  (setq org-recur-finish-done t
+        org-recur-finish-archive t))
 #+end_src
 ** Evil-mode
 Vim keybinds and goodness in emacs
@@ -1210,8 +1231,6 @@ Counsel is a customized set of commands to replace ~find-file~ with ~counsel-fin
   (counsel-mode 1)
 
   (my/leader-keys
-    "b"   'counsel-bookmark
-
     "h"  '(:ignore t :which-key "describe")
     "hf" 'counsel-describe-function
     "hv" 'counsel-describe-variable
@@ -1330,7 +1349,9 @@ For your general language needs.
   (ruby-mode     . lsp)
   (gdscript-mode . lsp)
   (scala-mode    . lsp)
-  :commands lsp)
+  :commands lsp
+  :config
+  (advice-add 'lsp :before #'direnv-update-environment))
 
 (defun lsp--gdscript-ignore-errors (original-function &rest args)
   "Ignore the error message resulting from Godot not replying to the `JSONRPC' request."
@@ -1434,6 +1455,14 @@ SBT
    minibuffer-local-completion-map))
 #+end_src
 
+Ammonite
+#+begin_src elisp
+(use-package ob-ammonite
+  :straight t
+  :config
+  (setq ammonite-term-repl-auto-detect-predef-file nil)
+  (setq ammonite-term-repl-program-args '("--no-default-predef" "--no-home-predef")))
+#+end_src
 *** GDScript
 #+begin_src elisp
 (use-package gdscript-mode
@@ -1486,6 +1515,35 @@ SBT
 (use-package zig-mode
   :straight t)
 #+end_src
+
+Poetry
+
+#+begin_src elisp
+(use-package poetry
+  :straight t)
+#+end_src
+*** Haskell
+#+begin_src elisp
+(use-package haskell-mode
+  :straight t)
+
+(use-package lsp-haskell
+  :straight t
+  :init
+  (add-hook 'haskell-mode-hook
+            (lambda ()
+              (lsp)
+              (setq evil-shift-width 2)))
+  (add-hook 'haskell-mode-hook #'lsp)
+  (add-hook 'haskell-literate-mode-hook #'lsp))
+
+(use-package lsp-ui
+  :straight t
+  :hook (prog-mode . lsp-ui-mode)
+  :config
+  ;;(evil-leader/set-key "x m" #'lsp-ui-imenu)
+  (setq lsp-ui-doc-position 'bottom))
+#+end_src
 ** Projectile
 #+begin_src elisp
 (use-package projectile
@@ -1505,7 +1563,8 @@ SBT
     "pxe" 'projectile-run-eshell
     "pf"  'counsel-projectile-find-file
     "pS"  'projectile-save-project-buffers
-    "pD"  'projectile-dired)
+    "pD"  'projectile-dired
+    "pg"  'counsel-projectile-grep)
 
   (projectile-mode +1))
 #+end_src
@@ -1843,9 +1902,9 @@ For distraction free writing
   :straight t
   :config
   (my/leader-keys
-     "wr" 'writeroom-mode))
+     "wr" 'writeroom-mode
+     "wi" 'writeroom-increase-width))
 #+end_src
-
 ** Ielm
 A built-in elisp repl in emacs
 #+begin_src elisp
@@ -1982,4 +2041,18 @@ A Collection of Ridiculously Useful eXtensions
     "re" 'crux-eval-and-replace
     "rs" 'crux-create-scratch-buffer
     "rb" 'crux-other-window-or-switch-buffer))
+#+end_src
+
+** Neuron mode
+#+begin_src elisp
+(use-package neuron-mode
+  :straight t
+  :config
+  (load-file (concat user-emacs-directory "/lisp/neuron-org/neuron-org.el"))
+  (my/leader-keys
+     "n n f" 'neuron-edit-zettel
+     "n n r" 'neuron-refresh
+     "n n n" 'neuron-org-new-zettel
+     "n n l" 'neuron-org-insert-zettel-link
+     "n n o" 'neuron-org-follow-link))
 #+end_src
