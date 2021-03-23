@@ -255,6 +255,10 @@
 
 (global-auto-revert-mode 1)
 
+(use-package vterm
+  :ensure-system-package cmake
+  :straight t)
+
 ;; dependency
 (use-package all-the-icons
   :straight t)

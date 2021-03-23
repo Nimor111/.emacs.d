@@ -41,6 +41,7 @@
       - [[#auto-fill-eg-adding-line-breaks-to-lines][Auto fill, e.g. adding line breaks to lines]]
     - [[#highlight-current-line][Highlight current line]]
     - [[#global-revert-mode][Global revert mode]]
+  - [[#terminal-emulator][Terminal emulator]]
   - [[#modeline][Modeline]]
   - [[#dashboard][Dashboard]]
   - [[#org-mode][Org-mode]]
@@ -477,6 +478,13 @@ Because writing yes is too much work.
 Revert buffers automatically when they change on disk.
 #+begin_src elisp
 (global-auto-revert-mode 1)
+#+end_src
+** Terminal emulator
+Also requires =libtool-bin= and =libvterm= (=libvterm-dev= on Ubuntu)
+#+begin_src elisp
+(use-package vterm
+  :ensure-system-package cmake
+  :straight t)
 #+end_src
 ** Modeline
 Doom modeline - it looks nice!
