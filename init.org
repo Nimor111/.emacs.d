@@ -1635,6 +1635,14 @@ Helpful adds a lot of very helpful (get it?) information to Emacs’ describe- c
   (my/leader-keys
     "hk" 'helpful-key))
 #+end_src
+
+Elisp demos - examples of usage of different elisp functions in the doc window
+#+begin_src elisp
+(use-package elisp-demos
+  :straight t
+  :config
+  (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
+#+end_src
 ** Better link opener
 #+begin_src elisp
 (use-package link-hint

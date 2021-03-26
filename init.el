@@ -1159,6 +1159,11 @@
   (my/leader-keys
     "hk" 'helpful-key))
 
+(use-package elisp-demos
+  :straight t
+  :config
+  (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
+
 (use-package link-hint
   :straight t
   :config
