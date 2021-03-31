@@ -397,6 +397,16 @@
 
 (add-hook 'org-mode-hook (lambda () (display-line-numbers-mode 0)))
 
+;; inspiration - https://stackoverflow.com/a/53738442
+;; Currently will keep files even if I abort the capture, but CBA to fix that now
+(defun my/create-notes-file (&optional path)
+  "Create an org file in ~/zettelkasten/."
+  (interactive)
+  (setq my-org-note--name (read-string "Filename: "))
+  (expand-file-name (format "%s.org"
+                    (s-downcase (replace-regexp-in-string "[?,'|;\s]" "_" my-org-note--name)))
+                    (if path path "~zettelkasten")))
+
 (use-package org-capture
   :after org
   :config
@@ -405,7 +415,19 @@
     "occ"  'org-capture)
   ;; quick templates for org files
   (setq org-capture-templates
-    '(("t" "Todo [inbox]" entry
+    '(("s" "Stream note" entry
+      (file (lambda () (my/create-notes-file "~/zettelkasten/stream")))
+      (file "~/Nextcloud/org/templates/neuron_stream_note.org"))
+      ("p" "Permanent note" entry
+      (file my/create-notes-file)
+      (file "~/Nextcloud/org/templates/neuron_permanent_note.org"))
+      ("r" "Resource note" entry
+      (file my/create-notes-file)
+      (file "~/Nextcloud/org/templates/neuron_resource_note.org"))
+      ("l" "Literature note" entry
+      (file my/create-notes-file)
+      (file "~/Nextcloud/org/templates/neuron_literature_note.org"))
+      ("t" "Todo [inbox]" entry
       (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
       "* TODO %i%? \n SCHEDULED: %t")
       ("T" "Tickler" entry

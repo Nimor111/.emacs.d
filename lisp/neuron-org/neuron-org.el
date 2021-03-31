@@ -71,7 +71,7 @@ If NO-DEFAULT-TAGS is non-nil, don't add the tags specified the variable
   (interactive (list (read-string "Title: ")))
   (neuron-check-if-zettelkasten-exists)
   (when (or (not id) (and id (not (neuron--get-cached-zettel-from-id id))))
-    (let* ((underscore-title (s-downcase (replace-regexp-in-string "[?';\s]" "_" title)))
+    (let* ((underscore-title (s-downcase (replace-regexp-in-string "[?',|;\s]" "_" title)))
            (cmd     (neuron-org--make-new-command id underscore-title))
            (path    (neuron--run-command cmd))
            (buffer  (find-file-noselect path))
