@@ -405,7 +405,7 @@
   (setq my-org-note--name (read-string "Filename: "))
   (expand-file-name (format "%s.org"
                     (s-downcase (replace-regexp-in-string "[?,'|;\s]" "_" my-org-note--name)))
-                    (if path path "~zettelkasten")))
+                    (if path path "~/zettelkasten")))
 
 (use-package org-capture
   :after org
