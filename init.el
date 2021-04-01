@@ -479,11 +479,10 @@
   ;; Keybindings
   (my/leader-keys
     "oc"   '(:ignore t :which-key "org-clock")
-    "oci"  'org-clock-in
+    ;;"oci"  'org-clock-in
     "oco"  'org-clock-out
     "ocl"  'org-clock-in-last
-    "ocr"  'org-clock-report
-    "ocg"  'org-clock-goto)
+    "ocr"  'org-clock-report)
   ;; Resume clocking task when emacs is restarted
   (org-clock-persistence-insinuate)
   ;; Save the running clock and all clock history when exiting Emacs, load it on startup
@@ -510,6 +509,16 @@
 
 (use-package org-clock-csv
   :straight t)
+
+(use-package org-mru-clock
+  :straight t
+  :config
+  (setq org-mru-clock-how-many 100)
+  (setq org-mru-clock-completing-read #'ivy-completing-read)
+
+  (my/leader-keys
+    "oci"  'org-mru-clock-in
+    "ocg"  'org-mru-clock-goto))
 
 (use-package org-roam
   :straight
