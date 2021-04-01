@@ -344,7 +344,7 @@
         org-habit-following-days 7)
 
   ;; log when an item is rescheduled
-  (setq org-log-reschedule (quote time))
+  (setq org-log-reschedule (quote note))
 
   ;; some safeguards against accidentally deleting entire sections of an org file
   (setq org-catch-invisible-edits 'smart)
