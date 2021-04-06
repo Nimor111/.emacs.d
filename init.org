@@ -333,7 +333,7 @@ This is seriously retarded.
 ;;   ;; Global settings (defaults)
 ;;   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
 ;;         doom-themes-enable-italic t) ; if nil, italics is universally disabled
-;;   (load-theme 'doom-dracula t)
+;;   (load-theme 'doom-gruvbox t)
 
 ;;   ;; Enable flashing mode-line on errors
 ;;   (doom-themes-visual-bell-config)
@@ -481,10 +481,11 @@ Revert buffers automatically when they change on disk.
 #+end_src
 ** Terminal emulator
 Also requires =libtool-bin= and =libvterm= (=libvterm-dev= on Ubuntu)
+Not using for now, doesn't work on Manjaro (cannot find libvterm even though it's installed).
 #+begin_src elisp
-(use-package vterm
-  :ensure-system-package cmake
-  :straight t)
+;; (use-package vterm
+;;   :ensure-system-package cmake
+;;   :straight t)
 #+end_src
 ** Modeline
 Doom modeline - it looks nice!
@@ -588,10 +589,9 @@ Dependency of the org-colored-text file
 
   ;; org habit
   (setq org-habit-show-all-today t
-        org-habit-show-habits-only-for-today t
         org-habit-show-done-always-green t
         org-habit-graph-column 80
-        org-habit-preceding-days 28
+        org-habit-preceding-days 35
         org-habit-following-days 7)
 
   ;; log when an item is rescheduled
@@ -1570,15 +1570,15 @@ Poetry
 (use-package haskell-mode
   :straight t)
 
-(use-package lsp-haskell
-  :straight t
-  :init
-  (add-hook 'haskell-mode-hook
-            (lambda ()
-              (lsp)
-              (setq evil-shift-width 2)))
-  (add-hook 'haskell-mode-hook #'lsp)
-  (add-hook 'haskell-literate-mode-hook #'lsp))
+;; (use-package lsp-haskell
+;;   :straight t
+;;   :config
+;;   (add-hook 'haskell-mode-hook
+;;             (lambda ()
+;;               (lsp)
+;;               (setq evil-shift-width 2)))
+;;   (add-hook 'haskell-mode-hook #'lsp)
+;;   (add-hook 'haskell-literate-mode-hook #'lsp))
 
 (use-package lsp-ui
   :straight t
@@ -1587,6 +1587,7 @@ Poetry
   ;;(evil-leader/set-key "x m" #'lsp-ui-imenu)
   (setq lsp-ui-doc-position 'bottom))
 #+end_src
+
 ** Projectile
 #+begin_src elisp
 (use-package projectile
@@ -1631,8 +1632,12 @@ Automatic paren completion and visualization, and other nifty things
 ** Flycheck
 For all the errors in the world
 #+begin_src elisp
+(defun turn-off-flycheck-mode ()
+  (flycheck-mode 0))
+
 (use-package flycheck
   :straight t
+  :hook (haskell-mode . turn-off-flycheck-mode)
   :init (global-flycheck-mode))
 #+end_src
 
@@ -2103,12 +2108,25 @@ A Collection of Ridiculously Useful eXtensions
 #+begin_src elisp
 (use-package neuron-mode
   :straight t
-  :config
-  (load-file (concat user-emacs-directory "/lisp/neuron-org/neuron-org.el"))
-  (my/leader-keys
-     "n n f" 'neuron-edit-zettel
-     "n n r" 'neuron-refresh
-     "n n n" 'neuron-org-new-zettel
-     "n n l" 'neuron-org-insert-zettel-link
-     "n n o" 'neuron-org-follow-link))
+  :hook
+  (neuron-mode . company-neuron-setup))
 #+end_src
+
+Load in neuron-org-mode
+#+begin_src elisp
+(load-file (concat user-emacs-directory "/lisp/neuron-org/neuron-org-mode.el"))
+#+end_src
+
+Configure neuron-org-mode. Use package doesn't seem to work, probably because this is not in the straight repos
+or something.
+#+begin_src elisp
+(add-hook 'neuron-org-mode-hook #'company-neuron-org-setup)
+(my/leader-keys
+   "n n f" 'neuron-edit-zettel
+   "n n r" 'neuron-refresh
+   "n n n" 'neuron-org-new-zettel
+   "n n l" 'neuron-org-insert-zettel-link
+   "n n o" 'neuron-org-follow-link)
+#+end_src
+
+#+RESULTS:

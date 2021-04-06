@@ -159,7 +159,7 @@
 ;;   ;; Global settings (defaults)
 ;;   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
 ;;         doom-themes-enable-italic t) ; if nil, italics is universally disabled
-;;   (load-theme 'doom-dracula t)
+;;   (load-theme 'doom-gruvbox t)
 
 ;;   ;; Enable flashing mode-line on errors
 ;;   (doom-themes-visual-bell-config)
@@ -255,9 +255,9 @@
 
 (global-auto-revert-mode 1)
 
-(use-package vterm
-  :ensure-system-package cmake
-  :straight t)
+;; (use-package vterm
+;;   :ensure-system-package cmake
+;;   :straight t)
 
 ;; dependency
 (use-package all-the-icons
@@ -337,10 +337,9 @@
 
   ;; org habit
   (setq org-habit-show-all-today t
-        org-habit-show-habits-only-for-today t
         org-habit-show-done-always-green t
         org-habit-graph-column 80
-        org-habit-preceding-days 28
+        org-habit-preceding-days 35
         org-habit-following-days 7)
 
   ;; log when an item is rescheduled
@@ -1111,15 +1110,15 @@
 (use-package haskell-mode
   :straight t)
 
-(use-package lsp-haskell
-  :straight t
-  :init
-  (add-hook 'haskell-mode-hook
-            (lambda ()
-              (lsp)
-              (setq evil-shift-width 2)))
-  (add-hook 'haskell-mode-hook #'lsp)
-  (add-hook 'haskell-literate-mode-hook #'lsp))
+;; (use-package lsp-haskell
+;;   :straight t
+;;   :config
+;;   (add-hook 'haskell-mode-hook
+;;             (lambda ()
+;;               (lsp)
+;;               (setq evil-shift-width 2)))
+;;   (add-hook 'haskell-mode-hook #'lsp)
+;;   (add-hook 'haskell-literate-mode-hook #'lsp))
 
 (use-package lsp-ui
   :straight t
@@ -1160,8 +1159,12 @@
   (smartparens-global-mode)
   (show-smartparens-global-mode))
 
+(defun turn-off-flycheck-mode ()
+  (flycheck-mode 0))
+
 (use-package flycheck
   :straight t
+  :hook (haskell-mode . turn-off-flycheck-mode)
   :init (global-flycheck-mode))
 
 (use-package flycheck-pos-tip
@@ -1532,11 +1535,15 @@
 
 (use-package neuron-mode
   :straight t
-  :config
-  (load-file (concat user-emacs-directory "/lisp/neuron-org/neuron-org.el"))
-  (my/leader-keys
-     "n n f" 'neuron-edit-zettel
-     "n n r" 'neuron-refresh
-     "n n n" 'neuron-org-new-zettel
-     "n n l" 'neuron-org-insert-zettel-link
-     "n n o" 'neuron-org-follow-link))
+  :hook
+  (neuron-mode . company-neuron-setup))
+
+(load-file (concat user-emacs-directory "/lisp/neuron-org/neuron-org-mode.el"))
+
+(add-hook 'neuron-org-mode-hook #'company-neuron-org-setup)
+(my/leader-keys
+   "n n f" 'neuron-edit-zettel
+   "n n r" 'neuron-refresh
+   "n n n" 'neuron-org-new-zettel
+   "n n l" 'neuron-org-insert-zettel-link
+   "n n o" 'neuron-org-follow-link)
