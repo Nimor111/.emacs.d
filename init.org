@@ -41,6 +41,7 @@
       - [[#auto-fill-eg-adding-line-breaks-to-lines][Auto fill, e.g. adding line breaks to lines]]
     - [[#highlight-current-line][Highlight current line]]
     - [[#global-revert-mode][Global revert mode]]
+    - [[#set-warning-level-to-error][Set warning level to error]]
   - [[#terminal-emulator][Terminal emulator]]
   - [[#modeline][Modeline]]
   - [[#dashboard][Dashboard]]
@@ -478,6 +479,10 @@ Because writing yes is too much work.
 Revert buffers automatically when they change on disk.
 #+begin_src elisp
 (global-auto-revert-mode 1)
+#+end_src
+*** Set warning level to error
+#+begin_src elisp
+(setq warning-minimum-level :error)
 #+end_src
 ** Terminal emulator
 Also requires =libtool-bin= and =libvterm= (=libvterm-dev= on Ubuntu)
@@ -1877,14 +1882,15 @@ Elfeed dashboard similar to mu4e one.
 #+end_src
 
 Adding fancy icons to dired items because why not.
+Disabled until https://github.com/wyuenho/all-the-icons-dired/issues/4 has a resolution.
 #+begin_src elisp
-(use-package all-the-icons-dired
-  :straight t
-  :hook (dired-mode . all-the-icons-dired-mode)
-  :config
-  (setq dired-auto-revert-buffer t)
-  (setq dired-dwim-target t)
-  (setq dired-listing-switches "-lah"))
+;; (use-package all-the-icons-dired
+;;   :straight t
+;;   :hook (dired-mode . all-the-icons-dired-mode)
+;;   :config
+;;   (setq dired-auto-revert-buffer t)
+;;   (setq dired-dwim-target t)
+;;   (setq dired-listing-switches "-lah"))
 #+end_src
 
 Open some files with external applications.
