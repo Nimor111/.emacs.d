@@ -1884,13 +1884,13 @@ Elfeed dashboard similar to mu4e one.
 Adding fancy icons to dired items because why not.
 Disabled until https://github.com/wyuenho/all-the-icons-dired/issues/4 has a resolution.
 #+begin_src elisp
-;; (use-package all-the-icons-dired
-;;   :straight t
-;;   :hook (dired-mode . all-the-icons-dired-mode)
-;;   :config
-;;   (setq dired-auto-revert-buffer t)
-;;   (setq dired-dwim-target t)
-;;   (setq dired-listing-switches "-lah"))
+(use-package all-the-icons-dired
+  :straight t
+  :hook (dired-mode . all-the-icons-dired-mode)
+  :config
+  (setq dired-auto-revert-buffer t)
+  (setq dired-dwim-target t)
+  (setq dired-listing-switches "-lah"))
 #+end_src
 
 Open some files with external applications.

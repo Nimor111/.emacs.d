@@ -1365,13 +1365,13 @@
     "fin" `(,(dw/dired-link "~/Nextcloud/org/finnish") :which-key "Finnish")
     "do"  `(,(dw/dired-link "~/Nextcloud/org") :which-key "Org")))
 
-;; (use-package all-the-icons-dired
-;;   :straight t
-;;   :hook (dired-mode . all-the-icons-dired-mode)
-;;   :config
-;;   (setq dired-auto-revert-buffer t)
-;;   (setq dired-dwim-target t)
-;;   (setq dired-listing-switches "-lah"))
+(use-package all-the-icons-dired
+  :straight t
+  :hook (dired-mode . all-the-icons-dired-mode)
+  :config
+  (setq dired-auto-revert-buffer t)
+  (setq dired-dwim-target t)
+  (setq dired-listing-switches "-lah"))
 
 (use-package dired-open
   :straight t
