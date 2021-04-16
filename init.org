@@ -577,15 +577,14 @@ Dependency of the org-colored-text file
 
     "m" '(:ignore t :which-key "todo")
     "mt" 'org-todo
+    "my" 'org-todo-yesterday
     "ms" 'org-schedule
     "md" 'org-deadline)
   ;; TODO keywords that I use - the ones after the | are the done states
   (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "NEXT(n)" "|" "DONE(d)" "CANCELLED(c)")))
 
-  ;; Clocking settings
-  (setq org-pretty-entities t)
-
   ;; indentation settings and other misc stuff
+  (setq org-pretty-entities t)
   (setq org-startup-indented t)
   (setq org-startup-folded t)
   (setq org-log-done 'note)
