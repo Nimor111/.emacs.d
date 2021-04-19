@@ -457,12 +457,36 @@
     "~/Nextcloud/Orgzly/inbox.org"
     "~/Nextcloud/Orgzly/hobbies.org"
     "~/Nextcloud/org/work/work.org"
+    "~/Nextcloud/org/work/storepick/slacker"
     "~/Nextcloud/org/reading_list.org"
     "~/Nextcloud/org-roam/20210214211549-reading_inbox.org"
     "~/Nextcloud/org-roam/20210215222848-archive.org"))
 
   ;; show logs during the day - closed tasks and times, clocks
-  (setq org-agenda-start-with-log-mode t))
+  (setq org-agenda-start-with-log-mode t)
+
+  (use-package with-simulated-input
+    :straight t)
+
+  (defun org-work-agenda ()
+    (interactive)
+    (progn
+      (org-agenda nil "a")
+      (org-agenda-day-view)
+      (with-simulated-input "-hobbies-tickler-gtd-inbox RET"
+        (org-agenda-filter))))
+
+  (defun org-home-agenda ()
+    (interactive)
+    (progn
+      (org-agenda nil "a")
+      (org-agenda-day-view)
+      (with-simulated-input "+hobbies+tickler+gtd+inbox RET"
+        (org-agenda-filter))))
+
+  (my/leader-keys
+    "wa" 'org-work-agenda
+    "ha" 'org-home-agenda))
 
 (use-package org-refile
   :after org
@@ -1365,13 +1389,13 @@
     "fin" `(,(dw/dired-link "~/Nextcloud/org/finnish") :which-key "Finnish")
     "do"  `(,(dw/dired-link "~/Nextcloud/org") :which-key "Org")))
 
-(use-package all-the-icons-dired
-  :straight t
-  :hook (dired-mode . all-the-icons-dired-mode)
-  :config
-  (setq dired-auto-revert-buffer t)
-  (setq dired-dwim-target t)
-  (setq dired-listing-switches "-lah"))
+;; (use-package all-the-icons-dired
+;;   :straight t
+;;   :hook (dired-mode . all-the-icons-dired-mode)
+;;   :config
+;;   (setq dired-auto-revert-buffer t)
+;;   (setq dired-dwim-target t)
+;;   (setq dired-listing-switches "-lah"))
 
 (use-package dired-open
   :straight t
