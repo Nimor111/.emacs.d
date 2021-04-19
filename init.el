@@ -470,19 +470,17 @@
 
   (defun org-work-agenda ()
     (interactive)
-    (progn
-      (org-agenda nil "a")
-      (org-agenda-day-view)
-      (with-simulated-input "-hobbies-tickler-gtd-inbox RET"
-        (org-agenda-filter))))
+    (org-agenda nil "a")
+    (org-agenda-day-view)
+    (with-simulated-input "-hobbies-tickler-gtd-inbox RET"
+      (org-agenda-filter)))
 
   (defun org-home-agenda ()
     (interactive)
-    (progn
-      (org-agenda nil "a")
-      (org-agenda-day-view)
-      (with-simulated-input "+hobbies+tickler+gtd+inbox RET"
-        (org-agenda-filter))))
+    (org-agenda nil "a")
+    (org-agenda-day-view)
+    (with-simulated-input "+hobbies+tickler+gtd+inbox RET"
+      (org-agenda-filter)))
 
   (my/leader-keys
     "wa" 'org-work-agenda
