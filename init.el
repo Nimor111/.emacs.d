@@ -472,14 +472,14 @@
     (interactive)
     (org-agenda nil "a")
     (org-agenda-day-view)
-    (with-simulated-input "-hobbies-tickler-gtd-inbox RET"
+    (with-simulated-input "-hobbies-tickler-gtd-inbox-readling_list RET"
       (org-agenda-filter)))
 
   (defun org-home-agenda ()
     (interactive)
     (org-agenda nil "a")
     (org-agenda-day-view)
-    (with-simulated-input "+hobbies+tickler+gtd+inbox RET"
+    (with-simulated-input "+hobbies+tickler+gtd+inbox+reading_list RET"
       (org-agenda-filter)))
 
   (my/leader-keys
