@@ -852,7 +852,7 @@ Optionally get the NTH quote."
 
 (defun org-rg (query)
   (interactive "MSearch Org files for: ")
-  (rg query "org" org-directory)
+  (rg query "org" "~/Nextcloud")
   (select-window (get-buffer-window "*rg*")))
 
 (my/leader-keys
