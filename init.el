@@ -278,11 +278,45 @@
   (add-hook 'after-make-frame-functions
             #'enable-doom-modeline-icons))
 
+(defvar quotes-file (concat user-emacs-directory "/quotes.txt")
+  "File to lookup quotes.")
+
+(defvar quotes-file-separator-regex "\n%\n"
+  "Delimiter for seperating the line in `quotes-file'.")
+
+(defvar quotes-author-regex "^--"
+  "Regex for getting the author of the quote.
+
+Anything after this will be changed to face `font-lock-comment-face'.")
+
+(defun get-quote (&optional nth)
+  "Get a random quote from `quotes-file'.
+
+Optionally get the NTH quote."
+  (let* ((quotes (split-string
+                  (with-temp-buffer
+                    (insert-file-contents quotes-file)
+                    (buffer-substring-no-properties
+                     (point-min)
+                     (point-max)))
+                  quotes-file-separator-regex t))
+         (selected-quote (nth (or nth
+                                  (random (length quotes)))
+                              quotes)))
+    (put-text-property
+     (string-match quotes-author-regex selected-quote)
+     (length selected-quote)
+     'face
+     'font-lock-comment-face
+     selected-quote)
+    selected-quote))
+
 (use-package dashboard
   :straight t
   :config
   (setq dashboard-items '((recents  . 5)
                           (projects . 5)))
+  (setq dashboard-banner-logo-title (get-quote))
   (dashboard-setup-startup-hook))
 
 (use-package dashboard-hackernews
@@ -325,6 +359,7 @@
     "my" 'org-todo-yesterday
     "ms" 'org-schedule
     "md" 'org-deadline)
+  (setq org-directory "~/Nextcloud/org")
   ;; TODO keywords that I use - the ones after the | are the done states
   (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "NEXT(n)" "|" "DONE(d)" "CANCELLED(c)")))
 
@@ -814,6 +849,14 @@
 
   (setq org-recur-finish-done t
         org-recur-finish-archive t))
+
+(defun org-rg (query)
+  (interactive "MSearch Org files for: ")
+  (rg query "org" org-directory)
+  (select-window (get-buffer-window "*rg*")))
+
+(my/leader-keys
+  "ob" 'org-rg)
 
 (use-package evil
   :straight t
@@ -1598,3 +1641,6 @@
    "n n n" 'neuron-org-new-zettel
    "n n l" 'neuron-org-insert-zettel-link
    "n n o" 'neuron-org-follow-link)
+
+(use-package rg
+  :straight t)
