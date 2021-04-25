@@ -1,11 +1,16 @@
 * root :elfeed:
 ** Programming :programming:
-*** [[https://this-week-in-rust.org/rss.xml][This week in Rust]] :rust:
 *** [[https://haskellweekly.news/newsletter.atom][Haskell weekly]] :haskell:
 *** [[https://reddit.com/r/haskell/.rss][r/haskell]] :haskell:
 *** [[https://reddit.com/r/purescript/.rss][r/purescript]] :purescript:
 *** [[https://reddit.com/r/scala/.rss][r/scala]] :scala:
-*** [[https://www.fpcomplete.com/atom.xml][FP Complete]] :fp:
+** Functional Programming :fp:
+*** [[https://www.fpcomplete.com/atom.xml][FP Complete]]
+*** [[https://planet.haskell.org/rss20.xml][Planet Haskell]] :haskell:
+*** [[https://serokell.io/blog.rss.xml][Serokell blog]] :haskell:rust:nix:
+*** [[https://kowainik.github.io/rss.xml][Kowainik blog]] :haskell:
+*** [[https://www.tweag.io/rss.xml][Tweag blog]] :haskell:nix:
+*** [[http://lexi-lambda.github.io/feeds/all.atom.xml][Lexi Lambda blog]] :haskell:
 ** Org-mode
 *** [[https://reddit.com/r/orgmode/.rss][r/org-mode]] :orgmode:
 ** Linux
