@@ -148,10 +148,6 @@
       `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
 
 (add-to-list 'default-frame-alist '(font . "mononoki Nerd Font Mono 18"))
-;; (if (eq system-type 'gnu/linux)
-;;   ;;(set-frame-font "Jet Brains Mono 18")
-;;   (set-frame-font "mononoki Nerd Font Mono 18")
-;;   (set-frame-font "JetBrains Mono 18"))
 
 ;; (use-package doom-themes
 ;;   :straight t
@@ -193,11 +189,6 @@
 
 (setq-default indent-tabs-mode nil)
 
-(use-package evil-nerd-commenter
-  :straight t
-  :config
-  (evilnc-default-hotkeys))
-
 (use-package command-log-mode
   :straight t)
 
@@ -210,18 +201,6 @@
   :straight t
   :init
   (global-undo-tree-mode))
-
-;; (setq display-buffer-alist
-;;   `(;; Messages, errors, processes, Calendar in the bottom side window
-;;      (,(rx bos (or "*Emacs Log*"))  ; interaction log *Emacs Log*
-;;        (display-buffer-reuse-window display-buffer-in-side-window)
-;;        (side . right)
-;;        (reusable-frames . visible)
-;;        (window-height . 0.45))
-;;        ;; Let `display-buffer' reuse visible frames for all buffers. This must
-;;        ;; be the last entry in `display-buffer-alist', because it overrides any
-;;        ;; previous entry with more actions.
-;;      ("." nil (reusable-frames . visible))))
 
 (use-package simple
   :hook (before-save . delete-trailing-whitespace))
@@ -256,10 +235,6 @@
 (global-auto-revert-mode 1)
 
 (setq warning-minimum-level :error)
-
-;; (use-package vterm
-;;   :ensure-system-package cmake
-;;   :straight t)
 
 ;; dependency
 (use-package all-the-icons
@@ -907,6 +882,11 @@ Optionally get the NTH quote."
   :config
   (evil-collection-init))
 
+(use-package evil-nerd-commenter
+  :straight t
+  :config
+  (evilnc-default-hotkeys))
+
 (use-package eshell-autojump
   :straight t
   :config
@@ -992,17 +972,6 @@ Optionally get the NTH quote."
   :straight t
   :hook
   (after-init . global-company-mode))
-
-;; (use-package yasnippet
-;;   :straight t
-;;   :custom
-;;   (yas-also-auto-indent-first-line t)
-;;   (yas-also-indent-empty-lines t)
-;;   :config
-;;   (yas-global-mode t))
-
-;; (use-package yasnippet-snippets
-;;   :straight t)
 
 (use-package howdoyou
   :straight t
@@ -1528,80 +1497,11 @@ Optionally get the NTH quote."
   :config
   (direnv-mode))
 
-(use-package cheatsheet
-  :straight t
-  :config
-  (my/leader-keys
-    "ch" 'cheatsheet-show)
-
-  (cheatsheet-add-group 'Cheatsheet
-                        '(:key "SPC c h" :description "Show cheatsheet")
-                        '(:key "C-q"     :description "Close cheatsheet buffer"))
-
-  (cheatsheet-add-group 'GTD
-                        '(:key "SPC g g" :description "Open gtd.org")
-                        '(:key "SPC g t" :description "Open tickler.org")
-                        '(:key "SPC g i" :description "Open inbox.org")
-                        '(:key "SPC g h" :description "Open hobbies.org")
-                        '(:key "SPC g u" :description "Open ukulele.org")
-                        '(:key "SPC g s" :description "Open someday.org")
-                        '(:key "SPC g d" :description "Open daily_reviews.org")
-                        '(:key "SPC g w" :description "Open weekly_reviews.org")
-                        '(:key "SPC g m" :description "Open monthly_reviews.org"))
-
-  (cheatsheet-add-group 'Projects
-                        '(:key "SPC p p"   :description "Select project")
-                        '(:key "SPC p f"   :description "Find file in project")
-                        '(:key "SPC p x e" :description "Open eshell in project root")
-                        '(:key "SPC p D"   :description "Open dired in project root")
-                        '(:key "SPC p k"   :description "Kill all project buffers")
-                        '(:key "SPC p a"   :description "Add new project to projectile")
-                        '(:key "SPC p r"   :description "Remove project from projectile")
-                        '(:key "SPC p S"   :description "Save all project buffers")
-                        '(:key "SPC o p g" :description "Select project todos to open"))
-
-  (cheatsheet-add-group 'Org
-                        '(:key "SPC m t"   :description "Change org todo state")
-                        '(:key "SPC m s"   :description "Schedule an org todo heading")
-                        '(:key "SPC m d"   :description "Make a deadline for an org todo heading")
-                        '(:key "SPC o a a" :description "Open org agenda")
-                        '(:key "SPC o c i" :description "Clock into task")
-                        '(:key "SPC o c o" :description "Clock out of task")
-                        '(:key "SPC o c l" :description "Clock into last clocked task")
-                        '(:key "SPC o c g" :description "Go to currently clocked task")
-                        '(:key "SPC o o"   :description "Org open link at point")
-                        '(:key "SPC o g"   :description "Search through headings in an org file")
-                        '(:key "SPC o d"   :description "Decrypt org file")
-                        '(:key "SPC o r"   :description "Refile heading in org file")
-                        '(:key "SPC o s"   :description "Archive heading in org file")
-                        '(:key "SPC o w i" :description "Org wiki index")
-                        '(:key "SPC o w c" :description "Close all org wiki buffers")
-                        '(:key "SPC o w h" :description "Helm search through org wiki file names")
-                        '(:key "SPC o w l" :description "Insert link into an org wiki file to another org wiki file")
-                        '(:key "SPC o w n" :description "Insert a link to and create a new org wiki file")
-                        '(:key "SPC o w N" :description "Create a new org wiki file without inserting a link to it")
-                        '(:key "SPC o w g" :description "Grep through the wiki directory inside Emacs")
-                        '(:key "SPC o t u" :description "Bump up org timestamp by a day")
-                        '(:key "SPC o t d" :description "Down org timestamp by a day")
-                        '(:key "SPC o t l" :description "Toggle link display in org mode (shows what stuff is linked to)")
-                        '(:key "SPC o v m" :description "Open custom reddit reddigg main screen")
-                        '(:key "SPC o v s" :description "Open specific sub reddit with reddigg")
-                        '(:key "SPC n f"   :description "Find a file in org roam")
-                        '(:key "SPC n i"   :description "Insert a link to a file in an org roam file and open it. Creates a backlink")
-                        '(:key "SPC n I"   :description "Insert a link to a new file in an org roam file but don't open it. Creates a backlink")
-                        '(:key "SPC n l"   :description "Open org roam backlinks sidebuffer")
-                        '(:key "SPC n o"   :description "Capture a new org roam daily entry")
-                        '(:key "SPC n t"   :description "Go to today's daily file in org roam")
-                        '(:key "SPC n y"   :description "Go to yesterday's daily file in org roam")))
-
 (use-package demo-it
   :straight (:host github :repo "howardabrams/demo-it" :branch "master")
   :config
   (my/leader-keys
      "des" 'demo-it-step))
-
-(use-package neato-graph-bar
-  :straight t)
 
 (use-package yasnippet
   :straight t
