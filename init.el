@@ -19,7 +19,7 @@
 (defun my/org-babel-tangle-config ()
   "Tangles the org config file to init.el"
   (when (string-equal (buffer-file-name)
-                      (expand-file-name "~/.emacs.d/init.org"))
+                      (expand-file-name (concat user-emacs-directory "init.org")))
     ;; Dynamic scoping to the rescue
     (let ((org-confirm-babel-evaluate nil))
       (org-babel-tangle))))
@@ -42,7 +42,7 @@
 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-(setq user-init-file-org "~/.emacs.d/init.org")
+(setq user-init-file-org (concat user-emacs-directory "init.org"))
 (setq gtd-inbox-file "~/Nextcloud/Orgzly/inbox.org")
 (setq gtd-file "~/Nextcloud/Orgzly/gtd.org")
 (setq gtd-someday-file "~/Nextcloud/Orgzly/someday.org")
@@ -51,10 +51,11 @@
 (setq ukulele-file "~/Nextcloud/Orgzly/ukulele.org")
 (setq tech-notebook-file "~/Nextcloud/org/tech_notebook.org")
 (setq work-file "~/Nextcloud/org/work/work.org")
-(setq weekly-reviews-file "~/Nextcloud/org/weekly_reviews.org")
+(setq weekly-reviews-file "~/Nextcloud/org/weekly_gtd_reviews.org")
 (setq daily-reviews-file "~/Nextcloud/org/daily_reviews.org")
 (setq monthly-reviews-file "~/Nextcloud/org/monthly_reviews.org")
 (setq reading-inbox-file "~/Nextcloud/org-roam/20210214211549-reading_inbox.org")
+(setq home-dashboard-file "~/Nextcloud/org/home.org")
 
 ;; would love to be able to do it like this but it doesn't work for some reason
 (defun my/open-file (file-name)
@@ -88,7 +89,8 @@
 
     "SPC" 'find-file
 
-    "fp"  (list (lambda () (interactive) (find-file user-init-file-org)) :which-key "config")
+    "fp"  (list (lambda () (interactive) (find-file user-init-file-org))    :which-key "config")
+    "oh"  (list (lambda () (interactive) (find-file home-dashboard-file))   :which-key "home dashboard")
 
     "g"   '(:ignore t :which-key "gtd")
     "gi"   (list (lambda () (interactive) (find-file gtd-inbox-file))       :which-key "inbox")
@@ -115,7 +117,7 @@
     "xsb" 'split-window-below))
 
 (setq-default
-  custom-file "~/.emacs.d/custom.el")
+  custom-file (concat user-emacs-directory "custom.el"))
 
 (when (file-exists-p custom-file)
   (load custom-file t))
@@ -123,9 +125,9 @@
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 (add-to-list 'default-frame-alist '(cursor-color . "palegoldenrod"))
 
-(let* ((home-dir (getenv "HOME"))
-     (custom-emacs-directory (concat home-dir "/.emacs.d")))
-  (setq user-emacs-directory custom-emacs-directory))
+;; (let* ((home-dir (getenv "HOME"))
+;;      (custom-emacs-directory (concat home-dir "/.emacs.d")))
+;;   (setq user-emacs-directory custom-emacs-directory))
 
 (add-to-list 'exec-path (concat user-emacs-directory ".nix-profile/bin"))
 
@@ -452,8 +454,8 @@ Optionally get the NTH quote."
       "* TODO Word of the day - %t \n:PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
       ("d" "Daily review" entry (file+olp+datetree "~/Nextcloud/org/daily_reviews.org")
       (file "~/Nextcloud/org/templates/daily_review.org"))
-      ("w" "Weekly review" entry (file+olp+datetree "~/Nextcloud/org/weekly_reviews.org")
-      (file "~/Nextcloud/org/templates/weekly_review.org"))
+      ("w" "Weekly review" entry (file+olp+datetree "~/Nextcloud/org/weekly_gtd_reviews.org")
+      (file "~/Nextcloud/org/templates/weekly_gtd.org"))
       ("m" "Monthly review" entry (file+olp+datetree "~/Nextcloud/org/monthly_reviews.org")
       (file "~/Nextcloud/org/templates/monthly_review.org")))))
 
@@ -480,17 +482,19 @@ Optionally get the NTH quote."
 
   (defun org-work-agenda ()
     (interactive)
+    (setq org-agenda-category-filter-preset '("-hobbies" "-tickler" "-gtd" "-inbox" "-reading_list"))
     (org-agenda nil "a")
-    (org-agenda-day-view)
-    (with-simulated-input "-hobbies-tickler-gtd-inbox-readling_list RET"
-      (org-agenda-filter)))
+    (org-agenda-day-view))
+    ;; (with-simulated-input "-hobbies-tickler-gtd-inbox-reading_list RET"
+    ;;   (org-agenda-filter)))
 
   (defun org-home-agenda ()
     (interactive)
+    (setq org-agenda-category-filter-preset '("+hobbies" "+tickler" "+gtd" "+inbox" "+reading_list"))
     (org-agenda nil "a")
-    (org-agenda-day-view)
-    (with-simulated-input "+hobbies+tickler+gtd+inbox+reading_list RET"
-      (org-agenda-filter)))
+    (org-agenda-day-view))
+    ;; (with-simulated-input "+hobbies+tickler+gtd+inbox+reading_list RET"
+    ;;   (org-agenda-filter)))
 
   (my/leader-keys
     "wa" 'org-work-agenda
@@ -553,69 +557,67 @@ Optionally get the NTH quote."
     "oci"  'org-mru-clock-in
     "ocg"  'org-mru-clock-goto))
 
-(use-package org-roam
-  :straight
-  (:host github :repo "org-roam/org-roam" :branch "master")
-  ;; currently checkout out at 06e5814898bbf2b506fe7e1eb88bb4069e7c46c2
-  ;; due to https://org-roam.discourse.group/t/backlinks-title-not-at-top-of-buffer/1209
-  :hook
-  (after-init . org-roam-mode)
-  :custom
-  (org-roam-directory "~/Nextcloud/org-roam")
-  :config
-  (setq org-roam-directory "~/Nextcloud/org-roam")
-  (my/leader-keys
-    "n" '(:ignore t :which-key "org-roam")
-    "nl" 'org-roam
-    "nf" 'org-roam-find-file
-    "ng" 'org-roam-graph-show
-    "ni" 'org-roam-insert
-    "nI" 'org-roam-insert-immediate
-    "no" 'org-roam-dailies-capture-today
-    "nt" 'org-roam-dailies-find-today
-    "ny" 'org-roam-dailies-find-yesterday)
+;; (use-package org-roam
+;;   :straight
+;;   (:host github :repo "org-roam/org-roam" :branch "v2")
+;;   ;; currently checkout out at 06e5814898bbf2b506fe7e1eb88bb4069e7c46c2
+;;   ;; due to https://org-roam.discourse.group/t/backlinks-title-not-at-top-of-buffer/1209
+;;   :hook
+;;   (after-init . org-roam-mode)
+;;   :config
+;;   (setq org-roam-directory "~/Nextcloud/org-roam")
+;;   (my/leader-keys
+;;     "n" '(:ignore t :which-key "org-roam")
+;;     "nl" 'org-roam
+;;     "nf" 'org-roam-find-file
+;;     "ng" 'org-roam-graph-show
+;;     "ni" 'org-roam-insert
+;;     "nI" 'org-roam-insert-immediate
+;;     "no" 'org-roam-dailies-capture-today
+;;     "nt" 'org-roam-dailies-find-today
+;;     "ny" 'org-roam-dailies-find-yesterday)
 
-  (setq org-roam-completion-everywhere t)
+;;   (setq org-roam-completion-everywhere t)
 
-  (setq org-roam-dailies-directory "daily/")
+;;   (setq org-roam-dailies-directory "daily/")
 
-  (setq org-roam-capture-templates
-    '(("s" "source" plain
-       #'org-roam-capture--get-point
-       "%?"
-       :file-name "%<%Y%m%d%H%M%S>-${slug}"
-       :head "#+title: ${title}\n#+date: %t\n#+ROAM_TAGS: source\n\n* Notes\n* Resources"
-       :unnarrowed t)
+;;   (setq org-roam-capture-templates
+;;     '(("s" "source" plain
+;;        #'org-roam-capture--get-point
+;;        "%?"
+;;        :file-name "%<%Y%m%d%H%M%S>-${slug}"
+;;        :head "#+title: ${title}\n#+date: %t\n#+ROAM_TAGS: source\n\n* Notes\n* Resources"
+;;        :unnarrowed t)
 
-      ("l" "literary" plain
-       #'org-roam-capture--get-point
-       "%?"
-       :file-name "%<%Y%m%d%H%M%S>-${slug}"
-       :head "#+title: ${title}\n#+date: %t\n#+ROAM_TAGS: literary\n\n* Note"
-       :unnarrowed t)))
+;;       ("l" "literary" plain
+;;        #'org-roam-capture--get-point
+;;        "%?"
+;;        :file-name "%<%Y%m%d%H%M%S>-${slug}"
+;;        :head "#+title: ${title}\n#+date: %t\n#+ROAM_TAGS: literary\n\n* Note"
+;;        :unnarrowed t)))
 
-  (setq org-roam-dailies-capture-templates
-    '(("d" "daily" entry
-       #'org-roam-capture--get-point
-       "* %<%H:%M> %?"
-       :file-name "daily/%<%Y-%m-%d>"
-       :head "#+title: %<%Y-%m-%d>\n#+ROAM_TAGS: private\n\n"
-       :olp ("Daily notes"))
+;;   (setq org-roam-dailies-capture-templates
+;;     '(("d" "daily" entry
+;;        #'org-roam-capture--get-point
+;;        "* %<%H:%M> %?"
+;;        :file-name "daily/%<%Y-%m-%d>"
+;;        :head "#+title: %<%Y-%m-%d>\n#+ROAM_TAGS: private\n\n"
+;;        :olp ("Daily notes"))
 
-      ("j" "journal" entry
-       #'org-roam-capture--get-point
-       "* %<%H:%M> :crypt: %?"
-       :file-name "daily/%<%Y-%m-%d>"
-       :head "#+title: %<%Y-%m-%d>\n#+ROAM_TAGS: private\n\n"
-       :olp ("Journal")))))
+;;       ("j" "journal" entry
+;;        #'org-roam-capture--get-point
+;;        "* %<%H:%M> :crypt: %?"
+;;        :file-name "daily/%<%Y-%m-%d>"
+;;        :head "#+title: %<%Y-%m-%d>\n#+ROAM_TAGS: private\n\n"
+;;        :olp ("Journal")))))
 
-(use-package nroam
-  :straight '(nroam :host github
-                    :branch "master"
-                    :repo "NicolasPetton/nroam")
-  :after org-roam
-  :config
-  (add-hook 'org-mode-hook #'nroam-setup-maybe))
+;; (use-package nroam
+;;   :straight '(nroam :host github
+;;                     :branch "master"
+;;                     :repo "NicolasPetton/nroam")
+;;   :after org-roam
+;;   :config
+;;   (add-hook 'org-mode-hook #'nroam-setup-maybe))
 
 (use-package ox-hugo
   :straight t
@@ -832,6 +834,10 @@ Optionally get the NTH quote."
 
 (my/leader-keys
   "ob" 'org-rg)
+
+(use-package dendroam
+  :straight (:host github :repo "vicrdguez/dendroam" :branch "main")
+  :after org)
 
 (use-package evil
   :straight t
@@ -1190,6 +1196,15 @@ Optionally get the NTH quote."
   ;;(evil-leader/set-key "x m" #'lsp-ui-imenu)
   (setq lsp-ui-doc-position 'bottom))
 
+(use-package elixir-mode
+  :straight t)
+
+(use-package alchemist
+  :straight t)
+
+(use-package mix
+  :straight t)
+
 (use-package projectile
   :straight t
   :config
@@ -1355,7 +1370,7 @@ Optionally get the NTH quote."
   :config
   ;; don't try to follow symlinks in straight.el repos
   (setq esup-depth 0)
-  (setq esup-user-init-file (file-truename "~/.emacs.d/init.el")))
+  (setq esup-user-init-file (file-truename (concat user-emacs-directory "init.el"))))
 
 (use-package elfeed
   :defer 3
@@ -1366,10 +1381,12 @@ Optionally get the NTH quote."
   :after elfeed
   :config
   (elfeed-org)
-  (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org")))
+  (setq rmh-elfeed-org-files (list (concat user-emacs-directory "elfeed.org"))))
+
+(setq elfeed-dashboard-load-path (concat user-emacs-directory "lisp/elfeed-dashboard/"))
 
 (use-package elfeed-dashboard
-  :load-path "~/.emacs.d/lisp/elfeed-dashboard/"
+  :load-path elfeed-dashboard-load-path
   :after elfeed
   :config
   ;; Keybindings
@@ -1379,7 +1396,7 @@ Optionally get the NTH quote."
     "edi" 'elfeed-dashboard-edit)
 
   (progn
-     (setq elfeed-dashboard-file "~/.emacs.d/lisp/elfeed-dashboard/elfeed-dashboard.org")
+     (setq elfeed-dashboard-file (concat user-emacs-directory "lisp/elfeed-dashboard/elfeed-dashboard.org"))
      ;; to update feed counts automatically
      (advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links)))
 
@@ -1544,3 +1561,65 @@ Optionally get the NTH quote."
 
 (use-package rg
   :straight t)
+
+(use-package emacsql
+  :straight t)
+
+(use-package emacsql-sqlite
+  :straight t)
+
+(defun my/org-roam-load ()
+  (interactive)
+  (add-to-list 'load-path "~/emacs-local-repos/org-roam")
+  (load-library "org-roam")
+  (setq org-roam-mode-sections
+       (list #'org-roam-backlinks-section
+             #'org-roam-reflinks-section
+             #'org-roam-unlinked-references-section))
+  (setq org-roam-directory (file-truename "~/Nextcloud/org-roam"))
+  (setq org-roam-file-extensions '("org"))
+  (setq org-roam-node-display-template "${hierarchy}:${title}")
+  (setq org-roam-completion-everywhere t)
+  (define-key org-roam-mode-map [mouse-1] #'org-roam-visit-thing)
+  (org-roam-setup)
+  (setq org-roam-capture-templates
+      '(("d" "default" plain
+         "%?"
+         :if-new (file+head "${slug}.org"
+                            "#+title: ${hierarchy-title}\n")
+         :unnarrowed t)))
+  (setq org-roam-dailies-capture-templates
+      '(("d" "default" entry
+         "* %<%H:%M> :crypt: %?"
+         :if-new (file+head "journal.daily.%<%Y-%m-%d>.org"
+                            "#+title: %<%Y-%m-%d>\n")
+         :olp ("Journal"))))
+  (setq dendroam-capture-templates
+      '(("t" "Time note" entry
+         "* %?"
+         :if-new (file+head "${current-file}.%<%Y-%m-%d-%H-%M>.org"
+                            "#+title: %^{title}\n"))
+        ("s" "Scratch note" entry
+         "* %?"
+         :if-new (file+head "scratch.%<%Y-%m-%d.%M%S%3N>.org"
+                            "#+title: %^{title}\n"))))
+
+  (defun dendroam-node-find-initial-input ()
+    (interactive)
+    (org-roam-node-find nil (if (buffer-file-name)
+                            (file-name-base (buffer-file-name))
+                            "")))
+
+  (my/leader-keys
+    "nf"  'org-roam-node-find
+    "nc"  'org-roam-capture
+    "ni"  'org-roam-node-insert
+    "nr"  'org-roam-buffer-toggle
+    "nt"  'org-roam-dailies-find-today
+    "ny"  'org-roam-dailies-find-yesterday
+    "nd" '(:ignore t :which-key "dendroam")
+    "ndi" 'dendroam-node-find-initial-input
+    "nds" 'dendroam-insert-scratch-note
+    "ndt" 'dendroam-insert-time-note))
+
+(my/org-roam-load)

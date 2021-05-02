@@ -13,6 +13,7 @@
 *** [[http://lexi-lambda.github.io/feeds/all.atom.xml][Lexi Lambda blog]] :haskell:
 ** Org-mode
 *** [[https://reddit.com/r/orgmode/.rss][r/org-mode]] :orgmode:
+*** [[https://blog.tecosaur.com/tmio/rss.xml][Tecosaur org news blog]] :orgmode:
 ** Linux
 *** [[https://xkcd.com/rss.xml][XKCD]] :linux:jokes:
 ** Emacs
