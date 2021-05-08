@@ -114,7 +114,11 @@
     "xk"  'kill-buffer
     "xs"  '(:ignore t :which-key "split-window")
     "xsr" 'split-window-right
-    "xsb" 'split-window-below))
+    "xsb" 'split-window-below
+
+    "ks" 'kill-sexp
+    "fs" 'forward-sexp
+    "bs" 'backward-sexp))
 
 (setq-default
   custom-file (concat user-emacs-directory "custom.el"))
@@ -1211,6 +1215,7 @@ Optionally get the NTH quote."
   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   (setq projectile-track-known-projects-automatically nil)
+  (setq projectile-indexing-method 'native)
 
   (my/leader-keys
     "p"   '(:ignore t :which-key "projectile")
@@ -1592,8 +1597,7 @@ Optionally get the NTH quote."
       '(("d" "default" entry
          "* %<%H:%M> :crypt: %?"
          :if-new (file+head "journal.daily.%<%Y-%m-%d>.org"
-                            "#+title: %<%Y-%m-%d>\n")
-         :olp ("Journal"))))
+                            "#+title: %<%Y-%m-%d>\n"))))
   (setq dendroam-capture-templates
       '(("t" "Time note" entry
          "* %?"
