@@ -1587,6 +1587,20 @@ Ammonite
 (use-package cider
   :straight t)
 #+end_src
+
+Flycheck clj-kondo for linting
+#+begin_src elisp
+(use-package flycheck-clj-kondo
+  :straight t)
+#+end_src
+
+Use it in clojure mode
+#+begin_src elisp
+(use-package clojure-mode
+  :straight t
+  :config
+  (require 'flycheck-clj-kondo))
+#+end_src
 *** Nix
 #+begin_src elisp
 (use-package nix-mode
@@ -1677,6 +1691,7 @@ Interaction with mix
 (use-package mix
   :straight t)
 #+end_src
+
 ** Projectile
 #+begin_src elisp
 (use-package projectile

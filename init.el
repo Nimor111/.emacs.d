@@ -1141,6 +1141,14 @@ Optionally get the NTH quote."
 (use-package cider
   :straight t)
 
+(use-package flycheck-clj-kondo
+  :straight t)
+
+(use-package clojure-mode
+  :straight t
+  :config
+  (require 'flycheck-clj-kondo))
+
 (use-package nix-mode
   :straight t)
 
