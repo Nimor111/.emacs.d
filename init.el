@@ -1306,7 +1306,7 @@ Optionally get the NTH quote."
     "em"  'mu4e)
 
   (setq mu4e-sent-messages-behaviour 'delete)
-  (setq mu4e-get-mail-command "/usr/bin/mbsync -Va")
+  (setq mu4e-get-mail-command "$(which mbsync) -Va")
   (setq mu4e-change-filenames-when-moving t)
   (setq mu4e-update-interval 300)
   (setq mu4e-use-fancy-chars t)
