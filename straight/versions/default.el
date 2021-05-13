@@ -105,7 +105,7 @@
  ("melpa" . "8bad2e8162f5a44bdbe1117efa31133ae7814489")
  ("mu4e-alert" . "91f0657c5b245a9de57aa38391221fb5d141d9bd")
  ("neato-graph-bar" . "a7ae35afd67911e8924f36e646bce0d3e3c1bbe6")
- ("neuron-mode" . "a968a923aad07ab15fb35deb79ac95581a427b4c")
+ ("neuron-mode" . "3f86d26fb2006e82c673a5bf122594820a4842d8")
  ("nix-mode" . "0023fc5b100ec0c939ffe699d1a7d1afcf1f417a")
  ("no-littering" . "57357e15643158b4e0d9b3b4f70a82f5fc73178a")
  ("nroam" . "a5508d9958c2148c04ec32d7b3a9f72423e4b0aa")
