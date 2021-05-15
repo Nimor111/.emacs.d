@@ -774,24 +774,6 @@ Optionally get the NTH quote."
   :ensure-system-package anki
   :straight t)
 
-(use-package org-wiki
-  :defer 2
-  :straight (:host github :repo "caiorss/org-wiki" :branch "master")
-  :config
-  (setq org-wiki-location "~/Nextcloud/org/wiki")
-  (setq org-wiki-template "#+TITLE:%n\n#+DESCRIPTION:\n#+KEYWORDS:\n#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup\n#+STARTUP:  content\n\n\n- [[wiki:index][Index]]\n\n- Related: \n\n* %n\n")
-
-  (my/leader-keys
-    "ow" '(:ignore t :which-key "wiki")
-
-    "owi" 'org-wiki-index
-    "owl" 'org-wiki-insert-link
-    "own" 'org-wiki-insert-new
-    "owN" 'org-wiki-new
-    "owh" 'org-wiki-helm
-    "owc" 'org-wiki-close
-    "owg" 'org-wiki-rgrep))
-
 (use-package org-mime
   :straight t)
 
@@ -1149,6 +1131,17 @@ Optionally get the NTH quote."
   :config
   (require 'flycheck-clj-kondo))
 
+(use-package clj-refactor
+  :straight t)
+
+(defun my-clojure-mode-hook ()
+    (clj-refactor-mode 1)
+    (yas-minor-mode 1) ; for adding require/use/import statements
+    ;; This choice of keybinding leaves cider-macroexpand-1 unbound
+    (cljr-add-keybindings-with-prefix "C-c C-m"))
+
+(add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
+
 (use-package nix-mode
   :straight t)
 
@@ -1288,12 +1281,6 @@ Optionally get the NTH quote."
   :straight t
   :config
   (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
-
-(use-package link-hint
-  :straight t
-  :config
-  (my/leader-keys
-    "fo" 'link-hint-open-link))
 
 (if (eq system-type 'gnu/linux)
     (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e"))

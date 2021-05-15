@@ -65,7 +65,6 @@
     - [[#org-projectile][Org projectile]]
     - [[#org-archive-hierarchically][Org archive hierarchically]]
     - [[#flashcards-with-anki][Flashcards with Anki]]
-    - [[#wiki][Wiki]]
     - [[#org-mime][Org-mime]]
     - [[#automatic-toggle-of-latex-previews][Automatic toggle of latex previews]]
     - [[#org-tree-slide][Org tree slide]]
@@ -107,7 +106,6 @@
   - [[#flycheck][Flycheck]]
   - [[#emojify][Emojify]]
   - [[#helpful][Helpful]]
-  - [[#better-link-opener][Better link opener]]
   - [[#email][Email]]
   - [[#persistent-scratch][Persistent scratch]]
   - [[#esup][Esup]]
@@ -1109,26 +1107,6 @@ Creates the heading before an archived heading in the archive file
   :ensure-system-package anki
   :straight t)
 #+end_src
-*** Wiki
-#+begin_src elisp
-(use-package org-wiki
-  :defer 2
-  :straight (:host github :repo "caiorss/org-wiki" :branch "master")
-  :config
-  (setq org-wiki-location "~/Nextcloud/org/wiki")
-  (setq org-wiki-template "#+TITLE:%n\n#+DESCRIPTION:\n#+KEYWORDS:\n#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup\n#+STARTUP:  content\n\n\n- [[wiki:index][Index]]\n\n- Related: \n\n* %n\n")
-
-  (my/leader-keys
-    "ow" '(:ignore t :which-key "wiki")
-
-    "owi" 'org-wiki-index
-    "owl" 'org-wiki-insert-link
-    "own" 'org-wiki-insert-new
-    "owN" 'org-wiki-new
-    "owh" 'org-wiki-helm
-    "owc" 'org-wiki-close
-    "owg" 'org-wiki-rgrep))
-#+end_src
 *** Org-mime
 For sending emails with org mode files
 #+begin_src elisp
@@ -1601,6 +1579,20 @@ Use it in clojure mode
   :config
   (require 'flycheck-clj-kondo))
 #+end_src
+
+Handy functions for refactoring clojure code
+#+begin_src elisp
+(use-package clj-refactor
+  :straight t)
+
+(defun my-clojure-mode-hook ()
+    (clj-refactor-mode 1)
+    (yas-minor-mode 1) ; for adding require/use/import statements
+    ;; This choice of keybinding leaves cider-macroexpand-1 unbound
+    (cljr-add-keybindings-with-prefix "C-c C-m"))
+
+(add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
+#+end_src
 *** Nix
 #+begin_src elisp
 (use-package nix-mode
@@ -1786,14 +1778,6 @@ Elisp demos - examples of usage of different elisp functions in the doc window
   :straight t
   :config
   (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update))
-#+end_src
-** Better link opener
-#+begin_src elisp
-(use-package link-hint
-  :straight t
-  :config
-  (my/leader-keys
-    "fo" 'link-hint-open-link))
 #+end_src
 ** Email
 To read / sync email in emacs. Using this only on home computers.
