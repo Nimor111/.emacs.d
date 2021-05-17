@@ -1590,7 +1590,7 @@ Optionally get the NTH quote."
          :unnarrowed t)))
   (setq org-roam-dailies-capture-templates
       '(("d" "default" entry
-         "* %<%H:%M> :crypt: %?"
+         "* %<%H:%M> %?"
          :if-new (file+head "journal.daily.%<%Y-%m-%d>.org"
                             "#+title: %<%Y-%m-%d>\n"))))
   (setq dendroam-capture-templates
