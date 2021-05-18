@@ -3,8 +3,14 @@
 #+PROPERTY: header-args :tangle init.el
 
 * Configure all the Emacs!
+** Obligatory quote about emacs
+#+begin_quote
+Calling EMACS an editor is like calling the Earth a hunk of dirt.
+- Author: Chris DiBona
+#+end_quote
 ** Table of contents :TOC_4_gh:
 - [[#configure-all-the-emacs][Configure all the Emacs!]]
+  - [[#obligatory-quote-about-emacs][Obligatory quote about emacs]]
   - [[#package-manager][Package manager]]
     - [[#bootstrap-code-for-the-package-manager---straightel][Bootstrap code for the package manager - =straight.el=]]
     - [[#install-use-package-for-sane-package-configuration][Install use-package for sane package configuration]]
