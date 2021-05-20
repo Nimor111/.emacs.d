@@ -56,6 +56,7 @@
 (setq monthly-reviews-file "~/Nextcloud/org/monthly_reviews.org")
 (setq reading-inbox-file "~/Nextcloud/org-roam/20210214211549-reading_inbox.org")
 (setq home-dashboard-file "~/Nextcloud/org/home.org")
+(setq reading-list-file "~/Nextcloud/org/reading_list.org")
 
 ;; would love to be able to do it like this but it doesn't work for some reason
 (defun my/open-file (file-name)
@@ -91,6 +92,7 @@
 
     "fp"  (list (lambda () (interactive) (find-file user-init-file-org))    :which-key "config")
     "oh"  (list (lambda () (interactive) (find-file home-dashboard-file))   :which-key "home dashboard")
+    "rl"  (list (lambda () (interactive) (find-file reading-list-file))     :which-key "reading list")
 
     "g"   '(:ignore t :which-key "gtd")
     "gi"   (list (lambda () (interactive) (find-file gtd-inbox-file))       :which-key "inbox")
@@ -1484,6 +1486,9 @@ Optionally get the NTH quote."
   :config
   ;; so bindings don't conflict
   (add-to-list 'evil-emacs-state-modes 'ledger-report-mode)
+  (my/leader-keys
+    "lr" 'ledger-report
+    "lc" 'ledger-mode-clean-buffer)
   :mode (("\\.dat\\'" . ledger-mode)
          ("\\.journal\\'" . ledger-mode)))
 
