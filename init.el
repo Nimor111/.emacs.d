@@ -447,16 +447,16 @@ Optionally get the NTH quote."
       (file my/create-notes-file)
       (file "~/Nextcloud/org/templates/neuron_literature_note.org"))
       ("t" "Todo [inbox]" entry
-      (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
+      (file+headline "~/Nextcloud/Orgzly/inbox.org" "Inbox")
       "* TODO %i%? \n SCHEDULED: %t")
       ("T" "Tickler" entry
       (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
       "* TODO %i%? \n SCHEDULED: %T")
       ("M" "Todo with link" entry
-      (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
+      (file+headline "~/Nextcloud/Orgzly/inbox.org" "Inbox")
       "* TODO %i%? \n SCHEDULED: %t \n :PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
       ("W" "Finnish word of the day" entry
-      (file+headline "~/Nextcloud/Orgzly/inbox.org" "Tasks")
+      (file+headline "~/Nextcloud/Orgzly/inbox.org" "Inbox")
       "* TODO Word of the day - %t \n:PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
       ("d" "Daily review" entry (file+olp+datetree "~/Nextcloud/org/daily_reviews.org")
       (file "~/Nextcloud/org/templates/daily_review.org"))
@@ -715,7 +715,8 @@ Optionally get the NTH quote."
   ;; conflicts of header bindings with evil-mode
   (setq org-super-agenda-header-map nil)
   (setq org-super-agenda-groups
-       '((:auto-category t)
+       '(;;(:auto-category t)
+         (:auto-outline-path t)
          (:discard (:not  ; Is it easier to read like this?
                     (:and
                      (:todo "READING" :file-path "reading_list")))))))
@@ -961,6 +962,10 @@ Optionally get the NTH quote."
   :straight t
   :init
   (ivy-rich-mode 1))
+
+(use-package all-the-icons-ivy-rich
+  :straight t
+  :init (all-the-icons-ivy-rich-mode 1))
 
 (use-package company
   :straight t
