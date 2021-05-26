@@ -1600,6 +1600,10 @@ Optionally get the NTH quote."
          :unnarrowed t)))
   (setq org-roam-dailies-capture-templates
       '(("d" "default" entry
+         "* Daily\n** Inbox\n** Today\n** Todos\n %?"
+         :if-new (file+head "notes.daily.%<%Y-%m-%d>.org"
+                            "#+title: %<%Y-%m-%d>\n"))
+         ("j" "journal" entry
          "* %<%H:%M> %?"
          :if-new (file+head "journal.daily.%<%Y-%m-%d>.org"
                             "#+title: %<%Y-%m-%d>\n"))))
