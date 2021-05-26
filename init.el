@@ -1614,8 +1614,8 @@ Optionally get the NTH quote."
                             "#+title: %^{title}\n"))
         ("s" "Scratch note" entry
          "* %?"
-         :if-new (file+head "scratch.%<%Y-%m-%d.%M%S%3N>.org"
-                            "#+title: %^{title}\n"))))
+         :if-new (file+head "scratch.%<%Y-%m-%d.%H%M%S>.org"
+                            "#+title: %<%H%M%S>\n"))))
 
   (defun dendroam-node-find-initial-input ()
     (interactive)
