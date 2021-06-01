@@ -108,6 +108,7 @@ Calling EMACS an editor is like calling the Earth a hunk of dirt.
     - [[#zig][Zig]]
     - [[#haskell][Haskell]]
     - [[#elixir][Elixir]]
+    - [[#hy][Hy]]
   - [[#projectile][Projectile]]
   - [[#parens][Parens]]
   - [[#flycheck][Flycheck]]
@@ -1200,9 +1201,6 @@ For simpler presentation in org files
   :defer t)
 #+end_src
 
-#+RESULTS:
-: t
-
 #+begin_src elisp
 (use-package org-brain
   :straight t
@@ -1219,8 +1217,8 @@ For simpler presentation in org files
   (push '("b" "Brain" plain (function org-brain-goto-end)
           "* %i%?" :empty-lines 1)
         org-capture-templates)
+  (setq org-brain-title-max-length 120)
   (setq org-brain-visualize-default-choices 'all)
-  (setq org-brain-title-max-length 12)
   (setq org-brain-include-file-entries nil
         org-brain-file-entries-use-title nil)
   (add-hook 'org-brain-visualize-mode-hook #'org-brain-polymode))
@@ -1425,7 +1423,6 @@ Your stack overflow and friends inside emacs (and the results are org files!)
 #+begin_src elisp
 (use-package howdoyou
   :straight t
-  :defer t
   :config
   (my/leader-keys
     "q"  'howdoyou-query))
@@ -1739,6 +1736,11 @@ Interaction with mix
   :straight t)
 #+end_src
 
+*** Hy
+#+begin_src elisp
+(use-package hy-mode
+  :straight t)
+#+end_src
 ** Projectile
 #+begin_src elisp
 (use-package projectile

@@ -848,8 +848,8 @@ Optionally get the NTH quote."
   (push '("b" "Brain" plain (function org-brain-goto-end)
           "* %i%?" :empty-lines 1)
         org-capture-templates)
+  (setq org-brain-title-max-length 120)
   (setq org-brain-visualize-default-choices 'all)
-  (setq org-brain-title-max-length 12)
   (setq org-brain-include-file-entries nil
         org-brain-file-entries-use-title nil)
   (add-hook 'org-brain-visualize-mode-hook #'org-brain-polymode))
@@ -1000,7 +1000,6 @@ Optionally get the NTH quote."
 
 (use-package howdoyou
   :straight t
-  :defer t
   :config
   (my/leader-keys
     "q"  'howdoyou-query))
@@ -1241,6 +1240,9 @@ Optionally get the NTH quote."
   :straight t)
 
 (use-package mix
+  :straight t)
+
+(use-package hy-mode
   :straight t)
 
 (use-package projectile
