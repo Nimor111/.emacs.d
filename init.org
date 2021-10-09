@@ -11,11 +11,13 @@ Calling EMACS an editor is like calling the Earth a hunk of dirt.
 ** Table of contents :TOC_4_gh:
 - [[#configure-all-the-emacs][Configure all the Emacs!]]
   - [[#obligatory-quote-about-emacs][Obligatory quote about emacs]]
+  - [[#try-to-speed-up-startup-time-with-the-garbage-collector][Try to speed up startup time with the garbage collector]]
   - [[#package-manager][Package manager]]
     - [[#bootstrap-code-for-the-package-manager---straightel][Bootstrap code for the package manager - =straight.el=]]
     - [[#install-use-package-for-sane-package-configuration][Install use-package for sane package configuration]]
     - [[#ensure-system-packages-to-check-they-exist][Ensure system packages to check they exist]]
   - [[#general-configs][General configs]]
+    - [[#load-module-path][Load module path]]
     - [[#tangle-config-file-on-save][Tangle config file on save]]
     - [[#keybindings][Keybindings]]
     - [[#custom-vars-file-so-it-doesnt-pollute-the-init-file][Custom vars file, so it doesn't pollute the init file]]
@@ -48,15 +50,17 @@ Calling EMACS an editor is like calling the Earth a hunk of dirt.
     - [[#set-warning-level-to-error][Set warning level to error]]
   - [[#modeline][Modeline]]
   - [[#random-quote-for-dashboard][Random quote for dashboard]]
+  - [[#projectile][Projectile]]
   - [[#dashboard][Dashboard]]
   - [[#org-mode][Org-mode]]
     - [[#general][General]]
+    - [[#org-gtd][Org gtd]]
     - [[#capture-templates][Capture templates]]
     - [[#agenda][Agenda]]
+    - [[#org-edna][Org-edna]]
     - [[#refiling][Refiling]]
     - [[#clocking][Clocking]]
     - [[#org-roam][Org-roam]]
-    - [[#ox-hugo][Ox-hugo]]
     - [[#org-reading-list][Org reading list]]
     - [[#toc][Toc]]
     - [[#org-journal][Org journal]]
@@ -70,7 +74,6 @@ Calling EMACS an editor is like calling the Earth a hunk of dirt.
     - [[#org-reveal-for-presentations][Org reveal for presentations]]
     - [[#org-projectile][Org projectile]]
     - [[#org-archive-hierarchically][Org archive hierarchically]]
-    - [[#flashcards-with-anki][Flashcards with Anki]]
     - [[#org-mime][Org-mime]]
     - [[#automatic-toggle-of-latex-previews][Automatic toggle of latex previews]]
     - [[#org-tree-slide][Org tree slide]]
@@ -78,8 +81,6 @@ Calling EMACS an editor is like calling the Earth a hunk of dirt.
     - [[#org-reddit-viewer][Org reddit viewer]]
     - [[#org-recur][Org recur]]
     - [[#searching-through-org-files][Searching through org files]]
-    - [[#dendroam][Dendroam]]
-    - [[#org-brain][Org brain]]
   - [[#evil-mode][Evil-mode]]
     - [[#evil-mode-configs][Evil mode configs]]
     - [[#org-mode-integration-with-evil][Org mode integration with evil]]
@@ -102,6 +103,7 @@ Calling EMACS an editor is like calling the Earth a hunk of dirt.
     - [[#scala][Scala]]
     - [[#gdscript][GDScript]]
     - [[#python][Python]]
+      - [[#poetry][Poetry]]
     - [[#clojure][Clojure]]
     - [[#nix][Nix]]
     - [[#common-lisp][Common Lisp]]
@@ -109,7 +111,7 @@ Calling EMACS an editor is like calling the Earth a hunk of dirt.
     - [[#haskell][Haskell]]
     - [[#elixir][Elixir]]
     - [[#hy][Hy]]
-  - [[#projectile][Projectile]]
+    - [[#fennel][Fennel]]
   - [[#parens][Parens]]
   - [[#flycheck][Flycheck]]
   - [[#emojify][Emojify]]
@@ -133,8 +135,18 @@ Calling EMACS an editor is like calling the Earth a hunk of dirt.
   - [[#crux][Crux]]
   - [[#neuron-mode][Neuron mode]]
   - [[#ripgrep][Ripgrep]]
-  - [[#org-roam-1][Org-roam]]
 
+** Try to speed up startup time with the garbage collector
+Courtesy of [[https://www.emacswiki.org/emacs/OptimizingEmacsStartup][Emacs Wiki]]
+#+begin_src elisp
+ ;; Minimize garbage collection during startup
+(setq gc-cons-threshold most-positive-fixnum)
+
+;; Lower threshold back to 8 MiB (default is 800kB)
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq gc-cons-threshold (expt 2 23))))
+#+end_src
 ** Package manager
 Must be in the beginning for =use-package= usage below.
 *** Bootstrap code for the package manager - =straight.el=
@@ -163,6 +175,11 @@ Must be in the beginning for =use-package= usage below.
   :straight t)
 #+end_src
 ** General configs
+*** Load module path
+Add the custom modules directory to the load path
+#+begin_src elisp
+(add-to-list 'load-path (concat user-emacs-directory "modules"))
+#+end_src
 *** Tangle config file on save
 Courtesy of the great emacs from scratch config: [[https://github.com/daviwil/emacs-from-scratch/blob/master/Emacs.org#auto-tangle-configuration-files][Link]]
 #+begin_src elisp
@@ -255,16 +272,16 @@ General keybindings
     "oh"  (list (lambda () (interactive) (find-file home-dashboard-file))   :which-key "home dashboard")
     "rl"  (list (lambda () (interactive) (find-file reading-list-file))     :which-key "reading list")
 
-    "g"   '(:ignore t :which-key "gtd")
-    "gi"   (list (lambda () (interactive) (find-file gtd-inbox-file))       :which-key "inbox")
-    "gg"   (list (lambda () (interactive) (find-file gtd-file))             :which-key "gtd")
-    "gs"   (list (lambda () (interactive) (find-file gtd-someday-file))     :which-key "someday")
-    "gt"   (list (lambda () (interactive) (find-file gtd-tickler-file))     :which-key "tickler")
-    "gh"   (list (lambda () (interactive) (find-file gtd-hobbies-file))     :which-key "hobbies")
-    "gu"   (list (lambda () (interactive) (find-file ukulele-file))         :which-key "ukulele")
-    "gm"   (list (lambda () (interactive) (find-file monthly-reviews-file)) :which-key "monthly")
-    "gd"   (list (lambda () (interactive) (find-file daily-reviews-file))   :which-key "daily")
-    "gw"   (list (lambda () (interactive) (find-file weekly-reviews-file))  :which-key "weekly")
+    ;; "g"   '(:ignore t :which-key "gtd")
+    ;; "gi"   (list (lambda () (interactive) (find-file gtd-inbox-file))       :which-key "inbox")
+    ;; "gg"   (list (lambda () (interactive) (find-file gtd-file))             :which-key "gtd")
+    ;; "gs"   (list (lambda () (interactive) (find-file gtd-someday-file))     :which-key "someday")
+    ;; "gt"   (list (lambda () (interactive) (find-file gtd-tickler-file))     :which-key "tickler")
+    ;; "gh"   (list (lambda () (interactive) (find-file gtd-hobbies-file))     :which-key "hobbies")
+    ;; "gu"   (list (lambda () (interactive) (find-file ukulele-file))         :which-key "ukulele")
+    ;; "gm"   (list (lambda () (interactive) (find-file monthly-reviews-file)) :which-key "monthly")
+    ;; "gd"   (list (lambda () (interactive) (find-file daily-reviews-file))   :which-key "daily")
+    ;; "gw"   (list (lambda () (interactive) (find-file weekly-reviews-file))  :which-key "weekly")
 
     "fw"  (list (lambda () (interactive) (find-file work-file)) :which-key "work")
 
@@ -526,6 +543,31 @@ Optionally get the NTH quote."
      selected-quote)
     selected-quote))
 #+end_src
+** Projectile
+#+begin_src elisp
+(use-package projectile
+  :straight t
+  :config
+  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  (setq projectile-track-known-projects-automatically nil)
+  (setq projectile-indexing-method 'native)
+
+  (my/leader-keys
+    "p"   '(:ignore t :which-key "projectile")
+    "pp"  'counsel-projectile-switch-project
+    "pk"  'projectile-kill-buffers
+    "pa"  'projectile-add-known-project
+    "pr"  'projectile-remove-known-project
+    "psr" 'projectile-ripgred
+    "pxe" 'projectile-run-eshell
+    "pf"  'counsel-projectile-find-file
+    "pS"  'projectile-save-project-buffers
+    "pD"  'projectile-dired
+    "pg"  'counsel-projectile-grep)
+
+  (projectile-mode +1))
+#+end_src
 ** Dashboard
 Ok I admit this is a little bloated, but I like something pretty to open when I turn on Emacs.
 #+begin_src elisp
@@ -564,7 +606,7 @@ Dependency of the org-colored-text file
   (visual-line-mode 1))
 
 (use-package org
-  :straight org-plus-contrib
+  :straight t
   :hook
   (org-mode . my/org-mode-setup)
   :mode
@@ -678,6 +720,28 @@ Disable line numbers in org-mode
 #+begin_src elisp
 (add-hook 'org-mode-hook (lambda () (display-line-numbers-mode 0)))
 #+end_src
+*** Org gtd
+Define some paths as =org-gtd= variables are kinda wonky with when they load
+#+begin_src elisp
+(setq org-gtd-dir "~/Nextcloud/org/gtd")
+(setq org-gtd-inbox "~/Nextcloud/org/gtd/inbox.org")
+#+end_src
+
+#+begin_src elisp
+(use-package org-gtd
+  :after org
+  :straight (:host github :repo "trevoke/org-gtd.el" :branch "master")
+  :config
+  (setq org-gtd-directory org-gtd-dir)
+  ;; keybindings
+  (my/leader-keys
+    "gc" 'org-gtd-capture
+    "ga" 'org-agenda-list
+    "gp" 'org-gtd-process-inbox
+    "gn" 'org-gtd-show-all-next
+    "gs" 'org-gtd-show-stuck-projects
+    "gf" 'org-gtd-clarify-finalize))
+#+end_src
 *** Capture templates
 #+begin_src elisp
 ;; inspiration - https://stackoverflow.com/a/53738442
@@ -691,86 +755,112 @@ Disable line numbers in org-mode
                     (if path path "~/zettelkasten")))
 
 (use-package org-capture
-  :after org
+  :after org-gtd
   :config
   ;; keybindings
   (my/leader-keys
     "occ"  'org-capture)
-  ;; quick templates for org files
+  ;; capture templates
   (setq org-capture-templates
-    '(("s" "Stream note" entry
-      (file (lambda () (my/create-notes-file "~/zettelkasten/stream")))
-      (file "~/Nextcloud/org/templates/neuron_stream_note.org"))
-      ("p" "Permanent note" entry
-      (file my/create-notes-file)
-      (file "~/Nextcloud/org/templates/neuron_permanent_note.org"))
-      ("r" "Resource note" entry
-      (file my/create-notes-file)
-      (file "~/Nextcloud/org/templates/neuron_resource_note.org"))
-      ("l" "Literature note" entry
-      (file my/create-notes-file)
-      (file "~/Nextcloud/org/templates/neuron_literature_note.org"))
-      ("t" "Todo [inbox]" entry
-      (file+headline "~/Nextcloud/Orgzly/inbox.org" "Inbox")
-      "* TODO %i%? \n SCHEDULED: %t")
-      ("T" "Tickler" entry
-      (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
-      "* TODO %i%? \n SCHEDULED: %T")
-      ("M" "Todo with link" entry
-      (file+headline "~/Nextcloud/Orgzly/inbox.org" "Inbox")
-      "* TODO %i%? \n SCHEDULED: %t \n :PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
-      ("W" "Finnish word of the day" entry
-      (file+headline "~/Nextcloud/Orgzly/inbox.org" "Inbox")
-      "* TODO Word of the day - %t \n:PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
-      ("d" "Daily review" entry (file+olp+datetree "~/Nextcloud/org/daily_reviews.org")
-      (file "~/Nextcloud/org/templates/daily_review.org"))
-      ("w" "Weekly review" entry (file+olp+datetree "~/Nextcloud/org/weekly_gtd_reviews.org")
-      (file "~/Nextcloud/org/templates/weekly_gtd.org"))
-      ("m" "Monthly review" entry (file+olp+datetree "~/Nextcloud/org/monthly_reviews.org")
-      (file "~/Nextcloud/org/templates/monthly_review.org")))))
+      `(("i" "Inbox"
+         entry (file org-gtd-inbox)
+         "* %?\n%U\n\n  %i"
+         :kill-buffer t)
+        ("l" "Todo with link"
+         entry (file org-gtd-inbox)
+         "* %?\n%U\n\n  %i\n  %a"
+         :kill-buffer t))))
+  ;; quick templates for org files
+  ;; (setq org-capture-templates
+  ;;   '(("s" "Stream note" entry
+  ;;     (file (lambda () (my/create-notes-file "~/zettelkasten/stream")))
+  ;;     (file "~/Nextcloud/org/templates/neuron_stream_note.org"))
+  ;;     ("p" "Permanent note" entry
+  ;;     (file my/create-notes-file)
+  ;;     (file "~/Nextcloud/org/templates/neuron_permanent_note.org"))
+  ;;     ("r" "Resource note" entry
+  ;;     (file my/create-notes-file)
+  ;;     (file "~/Nextcloud/org/templates/neuron_resource_note.org"))
+  ;;     ("l" "Literature note" entry
+  ;;     (file my/create-notes-file)
+  ;;     (file "~/Nextcloud/org/templates/neuron_literature_note.org"))
+  ;;     ("t" "Todo [inbox]" entry
+  ;;     (file+headline "~/Nextcloud/Orgzly/inbox.org" "Inbox")
+  ;;     "* TODO %i%? \n SCHEDULED: %t")
+  ;;     ("T" "Tickler" entry
+  ;;     (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
+  ;;     "* TODO %i%? \n SCHEDULED: %T")
+  ;;     ("M" "Todo with link" entry
+  ;;     (file+headline "~/Nextcloud/Orgzly/inbox.org" "Inbox")
+  ;;     "* TODO %i%? \n SCHEDULED: %t \n :PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
+  ;;     ("W" "Finnish word of the day" entry
+  ;;     (file+headline "~/Nextcloud/Orgzly/inbox.org" "Inbox")
+  ;;     "* TODO Word of the day - %t \n:PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
+  ;;     ("d" "Daily review" entry (file+olp+datetree "~/Nextcloud/org/daily_reviews.org")
+  ;;     (file "~/Nextcloud/org/templates/daily_review.org"))
+  ;;     ("w" "Weekly review" entry (file+olp+datetree "~/Nextcloud/org/weekly_gtd_reviews.org")
+  ;;     (file "~/Nextcloud/org/templates/weekly_gtd.org"))
+  ;;     ("m" "Monthly review" entry (file+olp+datetree "~/Nextcloud/org/monthly_reviews.org")
+  ;;     (file "~/Nextcloud/org/templates/monthly_review.org")))))
 #+end_src
 *** Agenda
 #+begin_src elisp
 (use-package org-agenda
-  :after org
+  :after org-gtd
   :config
+  ;; show who an item was delegated to in the agenda (from org-gtd)
+  (setq org-agenda-property-list '("DELEGATED_TO" "LOCATION"))
   ;; files that org-agenda will read from
-  (setq org-agenda-files
-  '("~/Nextcloud/Orgzly/gtd.org"
-    "~/Nextcloud/Orgzly/tickler.org"
-    "~/Nextcloud/Orgzly/inbox.org"
-    "~/Nextcloud/Orgzly/hobbies.org"
-    "~/Nextcloud/org/work/work.org"
-    "~/Nextcloud/org/work/storepick/slacker"
-    "~/Nextcloud/org/reading_list.org"
-    "~/Nextcloud/org-roam/20210214211549-reading_inbox.org"
-    "~/Nextcloud/org-roam/20210215222848-archive.org"))
+  (setq org-agenda-files '("~/Nextcloud/org/gtd"))
+
+  (setq org-agenda-custom-commands
+    '(("g" "Scheduled today and all NEXT items" ((agenda "" ((org-agenda-span 1))) (todo "NEXT")))))
+  ;; '("~/Nextcloud/Orgzly/gtd.org"
+  ;;   "~/Nextcloud/Orgzly/tickler.org"
+  ;;   "~/Nextcloud/Orgzly/inbox.org"
+  ;;   "~/Nextcloud/Orgzly/hobbies.org"
+  ;;   "~/Nextcloud/org/work/work.org"
+  ;;   "~/Nextcloud/org/work/storepick/slacker"
+  ;;   "~/Nextcloud/org/reading_list.org"
+  ;;   "~/Nextcloud/org-roam/20210214211549-reading_inbox.org"
+  ;;   "~/Nextcloud/org-roam/20210215222848-archive.org"))
 
   ;; show logs during the day - closed tasks and times, clocks
-  (setq org-agenda-start-with-log-mode t)
+  (setq org-agenda-start-with-log-mode t))
 
-  (use-package with-simulated-input
-    :straight t)
+  ;; (use-package with-simulated-input
+  ;;   :straight t)
 
-  (defun org-work-agenda ()
-    (interactive)
-    (setq org-agenda-category-filter-preset '("-hobbies" "-tickler" "-gtd" "-inbox" "-reading_list"))
-    (org-agenda nil "a")
-    (org-agenda-day-view))
+  ;; (defun org-work-agenda ()
+  ;;   (interactive)
+  ;;   ;;(setq org-agenda-category-filter-preset '("-hobbies" "-tickler" "-gtd" "-inbox" "-reading_list"))
+  ;;   (org-agenda nil "a")
+  ;;   (org-agenda-day-view))
     ;; (with-simulated-input "-hobbies-tickler-gtd-inbox-reading_list RET"
     ;;   (org-agenda-filter)))
 
-  (defun org-home-agenda ()
-    (interactive)
-    (setq org-agenda-category-filter-preset '("+hobbies" "+tickler" "+gtd" "+inbox" "+reading_list"))
-    (org-agenda nil "a")
-    (org-agenda-day-view))
+  ;; (defun org-home-agenda ()
+  ;;   (interactive)
+  ;;   ;;(setq org-agenda-category-filter-preset '("+hobbies" "+tickler" "+gtd" "+inbox" "+reading_list"))
+  ;;   (org-agenda nil "a")
+  ;;   (org-agenda-day-view)))
     ;; (with-simulated-input "+hobbies+tickler+gtd+inbox+reading_list RET"
     ;;   (org-agenda-filter)))
 
-  (my/leader-keys
-    "wa" 'org-work-agenda
-    "ha" 'org-home-agenda))
+  ;;(my/leader-keys
+    ;; "wa" 'org-work-agenda
+    ;; "ha" 'org-home-agenda)
+#+end_src
+
+#+RESULTS:
+: t
+
+*** Org-edna
+#+begin_src elisp
+(use-package org-edna
+  :config
+  (setq org-edna-use-inheritance t)
+  (org-edna-mode 1))
 #+end_src
 *** Refiling
 #+begin_src elisp
@@ -845,81 +935,34 @@ Some better clocking history
 *** Org-roam
 The notes (zettelkasten) god
 
-V1 config
 #+begin_src elisp
-;; (use-package org-roam
-;;   :straight
-;;   (:host github :repo "org-roam/org-roam" :branch "v2")
-;;   ;; currently checkout out at 06e5814898bbf2b506fe7e1eb88bb4069e7c46c2
-;;   ;; due to https://org-roam.discourse.group/t/backlinks-title-not-at-top-of-buffer/1209
-;;   :hook
-;;   (after-init . org-roam-mode)
-;;   :config
-;;   (setq org-roam-directory "~/Nextcloud/org-roam")
-;;   (my/leader-keys
-;;     "n" '(:ignore t :which-key "org-roam")
-;;     "nl" 'org-roam
-;;     "nf" 'org-roam-find-file
-;;     "ng" 'org-roam-graph-show
-;;     "ni" 'org-roam-insert
-;;     "nI" 'org-roam-insert-immediate
-;;     "no" 'org-roam-dailies-capture-today
-;;     "nt" 'org-roam-dailies-find-today
-;;     "ny" 'org-roam-dailies-find-yesterday)
-
-;;   (setq org-roam-completion-everywhere t)
-
-;;   (setq org-roam-dailies-directory "daily/")
-
-;;   (setq org-roam-capture-templates
-;;     '(("s" "source" plain
-;;        #'org-roam-capture--get-point
-;;        "%?"
-;;        :file-name "%<%Y%m%d%H%M%S>-${slug}"
-;;        :head "#+title: ${title}\n#+date: %t\n#+ROAM_TAGS: source\n\n* Notes\n* Resources"
-;;        :unnarrowed t)
-
-;;       ("l" "literary" plain
-;;        #'org-roam-capture--get-point
-;;        "%?"
-;;        :file-name "%<%Y%m%d%H%M%S>-${slug}"
-;;        :head "#+title: ${title}\n#+date: %t\n#+ROAM_TAGS: literary\n\n* Note"
-;;        :unnarrowed t)))
-
-;;   (setq org-roam-dailies-capture-templates
-;;     '(("d" "daily" entry
-;;        #'org-roam-capture--get-point
-;;        "* %<%H:%M> %?"
-;;        :file-name "daily/%<%Y-%m-%d>"
-;;        :head "#+title: %<%Y-%m-%d>\n#+ROAM_TAGS: private\n\n"
-;;        :olp ("Daily notes"))
-
-;;       ("j" "journal" entry
-;;        #'org-roam-capture--get-point
-;;        "* %<%H:%M> :crypt: %?"
-;;        :file-name "daily/%<%Y-%m-%d>"
-;;        :head "#+title: %<%Y-%m-%d>\n#+ROAM_TAGS: private\n\n"
-;;        :olp ("Journal")))))
-#+end_src
-
-
-Nroam - replace backlinks buffer
-#+begin_src elisp
-;; (use-package nroam
-;;   :straight '(nroam :host github
-;;                     :branch "master"
-;;                     :repo "NicolasPetton/nroam")
-;;   :after org-roam
-;;   :config
-;;   (add-hook 'org-mode-hook #'nroam-setup-maybe))
-#+end_src
-*** Ox-hugo
-Export org mode files to Hugo markdown.
-
-#+begin_src elisp
-(use-package ox-hugo
+(use-package org-roam
   :straight t
-  :after ox)
+  :custom
+  (org-roam-directory "~/Nextcloud/org-roam")
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find))
+  :config
+  (setq org-roam-v2-ack t)
+  (org-roam-setup))
+#+end_src
+
+Visualize the org-roam graph, this is an absolutely amazing package.
+#+begin_src elisp
+(use-package org-roam-ui
+  :straight
+    (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
+    :after org-roam
+;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;         a hookable mode anymore, you're advised to pick something yourself
+;;         if you don't care about startup time, use
+;;  :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
+
 #+end_src
 *** Org reading list
 Manage yer books.
@@ -1112,16 +1155,6 @@ Creates the heading before an archived heading in the archive file
   :straight (:host gitlab :repo "andersjohansson/org-archive-hierarchically" :branch "master")
   :after org)
 #+end_src
-*** Flashcards with Anki
-#+begin_src elisp
-(use-package anki-editor
-  :if (eq system-type 'darwin)
-  :ensure-system-package
-  ("/Applications/Anki.app" . "brew install anki")
-  :if (eq system-type 'gnu/linux)
-  :ensure-system-package anki
-  :straight t)
-#+end_src
 *** Org-mime
 For sending emails with org mode files
 #+begin_src elisp
@@ -1144,11 +1177,12 @@ For simpler presentation in org files
 *** Org CV
 #+begin_src elisp
 (use-package ox-altacv
-  :straight (:host gitlab :repo "Titan-C/org-cv" :branch "master")
+  :straight (:host gitlab :repo "Nimor111/org-cv" :branch "master")
   :init (require 'ox-altacv)
   :config
-  (setq org-latex-compiler "lualatex"))
+  (setq org-latex-compiler "pdflatex"))
 #+end_src
+
 *** Org reddit viewer
 #+begin_src elisp
 (use-package reddigg
@@ -1187,46 +1221,6 @@ For simpler presentation in org files
 (my/leader-keys
   "ob" 'org-rg)
 #+end_src
-*** Dendroam
-#+begin_src elisp
-(use-package dendroam
-  :straight (:host github :repo "vicrdguez/dendroam" :branch "main")
-  :after org)
-#+end_src
-*** Org brain
-#+begin_src elisp
-;; Allows you to edit entries directly from org-brain-visualize
-(use-package polymode
-  :straight t
-  :defer t)
-#+end_src
-
-#+begin_src elisp
-(use-package org-brain
-  :straight t
-  :init
-  (setq org-brain-path "~/Nextcloud/org/brain")
-  ;; For Evil users
-  (with-eval-after-load 'evil
-    (evil-set-initial-state 'org-brain-visualize-mode 'emacs))
-  :config
-  (bind-key "C-c b" 'org-brain-prefix-map org-mode-map)
-  (setq org-id-track-globally t)
-  (setq org-id-locations-file "~/.emacs.d/.org-id-locations")
-  (add-hook 'before-save-hook #'org-brain-ensure-ids-in-buffer)
-  (push '("b" "Brain" plain (function org-brain-goto-end)
-          "* %i%?" :empty-lines 1)
-        org-capture-templates)
-  (setq org-brain-title-max-length 120)
-  (setq org-brain-visualize-default-choices 'all)
-  (setq org-brain-include-file-entries nil
-        org-brain-file-entries-use-title nil)
-  (add-hook 'org-brain-visualize-mode-hook #'org-brain-polymode))
-#+end_src
-
-#+RESULTS:
-: t
-
 ** Evil-mode
 Vim keybinds and goodness in emacs
 
@@ -1342,13 +1336,13 @@ The git supercharge
   :defer t)
 #+end_src
 
-Something weird with ~emacsclient~ being installed with nix and magit not finding it when not started from a terminal (not sure if this is needed tbh)
+Something weird with =emacsclient= being installed with nix and magit not finding it when not started from a terminal (not sure if this is needed tbh)
 
 #+begin_src elisp
 (setq-default with-editor-emacsclient-executable "emacsclient")
 #+end_src
 ** Counsel
-Counsel is a customized set of commands to replace ~find-file~ with ~counsel-find-file~, etc which provide useful commands for each of the default completion commands.
+Counsel is a customized set of commands to replace =find-file= with =counsel-find-file= for example, etc which provide useful commands for each of the default completion commands.
 #+begin_src elisp
 (use-package counsel
   :straight t
@@ -1388,7 +1382,6 @@ A more minimal completion framework
   :config
   (setq ivy-use-virtual-buffers t)
   (setq ivy-count-format "%d/%d ")
-  ;;(define-key evil-ex-map "b" 'ivy-switch-buffer) ;; List buffers ( Vim way )
   (define-key evil-ex-map "b" 'counsel-ibuffer) ;; List buffers ( Vim way )
   ;; Press M-o when inside the ivy minibuffer for the actions to show
   (ivy-set-actions
@@ -1409,6 +1402,17 @@ A more minimal completion framework
   :straight t
   :init (all-the-icons-ivy-rich-mode 1))
 #+end_src
+
+Being prescient and all
+#+begin_src elisp
+(use-package prescient
+  :straight t)
+
+(use-package ivy-prescient
+  :straight t
+  :init
+  (ivy-prescient-mode 1))
+#+end_src
 ** Company
 Complete all the things!
 
@@ -1417,6 +1421,11 @@ Complete all the things!
   :straight t
   :hook
   (after-init . global-company-mode))
+
+(use-package company-prescient
+  :straight t
+  :init
+  (company-prescient-mode 1))
 #+end_src
 ** How-do-you
 Your stack overflow and friends inside emacs (and the results are org files!)
@@ -1499,24 +1508,10 @@ For those pesky shaders.
 #+end_src
 *** Lua
 #+begin_src elisp
-(defun set-company-backends-for-lua()
-  "Set lua company backend."
-  (setq-local company-backends '(
-                                 (
-                                  company-lsp
-                                  company-lua
-                                  company-keywords
-                                  company-gtags
-                                  company-yasnippet
-                                  )
-                                 company-capf
-                                 company-dabbrev-code
-                                 company-files
-                                 )))
-
 (use-package lua-mode
   :straight t
-  :hook (lua-mode . set-company-backends-for-lua))
+  :config
+  (setq lua-indent-level 2))
 
 (use-package love-minor-mode
   :straight t
@@ -1612,38 +1607,15 @@ Ammonite
   "p" '(:ignore t :which-key "python")
   "pf" 'elpy-autopep8-fix-code)
 #+end_src
+
+**** Poetry
+#+begin_src elisp
+(use-package poetry
+  :straight t)
+#+end_src
 *** Clojure
 #+begin_src elisp
-(use-package cider
-  :straight t)
-#+end_src
-
-Flycheck clj-kondo for linting
-#+begin_src elisp
-(use-package flycheck-clj-kondo
-  :straight t)
-#+end_src
-
-Use it in clojure mode
-#+begin_src elisp
-(use-package clojure-mode
-  :straight t
-  :config
-  (require 'flycheck-clj-kondo))
-#+end_src
-
-Handy functions for refactoring clojure code
-#+begin_src elisp
-(use-package clj-refactor
-  :straight t)
-
-(defun my-clojure-mode-hook ()
-    (clj-refactor-mode 1)
-    (yas-minor-mode 1) ; for adding require/use/import statements
-    ;; This choice of keybinding leaves cider-macroexpand-1 unbound
-    (cljr-add-keybindings-with-prefix "C-c C-m"))
-
-(add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
+;;(require 'clojure)
 #+end_src
 *** Nix
 #+begin_src elisp
@@ -1652,7 +1624,7 @@ Handy functions for refactoring clojure code
 #+end_src
 *** Common Lisp
 #+begin_src elisp
-(use-package sly
+(use-package slime
   :straight t)
 #+end_src
 *** Zig
@@ -1661,12 +1633,6 @@ Handy functions for refactoring clojure code
   :straight t)
 #+end_src
 
-Poetry
-
-#+begin_src elisp
-(use-package poetry
-  :straight t)
-#+end_src
 *** Haskell
 #+begin_src elisp
 (use-package haskell-mode
@@ -1741,31 +1707,21 @@ Interaction with mix
 (use-package hy-mode
   :straight t)
 #+end_src
-** Projectile
+*** Fennel
+Does not work for some reason
 #+begin_src elisp
-(use-package projectile
-  :straight t
-  :config
-  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-  (setq projectile-track-known-projects-automatically nil)
-  (setq projectile-indexing-method 'native)
-
-  (my/leader-keys
-    "p"   '(:ignore t :which-key "projectile")
-    "pp"  'counsel-projectile-switch-project
-    "pk"  'projectile-kill-buffers
-    "pa"  'projectile-add-known-project
-    "pr"  'projectile-remove-known-project
-    "psr" 'projectile-ripgred
-    "pxe" 'projectile-run-eshell
-    "pf"  'counsel-projectile-find-file
-    "pS"  'projectile-save-project-buffers
-    "pD"  'projectile-dired
-    "pg"  'counsel-projectile-grep)
-
-  (projectile-mode +1))
+;;(use-package fennel-mode
+;;  :straight t)
 #+end_src
+
+#+begin_src elisp
+(autoload 'fennel-mode (concat user-emacs-directory "lisp/fennel-mode/fennel-mode") nil t)
+  (add-to-list 'auto-mode-alist '("\\.fnl\\'" . fennel-mode))
+#+end_src
+
+#+RESULTS:
+: ((\.envrc\' . direnv-envrc-mode) (\.journal\' . ledger-mode) (\.dat\' . ledger-mode) (\.ledger\' . ledger-mode) (\.fnl\' . fennel-mode) (\.hy\' . hy-mode) (\.exs\' . elixir-mode) (\.ex\' . elixir-mode) (\.elixir\' . elixir-mode) (\.hsc\' . haskell-mode) (\.l[gh]s\' . haskell-literate-mode) (\.hsig\' . haskell-mode) (\.[gh]s\' . haskell-mode) (\.cabal\'\|/cabal\.project\|/\.cabal/config\' . haskell-cabal-mode) (\.chs\' . haskell-c2hs-mode) (\.ghci\' . ghci-script-mode) (\.dump-simpl\' . ghc-core-mode) (\.hcr\' . ghc-core-mode) (\.zig\' . zig-mode) (\.nix\' . nix-mode) (\`/nix/store/.+\.drv\' . nix-drv-mode) (\(?:build\|profile\)\.boot\' . clojure-mode) (\.cljs\' . clojurescript-mode) (\.cljc\' . clojurec-mode) (\.\(clj\|dtm\|edn\)\' . clojure-mode) (\.tres\' . conf-toml-mode) (\.tscn\' . conf-toml-mode) (\.gd\' . gdscript-mode) (\.s\(cala\|bt\)$ . scala-mode) (\.\(scala\|sbt\|worksheet\.sc\)\' . scala-mode) (\.ts\' . typescript-mode) (\.lua\' . lua-mode) (\.glsl\' . glsl-mode) (\.geom\' . glsl-mode) (\.frag\' . glsl-mode) (\.vert\' . glsl-mode) (\.rs\' . rust-mode) (\.\(?:md\|markdown\|mkd\|mdown\|mkdn\|mdwn\)\' . markdown-mode) (\.html?\' . web-mode) (\.erb\' . web-mode) (/git-rebase-todo\' . git-rebase-mode) (\.odc\' . archive-mode) (\.odf\' . archive-mode) (\.odi\' . archive-mode) (\.otp\' . archive-mode) (\.odp\' . archive-mode) (\.otg\' . archive-mode) (\.odg\' . archive-mode) (\.ots\' . archive-mode) (\.ods\' . archive-mode) (\.odm\' . archive-mode) (\.ott\' . archive-mode) (\.odt\' . archive-mode) (\.org_archive\' . org-mode) (\.gpg\(~\|\.~[0-9]+~\)?\' nil epa-file) (\.elc\' . elisp-byte-code-mode) (\.zst\' nil jka-compr) (\.dz\' nil jka-compr) (\.xz\' nil jka-compr) (\.lzma\' nil jka-compr) (\.lz\' nil jka-compr) (\.g?z\' nil jka-compr) (\.bz2\' nil jka-compr) (\.Z\' nil jka-compr) (\.vr[hi]?\' . vera-mode) (\(?:\.\(?:rbw?\|ru\|rake\|thor\|jbuilder\|rabl\|gemspec\|podspec\)\|/\(?:Gem\|Rake\|Cap\|Thor\|Puppet\|Berks\|Vagrant\|Guard\|Pod\)file\)\' . ruby-mode) (\.re?st\' . rst-mode) (\.py[iw]?\' . python-mode) (\.m\' . octave-maybe-mode) (\.less\' . less-css-mode) (\.scss\' . scss-mode) (\.awk\' . awk-mode) (\.\(u?lpc\|pike\|pmod\(\.in\)?\)\' . pike-mode) (\.idl\' . idl-mode) (\.java\' . java-mode) (\.m\' . objc-mode) (\.ii\' . c++-mode) (\.i\' . c-mode) (\.lex\' . c-mode) (\.y\(acc\)?\' . c-mode) (\.h\' . c-or-c++-mode) (\.c\' . c-mode) (\.\(CC?\|HH?\)\' . c++-mode) (\.[ch]\(pp\|xx\|\+\+\)\' . c++-mode) (\.\(cc\|hh\)\' . c++-mode) (\.\(bat\|cmd\)\' . bat-mode) (\.[sx]?html?\(\.[a-zA-Z_]+\)?\' . mhtml-mode) (\.svgz?\' . image-mode) (\.svgz?\' . xml-mode) (\.x[bp]m\' . image-mode) (\.x[bp]m\' . c-mode) (\.p[bpgn]m\' . image-mode) (\.tiff?\' . image-mode) (\.gif\' . image-mode) (\.png\' . image-mode) (\.jpe?g\' . image-mode) (\.te?xt\' . text-mode) (\.[tT]e[xX]\' . tex-mode) (\.ins\' . tex-mode) (\.ltx\' . latex-mode) (\.dtx\' . doctex-mode) (\.org\' . org-mode) (\.el\' . emacs-lisp-mode) (Project\.ede\' . emacs-lisp-mode) (\.\(scm\|stk\|ss\|sch\)\' . scheme-mode) (\.l\' . lisp-mode) (\.li?sp\' . lisp-mode) (\.[fF]\' . fortran-mode) (\.for\' . fortran-mode) (\.p\' . pascal-mode) (\.pas\' . pascal-mode) (\.\(dpr\|DPR\)\' . delphi-mode) (\.ad[abs]\' . ada-mode) (\.ad[bs]\.dg\' . ada-mode) (\.\([pP]\([Llm]\|erl\|od\)\|al\)\' . perl-mode) (Imakefile\' . makefile-imake-mode) (Makeppfile\(?:\.mk\)?\' . makefile-makepp-mode) (\.makepp\' . makefile-makepp-mode) (\.mk\' . makefile-gmake-mode) (\.make\' . makefile-gmake-mode) ([Mm]akefile\' . makefile-gmake-mode) (\.am\' . makefile-automake-mode) (\.texinfo\' . texinfo-mode) (\.te?xi\' . texinfo-mode) (\.[sS]\' . asm-mode) (\.asm\' . asm-mode) (\.css\' . css-mode) (\.mixal\' . mixal-mode) (\.gcov\' . compilation-mode) (/\.[a-z0-9-]*gdbinit . gdb-script-mode) (-gdb\.gdb . gdb-script-mode) ([cC]hange\.?[lL]og?\' . change-log-mode) ([cC]hange[lL]og[-.][0-9]+\' . change-log-mode) (\$CHANGE_LOG\$\.TXT . change-log-mode) (\.scm\.[0-9]*\' . scheme-mode) (\.[ckz]?sh\'\|\.shar\'\|/\.z?profile\' . sh-mode) (\.bash\' . sh-mode) (\(/\|\`\)\.\(bash_\(profile\|history\|log\(in\|out\)\)\|z?log\(in\|out\)\)\' . sh-mode) (\(/\|\`\)\.\(shrc\|zshrc\|m?kshrc\|bashrc\|t?cshrc\|esrc\)\' . sh-mode) (\(/\|\`\)\.\([kz]shenv\|xinitrc\|startxrc\|xsession\)\' . sh-mode) (\.m?spec\' . sh-mode) (\.m[mes]\' . nroff-mode) (\.man\' . nroff-mode) (\.sty\' . latex-mode) (\.cl[so]\' . latex-mode) (\.bbl\' . latex-mode) (\.bib\' . bibtex-mode) (\.bst\' . bibtex-style-mode) (\.sql\' . sql-mode) (\(acinclude\|aclocal\|acsite\)\.m4\' . autoconf-mode) (\.m[4c]\' . m4-mode) (\.mf\' . metafont-mode) (\.mp\' . metapost-mode) (\.vhdl?\' . vhdl-mode) (\.article\' . text-mode) (\.letter\' . text-mode) (\.i?tcl\' . tcl-mode) (\.exp\' . tcl-mode) (\.itk\' . tcl-mode) (\.icn\' . icon-mode) (\.sim\' . simula-mode) (\.mss\' . scribe-mode) (\.f9[05]\' . f90-mode) (\.f0[38]\' . f90-mode) (\.indent\.pro\' . fundamental-mode) (\.\(pro\|PRO\)\' . idlwave-mode) (\.srt\' . srecode-template-mode) (\.prolog\' . prolog-mode) (\.tar\' . tar-mode) (\.\(arc\|zip\|lzh\|lha\|zoo\|[jew]ar\|xpi\|rar\|cbr\|7z\|ARC\|ZIP\|LZH\|LHA\|ZOO\|[JEW]AR\|XPI\|RAR\|CBR\|7Z\)\' . archive-mode) (\.oxt\' . archive-mode) (\.\(deb\|[oi]pk\)\' . archive-mode) (\`/tmp/Re . text-mode) (/Message[0-9]*\' . text-mode) (\`/tmp/fol/ . text-mode) (\.oak\' . scheme-mode) (\.sgml?\' . sgml-mode) (\.x[ms]l\' . xml-mode) (\.dbk\' . xml-mode) (\.dtd\' . sgml-mode) (\.ds\(ss\)?l\' . dsssl-mode) (\.js[mx]?\' . javascript-mode) (\.har\' . javascript-mode) (\.json\' . javascript-mode) (\.[ds]?va?h?\' . verilog-mode) (\.by\' . bovine-grammar-mode) (\.wy\' . wisent-grammar-mode) ([:/\]\..*\(emacs\|gnus\|viper\)\' . emacs-lisp-mode) (\`\..*emacs\' . emacs-lisp-mode) ([:/]_emacs\' . emacs-lisp-mode) (/crontab\.X*[0-9]+\' . shell-script-mode) (\.ml\' . lisp-mode) (\.ld[si]?\' . ld-script-mode) (ld\.?script\' . ld-script-mode) (\.xs\' . c-mode) (\.x[abdsru]?[cnw]?\' . ld-script-mode) (\.zone\' . dns-mode) (\.soa\' . dns-mode) (\.asd\' . lisp-mode) (\.\(asn\|mib\|smi\)\' . snmp-mode) (\.\(as\|mi\|sm\)2\' . snmpv2-mode) (\.\(diffs?\|patch\|rej\)\' . diff-mode) (\.\(dif\|pat\)\' . diff-mode) (\.[eE]?[pP][sS]\' . ps-mode) (\.\(?:PDF\|DVI\|OD[FGPST]\|DOCX\|XLSX?\|PPTX?\|pdf\|djvu\|dvi\|od[fgpst]\|docx\|xlsx?\|pptx?\)\' . doc-view-mode-maybe) (configure\.\(ac\|in\)\' . autoconf-mode) (\.s\(v\|iv\|ieve\)\' . sieve-mode) (BROWSE\' . ebrowse-tree-mode) (\.ebrowse\' . ebrowse-tree-mode) (#\*mail\* . mail-mode) (\.g\' . antlr-mode) (\.mod\' . m2-mode) (\.ses\' . ses-mode) (\.docbook\' . sgml-mode) (\.com\' . dcl-mode) (/config\.\(?:bat\|log\)\' . fundamental-mode) (/\.\(authinfo\|netrc\)\' . authinfo-mode) (\.\(?:[iI][nN][iI]\|[lL][sS][tT]\|[rR][eE][gG]\|[sS][yY][sS]\)\' . conf-mode) (\.la\' . conf-unix-mode) (\.ppd\' . conf-ppd-mode) (java.+\.conf\' . conf-javaprop-mode) (\.properties\(?:\.[a-zA-Z0-9._-]+\)?\' . conf-javaprop-mode) (\.toml\' . conf-toml-mode) (\.desktop\' . conf-desktop-mode) (/\.redshift\.conf\' . conf-windows-mode) (\`/etc/\(?:DIR_COLORS\|ethers\|.?fstab\|.*hosts\|lesskey\|login\.?de\(?:fs\|vperm\)\|magic\|mtab\|pam\.d/.*\|permissions\(?:\.d/.+\)?\|protocols\|rpc\|services\)\' . conf-space-mode) (\`/etc/\(?:acpid?/.+\|aliases\(?:\.d/.+\)?\|default/.+\|group-?\|hosts\..+\|inittab\|ksysguarddrc\|opera6rc\|passwd-?\|shadow-?\|sysconfig/.+\)\' . conf-mode) ([cC]hange[lL]og[-.][-0-9a-z]+\' . change-log-mode) (/\.?\(?:gitconfig\|gnokiirc\|hgrc\|kde.*rc\|mime\.types\|wgetrc\)\' . conf-mode) (/\.\(?:asound\|enigma\|fetchmail\|gltron\|gtk\|hxplayer\|mairix\|mbsync\|msmtp\|net\|neverball\|nvidia-settings-\|offlineimap\|qt/.+\|realplayer\|reportbug\|rtorrent\.\|screen\|scummvm\|sversion\|sylpheed/.+\|xmp\)rc\' . conf-mode) (/\.\(?:gdbtkinit\|grip\|mpdconf\|notmuch-config\|orbital/.+txt\|rhosts\|tuxracer/options\)\' . conf-mode) (/\.?X\(?:default\|resource\|re\)s\> . conf-xdefaults-mode) (/X11.+app-defaults/\|\.ad\' . conf-xdefaults-mode) (/X11.+locale/.+/Compose\' . conf-colon-mode) (/X11.+locale/compose\.dir\' . conf-javaprop-mode) (\.~?[0-9]+\.[0-9][-.0-9]*~?\' nil t) (\.\(?:orig\|in\|[bB][aA][kK]\)\' nil t) ([/.]c\(?:on\)?f\(?:i?g\)?\(?:\.[a-zA-Z0-9._-]+\)?\' . conf-mode-maybe) (\.[1-9]\' . nroff-mode) (\.art\' . image-mode) (\.avs\' . image-mode) (\.bmp\' . image-mode) (\.cmyk\' . image-mode) (\.cmyka\' . image-mode) (\.crw\' . image-mode) (\.dcr\' . image-mode) (\.dcx\' . image-mode) (\.dng\' . image-mode) (\.dpx\' . image-mode) (\.fax\' . image-mode) (\.hrz\' . image-mode) (\.icb\' . image-mode) (\.icc\' . image-mode) (\.icm\' . image-mode) (\.ico\' . image-mode) (\.icon\' . image-mode) (\.jbg\' . image-mode) (\.jbig\' . image-mode) (\.jng\' . image-mode) (\.jnx\' . image-mode) (\.miff\' . image-mode) (\.mng\' . image-mode) (\.mvg\' . image-mode) (\.otb\' . image-mode) (\.p7\' . image-mode) (\.pcx\' . image-mode) (\.pdb\' . image-mode) (\.pfa\' . image-mode) (\.pfb\' . image-mode) (\.picon\' . image-mode) (\.pict\' . image-mode) (\.rgb\' . image-mode) (\.rgba\' . image-mode) (\.tga\' . image-mode) (\.wbmp\' . image-mode) (\.webp\' . image-mode) (\.wmf\' . image-mode) (\.wpg\' . image-mode) (\.xcf\' . image-mode) (\.xmp\' . image-mode) (\.xwd\' . image-mode) (\.yuv\' . image-mode) (\.tgz\' . tar-mode) (\.tbz2?\' . tar-mode) (\.txz\' . tar-mode) (\.tzst\' . tar-mode))
+
 ** Parens
 To have paren pairs in the same colour
 #+begin_src elisp
@@ -1934,13 +1890,14 @@ Alerts for emails
 #+end_src
 ** Esup
 Profiling.
+Not working currently. Some error about not being able to find =bind-key= package, wtf.
 #+begin_src elisp
-(use-package esup
-  :straight t
-  :config
-  ;; don't try to follow symlinks in straight.el repos
-  (setq esup-depth 0)
-  (setq esup-user-init-file (file-truename (concat user-emacs-directory "init.el"))))
+;; (use-package esup
+;;   :straight t
+;;   :config
+;;   ;; don't try to follow symlinks in straight.el repos
+;;   (setq esup-depth 0)
+;;   (setq esup-user-init-file (file-truename (concat user-emacs-directory "init.el"))))
 #+end_src
 ** Elfeed
 For the sweet RSS (data :scream:) feeds.
@@ -1999,18 +1956,6 @@ Elfeed dashboard similar to mu4e one.
     "do"  `(,(dw/dired-link "~/Nextcloud/org") :which-key "Org")))
 #+end_src
 
-Adding fancy icons to dired items because why not.
-Disabled until https://github.com/wyuenho/all-the-icons-dired/issues/4 has a resolution.
-#+begin_src elisp
-;; (use-package all-the-icons-dired
-;;   :straight t
-;;   :hook (dired-mode . all-the-icons-dired-mode)
-;;   :config
-;;   (setq dired-auto-revert-buffer t)
-;;   (setq dired-dwim-target t)
-;;   (setq dired-listing-switches "-lah"))
-#+end_src
-
 Open some files with external applications.
 #+begin_src elisp
 (use-package dired-open
@@ -2036,7 +1981,6 @@ This is done by navigating to prev/next directory with h/l
 (use-package snow
   :straight (:host github :repo "alphapapa/snow.el" :branch "master"))
 #+end_src
-
 ** Engine mode
 Search stuff from the comfort of your Emacs.
 #+begin_src elisp
@@ -2130,7 +2074,6 @@ To ssh into remote machines
   :config
   (setq tramp-default-method "ssh"))
 #+end_src
-
 ** Direnv
 For using direnv inside emacs.
 #+begin_src elisp
@@ -2149,7 +2092,6 @@ Interesting collection of functions for performing demos and presentations in st
   (my/leader-keys
      "des" 'demo-it-step))
 #+end_src
-
 ** Snippets
 #+begin_src elisp
 (use-package yasnippet
@@ -2215,75 +2157,3 @@ or something.
 (use-package rg
   :straight t)
 #+end_src
-
-** Org-roam
-V2 config from scratch + dendroam
-Hacky hacky hacky
-#+begin_src elisp
-(use-package emacsql
-  :straight t)
-
-(use-package emacsql-sqlite
-  :straight t)
-
-(defun my/org-roam-load ()
-  (interactive)
-  (add-to-list 'load-path "~/emacs-local-repos/org-roam")
-  (load-library "org-roam")
-  (setq org-roam-mode-sections
-       (list #'org-roam-backlinks-section
-             #'org-roam-reflinks-section
-             #'org-roam-unlinked-references-section))
-  (setq org-roam-directory (file-truename "~/Nextcloud/org-roam"))
-  (setq org-roam-file-extensions '("org"))
-  (setq org-roam-node-display-template "${hierarchy}:${title}")
-  (setq org-roam-completion-everywhere t)
-  (define-key org-roam-mode-map [mouse-1] #'org-roam-visit-thing)
-  (org-roam-setup)
-  (setq org-roam-capture-templates
-      '(("d" "default" plain
-         "%?"
-         :if-new (file+head "${slug}.org"
-                            "#+title: ${hierarchy-title}\n")
-         :unnarrowed t)))
-  (setq org-roam-dailies-capture-templates
-      '(("d" "default" entry
-         "* Daily\n** Inbox\n** Today\n** Todos\n %?"
-         :if-new (file+head "notes.daily.%<%Y-%m-%d>.org"
-                            "#+title: %<%Y-%m-%d>\n"))
-         ("j" "journal" entry
-         "* %<%H:%M> %?"
-         :if-new (file+head "journal.daily.%<%Y-%m-%d>.org"
-                            "#+title: %<%Y-%m-%d>\n"))))
-  (setq dendroam-capture-templates
-      '(("t" "Time note" entry
-         "* %?"
-         :if-new (file+head "${current-file}.%<%Y-%m-%d-%H-%M>.org"
-                            "#+title: %^{title}\n"))
-        ("s" "Scratch note" entry
-         "* %?"
-         :if-new (file+head "scratch.%<%Y-%m-%d.%H%M%S>.org"
-                            "#+title: %<%H%M%S>\n"))))
-
-  (defun dendroam-node-find-initial-input ()
-    (interactive)
-    (org-roam-node-find nil (if (buffer-file-name)
-                            (file-name-base (buffer-file-name))
-                            "")))
-
-  (my/leader-keys
-    "nf"  'org-roam-node-find
-    "nc"  'org-roam-capture
-    "ni"  'org-roam-node-insert
-    "nr"  'org-roam-buffer-toggle
-    "nt"  'org-roam-dailies-find-today
-    "ny"  'org-roam-dailies-find-yesterday
-    "nd" '(:ignore t :which-key "dendroam")
-    "ndi" 'dendroam-node-find-initial-input
-    "nds" 'dendroam-insert-scratch-note
-    "ndt" 'dendroam-insert-time-note))
-
-(my/org-roam-load)
-#+end_src
-
-#+RESULTS:

@@ -1,3 +1,11 @@
+ ;; Minimize garbage collection during startup
+(setq gc-cons-threshold most-positive-fixnum)
+
+;; Lower threshold back to 8 MiB (default is 800kB)
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq gc-cons-threshold (expt 2 23))))
+
 (defvar bootstrap-version)
 (let ((bootstrap-file
         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -15,6 +23,8 @@
 
 (use-package use-package-ensure-system-package
   :straight t)
+
+(add-to-list 'load-path (concat user-emacs-directory "modules"))
 
 (defun my/org-babel-tangle-config ()
   "Tangles the org config file to init.el"
@@ -94,16 +104,16 @@
     "oh"  (list (lambda () (interactive) (find-file home-dashboard-file))   :which-key "home dashboard")
     "rl"  (list (lambda () (interactive) (find-file reading-list-file))     :which-key "reading list")
 
-    "g"   '(:ignore t :which-key "gtd")
-    "gi"   (list (lambda () (interactive) (find-file gtd-inbox-file))       :which-key "inbox")
-    "gg"   (list (lambda () (interactive) (find-file gtd-file))             :which-key "gtd")
-    "gs"   (list (lambda () (interactive) (find-file gtd-someday-file))     :which-key "someday")
-    "gt"   (list (lambda () (interactive) (find-file gtd-tickler-file))     :which-key "tickler")
-    "gh"   (list (lambda () (interactive) (find-file gtd-hobbies-file))     :which-key "hobbies")
-    "gu"   (list (lambda () (interactive) (find-file ukulele-file))         :which-key "ukulele")
-    "gm"   (list (lambda () (interactive) (find-file monthly-reviews-file)) :which-key "monthly")
-    "gd"   (list (lambda () (interactive) (find-file daily-reviews-file))   :which-key "daily")
-    "gw"   (list (lambda () (interactive) (find-file weekly-reviews-file))  :which-key "weekly")
+    ;; "g"   '(:ignore t :which-key "gtd")
+    ;; "gi"   (list (lambda () (interactive) (find-file gtd-inbox-file))       :which-key "inbox")
+    ;; "gg"   (list (lambda () (interactive) (find-file gtd-file))             :which-key "gtd")
+    ;; "gs"   (list (lambda () (interactive) (find-file gtd-someday-file))     :which-key "someday")
+    ;; "gt"   (list (lambda () (interactive) (find-file gtd-tickler-file))     :which-key "tickler")
+    ;; "gh"   (list (lambda () (interactive) (find-file gtd-hobbies-file))     :which-key "hobbies")
+    ;; "gu"   (list (lambda () (interactive) (find-file ukulele-file))         :which-key "ukulele")
+    ;; "gm"   (list (lambda () (interactive) (find-file monthly-reviews-file)) :which-key "monthly")
+    ;; "gd"   (list (lambda () (interactive) (find-file daily-reviews-file))   :which-key "daily")
+    ;; "gw"   (list (lambda () (interactive) (find-file weekly-reviews-file))  :which-key "weekly")
 
     "fw"  (list (lambda () (interactive) (find-file work-file)) :which-key "work")
 
@@ -294,6 +304,29 @@ Optionally get the NTH quote."
      selected-quote)
     selected-quote))
 
+(use-package projectile
+  :straight t
+  :config
+  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  (setq projectile-track-known-projects-automatically nil)
+  (setq projectile-indexing-method 'native)
+
+  (my/leader-keys
+    "p"   '(:ignore t :which-key "projectile")
+    "pp"  'counsel-projectile-switch-project
+    "pk"  'projectile-kill-buffers
+    "pa"  'projectile-add-known-project
+    "pr"  'projectile-remove-known-project
+    "psr" 'projectile-ripgred
+    "pxe" 'projectile-run-eshell
+    "pf"  'counsel-projectile-find-file
+    "pS"  'projectile-save-project-buffers
+    "pD"  'projectile-dired
+    "pg"  'counsel-projectile-grep)
+
+  (projectile-mode +1))
+
 (use-package dashboard
   :straight t
   :config
@@ -313,7 +346,7 @@ Optionally get the NTH quote."
   (visual-line-mode 1))
 
 (use-package org
-  :straight org-plus-contrib
+  :straight t
   :hook
   (org-mode . my/org-mode-setup)
   :mode
@@ -416,6 +449,23 @@ Optionally get the NTH quote."
 
 (add-hook 'org-mode-hook (lambda () (display-line-numbers-mode 0)))
 
+(setq org-gtd-dir "~/Nextcloud/org/gtd")
+(setq org-gtd-inbox "~/Nextcloud/org/gtd/inbox.org")
+
+(use-package org-gtd
+  :after org
+  :straight (:host github :repo "trevoke/org-gtd.el" :branch "master")
+  :config
+  (setq org-gtd-directory org-gtd-dir)
+  ;; keybindings
+  (my/leader-keys
+    "gc" 'org-gtd-capture
+    "ga" 'org-agenda-list
+    "gp" 'org-gtd-process-inbox
+    "gn" 'org-gtd-show-all-next
+    "gs" 'org-gtd-show-stuck-projects
+    "gf" 'org-gtd-clarify-finalize))
+
 ;; inspiration - https://stackoverflow.com/a/53738442
 ;; Currently will keep files even if I abort the capture, but CBA to fix that now
 (defun my/create-notes-file (&optional path)
@@ -427,84 +477,104 @@ Optionally get the NTH quote."
                     (if path path "~/zettelkasten")))
 
 (use-package org-capture
-  :after org
+  :after org-gtd
   :config
   ;; keybindings
   (my/leader-keys
     "occ"  'org-capture)
-  ;; quick templates for org files
+  ;; capture templates
   (setq org-capture-templates
-    '(("s" "Stream note" entry
-      (file (lambda () (my/create-notes-file "~/zettelkasten/stream")))
-      (file "~/Nextcloud/org/templates/neuron_stream_note.org"))
-      ("p" "Permanent note" entry
-      (file my/create-notes-file)
-      (file "~/Nextcloud/org/templates/neuron_permanent_note.org"))
-      ("r" "Resource note" entry
-      (file my/create-notes-file)
-      (file "~/Nextcloud/org/templates/neuron_resource_note.org"))
-      ("l" "Literature note" entry
-      (file my/create-notes-file)
-      (file "~/Nextcloud/org/templates/neuron_literature_note.org"))
-      ("t" "Todo [inbox]" entry
-      (file+headline "~/Nextcloud/Orgzly/inbox.org" "Inbox")
-      "* TODO %i%? \n SCHEDULED: %t")
-      ("T" "Tickler" entry
-      (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
-      "* TODO %i%? \n SCHEDULED: %T")
-      ("M" "Todo with link" entry
-      (file+headline "~/Nextcloud/Orgzly/inbox.org" "Inbox")
-      "* TODO %i%? \n SCHEDULED: %t \n :PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
-      ("W" "Finnish word of the day" entry
-      (file+headline "~/Nextcloud/Orgzly/inbox.org" "Inbox")
-      "* TODO Word of the day - %t \n:PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
-      ("d" "Daily review" entry (file+olp+datetree "~/Nextcloud/org/daily_reviews.org")
-      (file "~/Nextcloud/org/templates/daily_review.org"))
-      ("w" "Weekly review" entry (file+olp+datetree "~/Nextcloud/org/weekly_gtd_reviews.org")
-      (file "~/Nextcloud/org/templates/weekly_gtd.org"))
-      ("m" "Monthly review" entry (file+olp+datetree "~/Nextcloud/org/monthly_reviews.org")
-      (file "~/Nextcloud/org/templates/monthly_review.org")))))
+      `(("i" "Inbox"
+         entry (file org-gtd-inbox)
+         "* %?\n%U\n\n  %i"
+         :kill-buffer t)
+        ("l" "Todo with link"
+         entry (file org-gtd-inbox)
+         "* %?\n%U\n\n  %i\n  %a"
+         :kill-buffer t))))
+  ;; quick templates for org files
+  ;; (setq org-capture-templates
+  ;;   '(("s" "Stream note" entry
+  ;;     (file (lambda () (my/create-notes-file "~/zettelkasten/stream")))
+  ;;     (file "~/Nextcloud/org/templates/neuron_stream_note.org"))
+  ;;     ("p" "Permanent note" entry
+  ;;     (file my/create-notes-file)
+  ;;     (file "~/Nextcloud/org/templates/neuron_permanent_note.org"))
+  ;;     ("r" "Resource note" entry
+  ;;     (file my/create-notes-file)
+  ;;     (file "~/Nextcloud/org/templates/neuron_resource_note.org"))
+  ;;     ("l" "Literature note" entry
+  ;;     (file my/create-notes-file)
+  ;;     (file "~/Nextcloud/org/templates/neuron_literature_note.org"))
+  ;;     ("t" "Todo [inbox]" entry
+  ;;     (file+headline "~/Nextcloud/Orgzly/inbox.org" "Inbox")
+  ;;     "* TODO %i%? \n SCHEDULED: %t")
+  ;;     ("T" "Tickler" entry
+  ;;     (file+headline "~/Nextcloud/Orgzly/tickler.org" "Tickler")
+  ;;     "* TODO %i%? \n SCHEDULED: %T")
+  ;;     ("M" "Todo with link" entry
+  ;;     (file+headline "~/Nextcloud/Orgzly/inbox.org" "Inbox")
+  ;;     "* TODO %i%? \n SCHEDULED: %t \n :PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
+  ;;     ("W" "Finnish word of the day" entry
+  ;;     (file+headline "~/Nextcloud/Orgzly/inbox.org" "Inbox")
+  ;;     "* TODO Word of the day - %t \n:PROPERTIES: \n:CREATED: %U \n:END: \n %a\n")
+  ;;     ("d" "Daily review" entry (file+olp+datetree "~/Nextcloud/org/daily_reviews.org")
+  ;;     (file "~/Nextcloud/org/templates/daily_review.org"))
+  ;;     ("w" "Weekly review" entry (file+olp+datetree "~/Nextcloud/org/weekly_gtd_reviews.org")
+  ;;     (file "~/Nextcloud/org/templates/weekly_gtd.org"))
+  ;;     ("m" "Monthly review" entry (file+olp+datetree "~/Nextcloud/org/monthly_reviews.org")
+  ;;     (file "~/Nextcloud/org/templates/monthly_review.org")))))
 
 (use-package org-agenda
-  :after org
+  :after org-gtd
   :config
+  ;; show who an item was delegated to in the agenda (from org-gtd)
+  (setq org-agenda-property-list '("DELEGATED_TO" "LOCATION"))
   ;; files that org-agenda will read from
-  (setq org-agenda-files
-  '("~/Nextcloud/Orgzly/gtd.org"
-    "~/Nextcloud/Orgzly/tickler.org"
-    "~/Nextcloud/Orgzly/inbox.org"
-    "~/Nextcloud/Orgzly/hobbies.org"
-    "~/Nextcloud/org/work/work.org"
-    "~/Nextcloud/org/work/storepick/slacker"
-    "~/Nextcloud/org/reading_list.org"
-    "~/Nextcloud/org-roam/20210214211549-reading_inbox.org"
-    "~/Nextcloud/org-roam/20210215222848-archive.org"))
+  (setq org-agenda-files '("~/Nextcloud/org/gtd"))
+
+  (setq org-agenda-custom-commands
+    '(("g" "Scheduled today and all NEXT items" ((agenda "" ((org-agenda-span 1))) (todo "NEXT")))))
+  ;; '("~/Nextcloud/Orgzly/gtd.org"
+  ;;   "~/Nextcloud/Orgzly/tickler.org"
+  ;;   "~/Nextcloud/Orgzly/inbox.org"
+  ;;   "~/Nextcloud/Orgzly/hobbies.org"
+  ;;   "~/Nextcloud/org/work/work.org"
+  ;;   "~/Nextcloud/org/work/storepick/slacker"
+  ;;   "~/Nextcloud/org/reading_list.org"
+  ;;   "~/Nextcloud/org-roam/20210214211549-reading_inbox.org"
+  ;;   "~/Nextcloud/org-roam/20210215222848-archive.org"))
 
   ;; show logs during the day - closed tasks and times, clocks
-  (setq org-agenda-start-with-log-mode t)
+  (setq org-agenda-start-with-log-mode t))
 
-  (use-package with-simulated-input
-    :straight t)
+  ;; (use-package with-simulated-input
+  ;;   :straight t)
 
-  (defun org-work-agenda ()
-    (interactive)
-    (setq org-agenda-category-filter-preset '("-hobbies" "-tickler" "-gtd" "-inbox" "-reading_list"))
-    (org-agenda nil "a")
-    (org-agenda-day-view))
+  ;; (defun org-work-agenda ()
+  ;;   (interactive)
+  ;;   ;;(setq org-agenda-category-filter-preset '("-hobbies" "-tickler" "-gtd" "-inbox" "-reading_list"))
+  ;;   (org-agenda nil "a")
+  ;;   (org-agenda-day-view))
     ;; (with-simulated-input "-hobbies-tickler-gtd-inbox-reading_list RET"
     ;;   (org-agenda-filter)))
 
-  (defun org-home-agenda ()
-    (interactive)
-    (setq org-agenda-category-filter-preset '("+hobbies" "+tickler" "+gtd" "+inbox" "+reading_list"))
-    (org-agenda nil "a")
-    (org-agenda-day-view))
+  ;; (defun org-home-agenda ()
+  ;;   (interactive)
+  ;;   ;;(setq org-agenda-category-filter-preset '("+hobbies" "+tickler" "+gtd" "+inbox" "+reading_list"))
+  ;;   (org-agenda nil "a")
+  ;;   (org-agenda-day-view)))
     ;; (with-simulated-input "+hobbies+tickler+gtd+inbox+reading_list RET"
     ;;   (org-agenda-filter)))
 
-  (my/leader-keys
-    "wa" 'org-work-agenda
-    "ha" 'org-home-agenda))
+  ;;(my/leader-keys
+    ;; "wa" 'org-work-agenda
+    ;; "ha" 'org-home-agenda)
+
+(use-package org-edna
+  :config
+  (setq org-edna-use-inheritance t)
+  (org-edna-mode 1))
 
 (use-package org-refile
   :after org
@@ -563,71 +633,29 @@ Optionally get the NTH quote."
     "oci"  'org-mru-clock-in
     "ocg"  'org-mru-clock-goto))
 
-;; (use-package org-roam
-;;   :straight
-;;   (:host github :repo "org-roam/org-roam" :branch "v2")
-;;   ;; currently checkout out at 06e5814898bbf2b506fe7e1eb88bb4069e7c46c2
-;;   ;; due to https://org-roam.discourse.group/t/backlinks-title-not-at-top-of-buffer/1209
-;;   :hook
-;;   (after-init . org-roam-mode)
-;;   :config
-;;   (setq org-roam-directory "~/Nextcloud/org-roam")
-;;   (my/leader-keys
-;;     "n" '(:ignore t :which-key "org-roam")
-;;     "nl" 'org-roam
-;;     "nf" 'org-roam-find-file
-;;     "ng" 'org-roam-graph-show
-;;     "ni" 'org-roam-insert
-;;     "nI" 'org-roam-insert-immediate
-;;     "no" 'org-roam-dailies-capture-today
-;;     "nt" 'org-roam-dailies-find-today
-;;     "ny" 'org-roam-dailies-find-yesterday)
-
-;;   (setq org-roam-completion-everywhere t)
-
-;;   (setq org-roam-dailies-directory "daily/")
-
-;;   (setq org-roam-capture-templates
-;;     '(("s" "source" plain
-;;        #'org-roam-capture--get-point
-;;        "%?"
-;;        :file-name "%<%Y%m%d%H%M%S>-${slug}"
-;;        :head "#+title: ${title}\n#+date: %t\n#+ROAM_TAGS: source\n\n* Notes\n* Resources"
-;;        :unnarrowed t)
-
-;;       ("l" "literary" plain
-;;        #'org-roam-capture--get-point
-;;        "%?"
-;;        :file-name "%<%Y%m%d%H%M%S>-${slug}"
-;;        :head "#+title: ${title}\n#+date: %t\n#+ROAM_TAGS: literary\n\n* Note"
-;;        :unnarrowed t)))
-
-;;   (setq org-roam-dailies-capture-templates
-;;     '(("d" "daily" entry
-;;        #'org-roam-capture--get-point
-;;        "* %<%H:%M> %?"
-;;        :file-name "daily/%<%Y-%m-%d>"
-;;        :head "#+title: %<%Y-%m-%d>\n#+ROAM_TAGS: private\n\n"
-;;        :olp ("Daily notes"))
-
-;;       ("j" "journal" entry
-;;        #'org-roam-capture--get-point
-;;        "* %<%H:%M> :crypt: %?"
-;;        :file-name "daily/%<%Y-%m-%d>"
-;;        :head "#+title: %<%Y-%m-%d>\n#+ROAM_TAGS: private\n\n"
-;;        :olp ("Journal")))))
-
-;; (use-package nroam
-;;   :straight '(nroam :host github
-;;                     :branch "master"
-;;                     :repo "NicolasPetton/nroam")
-;;   :after org-roam
-;;   :config
-;;   (add-hook 'org-mode-hook #'nroam-setup-maybe))
-
-(use-package ox-hugo
+(use-package org-roam
   :straight t
-  :after ox)
+  :custom
+  (org-roam-directory "~/Nextcloud/org-roam")
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find))
+  :config
+  (setq org-roam-v2-ack t)
+  (org-roam-setup))
+
+(use-package org-roam-ui
+  :straight
+    (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
+    :after org-roam
+;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;         a hookable mode anymore, you're advised to pick something yourself
+;;         if you don't care about startup time, use
+;;  :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
 
 (use-package org-books
   :straight t
@@ -769,14 +797,6 @@ Optionally get the NTH quote."
   :straight (:host gitlab :repo "andersjohansson/org-archive-hierarchically" :branch "master")
   :after org)
 
-(use-package anki-editor
-  :if (eq system-type 'darwin)
-  :ensure-system-package
-  ("/Applications/Anki.app" . "brew install anki")
-  :if (eq system-type 'gnu/linux)
-  :ensure-system-package anki
-  :straight t)
-
 (use-package org-mime
   :straight t)
 
@@ -788,10 +808,10 @@ Optionally get the NTH quote."
   :straight t)
 
 (use-package ox-altacv
-  :straight (:host gitlab :repo "Titan-C/org-cv" :branch "master")
+  :straight (:host gitlab :repo "Nimor111/org-cv" :branch "master")
   :init (require 'ox-altacv)
   :config
-  (setq org-latex-compiler "lualatex"))
+  (setq org-latex-compiler "pdflatex"))
 
 (use-package reddigg
   :straight (:host github :repo "thanhvg/emacs-reddigg" :branch "master")
@@ -823,36 +843,6 @@ Optionally get the NTH quote."
 
 (my/leader-keys
   "ob" 'org-rg)
-
-(use-package dendroam
-  :straight (:host github :repo "vicrdguez/dendroam" :branch "main")
-  :after org)
-
-;; Allows you to edit entries directly from org-brain-visualize
-(use-package polymode
-  :straight t
-  :defer t)
-
-(use-package org-brain
-  :straight t
-  :init
-  (setq org-brain-path "~/Nextcloud/org/brain")
-  ;; For Evil users
-  (with-eval-after-load 'evil
-    (evil-set-initial-state 'org-brain-visualize-mode 'emacs))
-  :config
-  (bind-key "C-c b" 'org-brain-prefix-map org-mode-map)
-  (setq org-id-track-globally t)
-  (setq org-id-locations-file "~/.emacs.d/.org-id-locations")
-  (add-hook 'before-save-hook #'org-brain-ensure-ids-in-buffer)
-  (push '("b" "Brain" plain (function org-brain-goto-end)
-          "* %i%?" :empty-lines 1)
-        org-capture-templates)
-  (setq org-brain-title-max-length 120)
-  (setq org-brain-visualize-default-choices 'all)
-  (setq org-brain-include-file-entries nil
-        org-brain-file-entries-use-title nil)
-  (add-hook 'org-brain-visualize-mode-hook #'org-brain-polymode))
 
 (use-package evil
   :straight t
@@ -972,7 +962,6 @@ Optionally get the NTH quote."
   :config
   (setq ivy-use-virtual-buffers t)
   (setq ivy-count-format "%d/%d ")
-  ;;(define-key evil-ex-map "b" 'ivy-switch-buffer) ;; List buffers ( Vim way )
   (define-key evil-ex-map "b" 'counsel-ibuffer) ;; List buffers ( Vim way )
   ;; Press M-o when inside the ivy minibuffer for the actions to show
   (ivy-set-actions
@@ -993,10 +982,23 @@ Optionally get the NTH quote."
   :straight t
   :init (all-the-icons-ivy-rich-mode 1))
 
+(use-package prescient
+  :straight t)
+
+(use-package ivy-prescient
+  :straight t
+  :init
+  (ivy-prescient-mode 1))
+
 (use-package company
   :straight t
   :hook
   (after-init . global-company-mode))
+
+(use-package company-prescient
+  :straight t
+  :init
+  (company-prescient-mode 1))
 
 (use-package howdoyou
   :straight t
@@ -1055,24 +1057,10 @@ Optionally get the NTH quote."
 (use-package glsl-mode
   :straight t)
 
-(defun set-company-backends-for-lua()
-  "Set lua company backend."
-  (setq-local company-backends '(
-                                 (
-                                  company-lsp
-                                  company-lua
-                                  company-keywords
-                                  company-gtags
-                                  company-yasnippet
-                                  )
-                                 company-capf
-                                 company-dabbrev-code
-                                 company-files
-                                 )))
-
 (use-package lua-mode
   :straight t
-  :hook (lua-mode . set-company-backends-for-lua))
+  :config
+  (setq lua-indent-level 2))
 
 (use-package love-minor-mode
   :straight t
@@ -1152,38 +1140,18 @@ Optionally get the NTH quote."
   "p" '(:ignore t :which-key "python")
   "pf" 'elpy-autopep8-fix-code)
 
-(use-package cider
+(use-package poetry
   :straight t)
 
-(use-package flycheck-clj-kondo
-  :straight t)
-
-(use-package clojure-mode
-  :straight t
-  :config
-  (require 'flycheck-clj-kondo))
-
-(use-package clj-refactor
-  :straight t)
-
-(defun my-clojure-mode-hook ()
-    (clj-refactor-mode 1)
-    (yas-minor-mode 1) ; for adding require/use/import statements
-    ;; This choice of keybinding leaves cider-macroexpand-1 unbound
-    (cljr-add-keybindings-with-prefix "C-c C-m"))
-
-(add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
+;;(require 'clojure)
 
 (use-package nix-mode
   :straight t)
 
-(use-package sly
+(use-package slime
   :straight t)
 
 (use-package zig-mode
-  :straight t)
-
-(use-package poetry
   :straight t)
 
 (use-package haskell-mode
@@ -1245,28 +1213,11 @@ Optionally get the NTH quote."
 (use-package hy-mode
   :straight t)
 
-(use-package projectile
-  :straight t
-  :config
-  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-  (setq projectile-track-known-projects-automatically nil)
-  (setq projectile-indexing-method 'native)
+;;(use-package fennel-mode
+;;  :straight t)
 
-  (my/leader-keys
-    "p"   '(:ignore t :which-key "projectile")
-    "pp"  'counsel-projectile-switch-project
-    "pk"  'projectile-kill-buffers
-    "pa"  'projectile-add-known-project
-    "pr"  'projectile-remove-known-project
-    "psr" 'projectile-ripgred
-    "pxe" 'projectile-run-eshell
-    "pf"  'counsel-projectile-find-file
-    "pS"  'projectile-save-project-buffers
-    "pD"  'projectile-dired
-    "pg"  'counsel-projectile-grep)
-
-  (projectile-mode +1))
+(autoload 'fennel-mode (concat user-emacs-directory "lisp/fennel-mode/fennel-mode") nil t)
+  (add-to-list 'auto-mode-alist '("\\.fnl\\'" . fennel-mode))
 
 (use-package rainbow-delimiters
   :straight t
@@ -1400,12 +1351,12 @@ Optionally get the NTH quote."
   :config
   (persistent-scratch-setup-default))
 
-(use-package esup
-  :straight t
-  :config
-  ;; don't try to follow symlinks in straight.el repos
-  (setq esup-depth 0)
-  (setq esup-user-init-file (file-truename (concat user-emacs-directory "init.el"))))
+;; (use-package esup
+;;   :straight t
+;;   :config
+;;   ;; don't try to follow symlinks in straight.el repos
+;;   (setq esup-depth 0)
+;;   (setq esup-user-init-file (file-truename (concat user-emacs-directory "init.el"))))
 
 (use-package elfeed
   :defer 3
@@ -1450,14 +1401,6 @@ Optionally get the NTH quote."
     "drm" `(,(dw/dired-link "/run/media/gbojinov") :which-key "Media")
     "fin" `(,(dw/dired-link "~/Nextcloud/org/finnish") :which-key "Finnish")
     "do"  `(,(dw/dired-link "~/Nextcloud/org") :which-key "Org")))
-
-;; (use-package all-the-icons-dired
-;;   :straight t
-;;   :hook (dired-mode . all-the-icons-dired-mode)
-;;   :config
-;;   (setq dired-auto-revert-buffer t)
-;;   (setq dired-dwim-target t)
-;;   (setq dired-listing-switches "-lah"))
 
 (use-package dired-open
   :straight t
@@ -1599,68 +1542,3 @@ Optionally get the NTH quote."
 
 (use-package rg
   :straight t)
-
-(use-package emacsql
-  :straight t)
-
-(use-package emacsql-sqlite
-  :straight t)
-
-(defun my/org-roam-load ()
-  (interactive)
-  (add-to-list 'load-path "~/emacs-local-repos/org-roam")
-  (load-library "org-roam")
-  (setq org-roam-mode-sections
-       (list #'org-roam-backlinks-section
-             #'org-roam-reflinks-section
-             #'org-roam-unlinked-references-section))
-  (setq org-roam-directory (file-truename "~/Nextcloud/org-roam"))
-  (setq org-roam-file-extensions '("org"))
-  (setq org-roam-node-display-template "${hierarchy}:${title}")
-  (setq org-roam-completion-everywhere t)
-  (define-key org-roam-mode-map [mouse-1] #'org-roam-visit-thing)
-  (org-roam-setup)
-  (setq org-roam-capture-templates
-      '(("d" "default" plain
-         "%?"
-         :if-new (file+head "${slug}.org"
-                            "#+title: ${hierarchy-title}\n")
-         :unnarrowed t)))
-  (setq org-roam-dailies-capture-templates
-      '(("d" "default" entry
-         "* Daily\n** Inbox\n** Today\n** Todos\n %?"
-         :if-new (file+head "notes.daily.%<%Y-%m-%d>.org"
-                            "#+title: %<%Y-%m-%d>\n"))
-         ("j" "journal" entry
-         "* %<%H:%M> %?"
-         :if-new (file+head "journal.daily.%<%Y-%m-%d>.org"
-                            "#+title: %<%Y-%m-%d>\n"))))
-  (setq dendroam-capture-templates
-      '(("t" "Time note" entry
-         "* %?"
-         :if-new (file+head "${current-file}.%<%Y-%m-%d-%H-%M>.org"
-                            "#+title: %^{title}\n"))
-        ("s" "Scratch note" entry
-         "* %?"
-         :if-new (file+head "scratch.%<%Y-%m-%d.%H%M%S>.org"
-                            "#+title: %<%H%M%S>\n"))))
-
-  (defun dendroam-node-find-initial-input ()
-    (interactive)
-    (org-roam-node-find nil (if (buffer-file-name)
-                            (file-name-base (buffer-file-name))
-                            "")))
-
-  (my/leader-keys
-    "nf"  'org-roam-node-find
-    "nc"  'org-roam-capture
-    "ni"  'org-roam-node-insert
-    "nr"  'org-roam-buffer-toggle
-    "nt"  'org-roam-dailies-find-today
-    "ny"  'org-roam-dailies-find-yesterday
-    "nd" '(:ignore t :which-key "dendroam")
-    "ndi" 'dendroam-node-find-initial-input
-    "nds" 'dendroam-insert-scratch-note
-    "ndt" 'dendroam-insert-time-note))
-
-(my/org-roam-load)
