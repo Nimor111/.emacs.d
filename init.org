@@ -1070,10 +1070,6 @@ For a better way to group entries in the agenda.
                     (:and
                      (:todo "READING" :file-path "reading_list")))))))
 #+end_src
-
-#+RESULTS:
-: t
-
 *** Better? Linking
 #+begin_src elisp
 (use-package org-super-links
