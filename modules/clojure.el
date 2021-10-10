@@ -1,4 +1,4 @@
-;;; clojure.el --- Personal configuration for clojure development
+;;; clojure.el --- Personal configuration for clojure development -*- lexical-binding: t; -*-
 ;;;
 ;;; Commentary:
 ;;;
