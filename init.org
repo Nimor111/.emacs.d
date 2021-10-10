@@ -81,6 +81,7 @@ Calling EMACS an editor is like calling the Earth a hunk of dirt.
     - [[#org-reddit-viewer][Org reddit viewer]]
     - [[#org-recur][Org recur]]
     - [[#searching-through-org-files][Searching through org files]]
+    - [[#ox-hugo][Ox hugo]]
   - [[#evil-mode][Evil-mode]]
     - [[#evil-mode-configs][Evil mode configs]]
     - [[#org-mode-integration-with-evil][Org mode integration with evil]]
@@ -1197,6 +1198,13 @@ For simpler presentation in org files
 
 (my/leader-keys
   "ob" 'org-rg)
+#+end_src
+*** Ox hugo
+For them websites.
+#+begin_src elisp
+(use-package ox-hugo
+  :straight t
+  :after ox)
 #+end_src
 ** Evil-mode
 Vim keybinds and goodness in emacs

@@ -844,6 +844,10 @@ Optionally get the NTH quote."
 (my/leader-keys
   "ob" 'org-rg)
 
+(use-package ox-hugo
+  :straight t
+  :after ox)
+
 (use-package evil
   :straight t
   :init
