@@ -1,5 +1,5 @@
  ;; Minimize garbage collection during startup
-(setq gc-cons-threshold most-positive-fixnum)
+ (setq gc-cons-threshold most-positive-fixnum)
 
 ;; Lower threshold back to 8 MiB (default is 800kB)
 (add-hook 'emacs-startup-hook
@@ -535,15 +535,6 @@ Optionally get the NTH quote."
 
   (setq org-agenda-custom-commands
     '(("g" "Scheduled today and all NEXT items" ((agenda "" ((org-agenda-span 1))) (todo "NEXT")))))
-  ;; '("~/Nextcloud/Orgzly/gtd.org"
-  ;;   "~/Nextcloud/Orgzly/tickler.org"
-  ;;   "~/Nextcloud/Orgzly/inbox.org"
-  ;;   "~/Nextcloud/Orgzly/hobbies.org"
-  ;;   "~/Nextcloud/org/work/work.org"
-  ;;   "~/Nextcloud/org/work/storepick/slacker"
-  ;;   "~/Nextcloud/org/reading_list.org"
-  ;;   "~/Nextcloud/org-roam/20210214211549-reading_inbox.org"
-  ;;   "~/Nextcloud/org-roam/20210215222848-archive.org"))
 
   ;; show logs during the day - closed tasks and times, clocks
   (setq org-agenda-start-with-log-mode t))
@@ -578,13 +569,13 @@ Optionally get the NTH quote."
 
 (use-package org-refile
   :after org
-  :config
+  :config)
   ;; files to refile to
-  (setq org-refile-targets
-    '(("~/Nextcloud/Orgzly/gtd.org"      :maxlevel . 9)
-      ("~/Nextcloud/Orgzly/someday.org"  :maxlevel . 9)
-      ("~/Nextcloud/Orgzly/tickler.org"  :maxlevel . 9)
-      ("~/Nextcloud/Orgzly/ukulele.org"  :maxlevel . 9))))
+  ;; (setq org-refile-targets
+  ;;   '(("~/Nextcloud/Orgzly/gtd.org"      :maxlevel . 9)
+  ;;     ("~/Nextcloud/Orgzly/someday.org"  :maxlevel . 9)
+  ;;     ("~/Nextcloud/Orgzly/tickler.org"  :maxlevel . 9)
+  ;;     ("~/Nextcloud/Orgzly/ukulele.org"  :maxlevel . 9))))
 
 (use-package org-clock
   :after org
@@ -635,22 +626,20 @@ Optionally get the NTH quote."
 
 (use-package org-roam
   :straight t
-  :custom
-  (org-roam-directory "~/Nextcloud/org-roam")
-  :bind (("C-c n l" . org-roam-buffer-toggle)
-         ("C-c n f" . org-roam-node-find))
-  :config
+  :init
   (setq org-roam-v2-ack t)
-  (org-roam-setup))
+  :config
+  (setq org-roam-directory "~/Nextcloud/org-roam")
+  (org-roam-db-autosync-mode)
+  (my/leader-keys
+    "nrr" 'org-roam-buffer-toggle
+    "nrf" 'org-roam-node-find
+    "nri" 'org-roam-node-insert))
 
 (use-package org-roam-ui
   :straight
     (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
     :after org-roam
-;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
-;;         a hookable mode anymore, you're advised to pick something yourself
-;;         if you don't care about startup time, use
-;;  :hook (after-init . org-roam-ui-mode)
     :config
     (setq org-roam-ui-sync-theme t
           org-roam-ui-follow t
@@ -669,7 +658,6 @@ Optionally get the NTH quote."
   :hook
   (org-mode . toc-org-enable))
 
-;; TODO Remove this as it's in org roam now
 (use-package org-journal
   :straight t
   :after org
@@ -743,7 +731,7 @@ Optionally get the NTH quote."
   ;; conflicts of header bindings with evil-mode
   (setq org-super-agenda-header-map nil)
   (setq org-super-agenda-groups
-       '(;;(:auto-category t)
+       '((:auto-category t)
          (:auto-outline-path t)
          (:discard (:not  ; Is it easier to read like this?
                     (:and
@@ -1010,22 +998,22 @@ Optionally get the NTH quote."
   (my/leader-keys
     "q"  'howdoyou-query))
 
-(require 'web)
-;;(require 'rust)
-;;(require 'glsl)
-(require 'lua)
-;;(require 'ruby)
-;;(require 'typescript)
-;;(require 'scala)
-;;(require 'gdscript)
-(require 'python)
-;;(require 'clojure)
-(require 'nix)
-;;(require 'common-lisp)
-;;(require 'zig)
-;;(require 'haskell)
-;;(require 'elixir)
-(require 'lsp)
+(use-package web)
+;;(use-package rust)
+;;(use-package glsl)
+(use-package lua)
+;;(use-package ruby)
+;;(use-package typescript)
+;;(use-package scala)
+;;(use-package gdscript)
+(use-package python)
+;;(use-package clojure)
+(use-package nix)
+;;(use-package common-lisp)
+;;(use-package zig)
+;;(use-package haskell)
+;;(use-package elixir)
+(use-package lsp)
 
 (use-package rainbow-delimiters
   :straight t
@@ -1330,23 +1318,23 @@ Optionally get the NTH quote."
     "rs" 'crux-create-scratch-buffer
     "rb" 'crux-other-window-or-switch-buffer))
 
-(use-package xah-get-thing
-  :straight t)
+;; (use-package xah-get-thing
+;;   :straight t)
 
-(use-package neuron-mode
-  :straight t
-  :hook
-  (neuron-mode . company-neuron-setup))
+;; (use-package neuron-mode
+;;   :straight t
+;;   :hook
+;;   (neuron-mode . company-neuron-setup))
 
-(load-file (concat user-emacs-directory "/lisp/neuron-org/neuron-org-mode.el"))
+;; (load-file (concat user-emacs-directory "/lisp/neuron-org/neuron-org-mode.el"))
 
-(add-hook 'neuron-org-mode-hook #'company-neuron-org-setup)
-(my/leader-keys
-   "n n f" 'neuron-edit-zettel
-   "n n r" 'neuron-refresh
-   "n n n" 'neuron-org-new-zettel
-   "n n l" 'neuron-org-insert-zettel-link
-   "n n o" 'neuron-org-follow-link)
+;; (add-hook 'neuron-org-mode-hook #'company-neuron-org-setup)
+;; (my/leader-keys
+;;    "n n f" 'neuron-edit-zettel
+;;    "n n r" 'neuron-refresh
+;;    "n n n" 'neuron-org-new-zettel
+;;    "n n l" 'neuron-org-insert-zettel-link
+;;    "n n o" 'neuron-org-follow-link)
 
 (use-package rg
   :straight t)

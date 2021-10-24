@@ -6,6 +6,8 @@
  '(custom-safe-themes
    '("aaf300544667970333366f2bad847899f193fcfe96172ec325dbc3195b797220" default))
  '(helm-minibuffer-history-key "M-p")
+ '(org-agenda-files
+   '("/home/gbojinov/Nextcloud/org/gtd/actionable.org" "/home/gbojinov/Nextcloud/org/gtd/inbox.org" "/home/gbojinov/Nextcloud/org/gtd/incubate.org" "/home/gbojinov/Nextcloud/journal/20211025.org"))
  '(safe-local-variable-values
    '((org-roam-directory . "~/Nextcloud/org/finnish/")
      (encoding . utf-8)

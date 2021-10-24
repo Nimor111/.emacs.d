@@ -117,12 +117,13 @@ Calling EMACS an editor is like calling the Earth a hunk of dirt.
   - [[#crux][Crux]]
   - [[#neuron-mode][Neuron mode]]
   - [[#ripgrep][Ripgrep]]
+  - [[#scratchpad][Scratchpad]]
 
 ** Try to speed up startup time with the garbage collector
 Courtesy of [[https://www.emacswiki.org/emacs/OptimizingEmacsStartup][Emacs Wiki]]
 #+begin_src elisp
  ;; Minimize garbage collection during startup
-(setq gc-cons-threshold most-positive-fixnum)
+ (setq gc-cons-threshold most-positive-fixnum)
 
 ;; Lower threshold back to 8 MiB (default is 800kB)
 (add-hook 'emacs-startup-hook
@@ -797,15 +798,6 @@ Define some paths as =org-gtd= variables are kinda wonky with when they load
 
   (setq org-agenda-custom-commands
     '(("g" "Scheduled today and all NEXT items" ((agenda "" ((org-agenda-span 1))) (todo "NEXT")))))
-  ;; '("~/Nextcloud/Orgzly/gtd.org"
-  ;;   "~/Nextcloud/Orgzly/tickler.org"
-  ;;   "~/Nextcloud/Orgzly/inbox.org"
-  ;;   "~/Nextcloud/Orgzly/hobbies.org"
-  ;;   "~/Nextcloud/org/work/work.org"
-  ;;   "~/Nextcloud/org/work/storepick/slacker"
-  ;;   "~/Nextcloud/org/reading_list.org"
-  ;;   "~/Nextcloud/org-roam/20210214211549-reading_inbox.org"
-  ;;   "~/Nextcloud/org-roam/20210215222848-archive.org"))
 
   ;; show logs during the day - closed tasks and times, clocks
   (setq org-agenda-start-with-log-mode t))
@@ -848,13 +840,13 @@ Define some paths as =org-gtd= variables are kinda wonky with when they load
 #+begin_src elisp
 (use-package org-refile
   :after org
-  :config
+  :config)
   ;; files to refile to
-  (setq org-refile-targets
-    '(("~/Nextcloud/Orgzly/gtd.org"      :maxlevel . 9)
-      ("~/Nextcloud/Orgzly/someday.org"  :maxlevel . 9)
-      ("~/Nextcloud/Orgzly/tickler.org"  :maxlevel . 9)
-      ("~/Nextcloud/Orgzly/ukulele.org"  :maxlevel . 9))))
+  ;; (setq org-refile-targets
+  ;;   '(("~/Nextcloud/Orgzly/gtd.org"      :maxlevel . 9)
+  ;;     ("~/Nextcloud/Orgzly/someday.org"  :maxlevel . 9)
+  ;;     ("~/Nextcloud/Orgzly/tickler.org"  :maxlevel . 9)
+  ;;     ("~/Nextcloud/Orgzly/ukulele.org"  :maxlevel . 9))))
 #+end_src
 *** Clocking
 #+begin_src elisp
@@ -920,13 +912,15 @@ The notes (zettelkasten) god
 #+begin_src elisp
 (use-package org-roam
   :straight t
-  :custom
-  (org-roam-directory "~/Nextcloud/org-roam")
-  :bind (("C-c n l" . org-roam-buffer-toggle)
-         ("C-c n f" . org-roam-node-find))
-  :config
+  :init
   (setq org-roam-v2-ack t)
-  (org-roam-setup))
+  :config
+  (setq org-roam-directory "~/Nextcloud/org-roam")
+  (org-roam-db-autosync-mode)
+  (my/leader-keys
+    "nrr" 'org-roam-buffer-toggle
+    "nrf" 'org-roam-node-find
+    "nri" 'org-roam-node-insert))
 #+end_src
 
 Visualize the org-roam graph, this is an absolutely amazing package.
@@ -935,10 +929,6 @@ Visualize the org-roam graph, this is an absolutely amazing package.
   :straight
     (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
     :after org-roam
-;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
-;;         a hookable mode anymore, you're advised to pick something yourself
-;;         if you don't care about startup time, use
-;;  :hook (after-init . org-roam-ui-mode)
     :config
     (setq org-roam-ui-sync-theme t
           org-roam-ui-follow t
@@ -968,7 +958,6 @@ Table of contents on save for org files, it's awesome
 *** Org journal
 For your journaling needs.
 #+begin_src elisp
-;; TODO Remove this as it's in org roam now
 (use-package org-journal
   :straight t
   :after org
@@ -1065,12 +1054,16 @@ For a better way to group entries in the agenda.
   ;; conflicts of header bindings with evil-mode
   (setq org-super-agenda-header-map nil)
   (setq org-super-agenda-groups
-       '(;;(:auto-category t)
+       '((:auto-category t)
          (:auto-outline-path t)
          (:discard (:not  ; Is it easier to read like this?
                     (:and
                      (:todo "READING" :file-path "reading_list")))))))
 #+end_src
+
+#+RESULTS:
+: t
+
 *** Better? Linking
 #+begin_src elisp
 (use-package org-super-links
@@ -1423,22 +1416,22 @@ Your stack overflow and friends inside emacs (and the results are org files!)
 #+end_src
 ** Language-specific
 #+begin_src elisp
-(require 'web)
-;;(require 'rust)
-;;(require 'glsl)
-(require 'lua)
-;;(require 'ruby)
-;;(require 'typescript)
-;;(require 'scala)
-;;(require 'gdscript)
-(require 'python)
-;;(require 'clojure)
-(require 'nix)
-;;(require 'common-lisp)
-;;(require 'zig)
-;;(require 'haskell)
-;;(require 'elixir)
-(require 'lsp)
+(use-package web)
+;;(use-package rust)
+;;(use-package glsl)
+(use-package lua)
+;;(use-package ruby)
+;;(use-package typescript)
+;;(use-package scala)
+;;(use-package gdscript)
+(use-package python)
+;;(use-package clojure)
+(use-package nix)
+;;(use-package common-lisp)
+;;(use-package zig)
+;;(use-package haskell)
+;;(use-package elixir)
+(use-package lsp)
 #+end_src
 ** Parens
 To have paren pairs in the same colour
@@ -1608,7 +1601,7 @@ Alerts for emails
 #+end_src
 ** Esup
 Profiling.
-Not working currently. Some error about not being able to find =bind-key= package, wtf.
+Doesn't seem to work with =chemacs=, as it rebuilds everything every time.
 #+begin_src elisp
 ;; (use-package esup
 ;;   :straight t
@@ -1617,6 +1610,10 @@ Not working currently. Some error about not being able to find =bind-key= packag
 ;;   (setq esup-depth 0)
 ;;   (setq esup-user-init-file (file-truename (concat user-emacs-directory "init.el"))))
 #+end_src
+
+#+RESULTS:
+: t
+
 ** Elfeed
 For the sweet RSS (data :scream:) feeds.
 #+begin_src elisp
@@ -1840,32 +1837,32 @@ A Collection of Ridiculously Useful eXtensions
 
 ** Neuron mode
 #+begin_src elisp
-(use-package xah-get-thing
-  :straight t)
+;; (use-package xah-get-thing
+;;   :straight t)
 #+end_src
 
 #+begin_src elisp
-(use-package neuron-mode
-  :straight t
-  :hook
-  (neuron-mode . company-neuron-setup))
+;; (use-package neuron-mode
+;;   :straight t
+;;   :hook
+;;   (neuron-mode . company-neuron-setup))
 #+end_src
 
 Load in neuron-org-mode
 #+begin_src elisp
-(load-file (concat user-emacs-directory "/lisp/neuron-org/neuron-org-mode.el"))
+;; (load-file (concat user-emacs-directory "/lisp/neuron-org/neuron-org-mode.el"))
 #+end_src
 
 Configure neuron-org-mode. Use package doesn't seem to work, probably because this is not in the straight repos
 or something.
 #+begin_src elisp
-(add-hook 'neuron-org-mode-hook #'company-neuron-org-setup)
-(my/leader-keys
-   "n n f" 'neuron-edit-zettel
-   "n n r" 'neuron-refresh
-   "n n n" 'neuron-org-new-zettel
-   "n n l" 'neuron-org-insert-zettel-link
-   "n n o" 'neuron-org-follow-link)
+;; (add-hook 'neuron-org-mode-hook #'company-neuron-org-setup)
+;; (my/leader-keys
+;;    "n n f" 'neuron-edit-zettel
+;;    "n n r" 'neuron-refresh
+;;    "n n n" 'neuron-org-new-zettel
+;;    "n n l" 'neuron-org-insert-zettel-link
+;;    "n n o" 'neuron-org-follow-link)
 #+end_src
 
 #+RESULTS:
@@ -1875,3 +1872,5 @@ or something.
 (use-package rg
   :straight t)
 #+end_src
+
+** Scratchpad
