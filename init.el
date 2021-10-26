@@ -630,6 +630,36 @@ Optionally get the NTH quote."
   (setq org-roam-v2-ack t)
   :config
   (setq org-roam-directory "~/Nextcloud/org-roam")
+  (setq org-roam-dailies-directory "daily/")
+  (setq org-roam-completion-everywhere t)
+
+  (setq org-roam-dailies-capture-templates
+      '(("d" "default" plain (file "~/Nextcloud/org/roam-templates/daily_note.org")
+         :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n#+filetags: daily"))))
+
+
+  (setq org-roam-capture-templates
+        '(("b" "book notes" plain
+           "\n* Source\n\nAuthor: %^{Author}\nTitle: ${title}\nYear: %^{Year}\n\n* Summary\n\n%?"
+           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+           :unnarrowed t)
+
+          ("c" "video/article notes" plain
+           "\n* Source\n\nLink: %^{Link}\nTitle: ${title}\n\n* Fleeting Notes\n\n%?"
+           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+           :unnarrowed t)
+
+          ("l" "literature note" plain
+           "\n* Notes\n\n* Resources\n\n%?"
+           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: literature")
+           :unnarrowed t)
+
+          ("z" "zettel" plain
+           "\n* Title\n\n* See also\n\n%?"
+           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+           :unnarrowed t)
+          ))
+
   (org-roam-db-autosync-mode)
   (my/leader-keys
     "nrr" 'org-roam-buffer-toggle
@@ -981,6 +1011,9 @@ Optionally get the NTH quote."
   :straight t
   :init
   (ivy-prescient-mode 1))
+
+(use-package ivy-clipmenu
+  :straight t)
 
 (use-package company
   :straight t
