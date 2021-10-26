@@ -920,9 +920,8 @@ The notes (zettelkasten) god
   (setq org-roam-completion-everywhere t)
 
   (setq org-roam-dailies-capture-templates
-      '(("d" "default" plain (file "~/Nextcloud/org/roam-templates/daily_note.org")
-         :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n#+filetags: daily"))))
-
+      '(("d" "default" entry "* %<%I:%M %p>\n %?"
+         :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))))
 
   (setq org-roam-capture-templates
         '(("b" "book notes" plain
@@ -941,17 +940,22 @@ The notes (zettelkasten) god
            :unnarrowed t)
 
           ("z" "zettel" plain
-           "\n* Title\n\n* See also\n\n%?"
+           "\n* Content\n\n* See also\n\n%?"
            :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
            :unnarrowed t)
           ))
 
   (org-roam-db-autosync-mode)
   (my/leader-keys
-    "nrr" 'org-roam-buffer-toggle
-    "nrf" 'org-roam-node-find
-    "nri" 'org-roam-node-insert))
+    "nrr"  'org-roam-buffer-toggle
+    "nrf"  'org-roam-node-find
+    "nri"  'org-roam-node-insert
+    "nrdt" 'org-roam-dailies-goto-today
+    "nrct  'org-roam-daileis-capture-today))
 #+end_src
+
+#+RESULTS:
+: t
 
 Visualize the org-roam graph, this is an absolutely amazing package.
 #+begin_src elisp
@@ -966,6 +970,7 @@ Visualize the org-roam graph, this is an absolutely amazing package.
           org-roam-ui-open-on-start t))
 
 #+end_src
+
 *** Org reading list
 Manage yer books.
 #+begin_src elisp
@@ -1020,6 +1025,13 @@ Convert org files to ipynb
 (use-package ob-js       :after org)
 (use-package ob-java     :after org)
 (use-package ob-jupyter  :after org)
+#+end_src
+
+Now this is a curl with better syntax.
+#+begin_src elisp
+(use-package ob-http
+  :straight t
+  :after org)
 #+end_src
 
 Google translate
@@ -1420,12 +1432,6 @@ Being prescient and all
   :straight t
   :init
   (ivy-prescient-mode 1))
-#+end_src
-
-Integration with =clipmenu=
-#+begin_src elisp
-(use-package ivy-clipmenu
-  :straight t)
 #+end_src
 ** Company
 Complete all the things!
@@ -1908,5 +1914,4 @@ or something.
 (use-package rg
   :straight t)
 #+end_src
-
 ** Scratchpad

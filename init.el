@@ -634,9 +634,8 @@ Optionally get the NTH quote."
   (setq org-roam-completion-everywhere t)
 
   (setq org-roam-dailies-capture-templates
-      '(("d" "default" plain (file "~/Nextcloud/org/roam-templates/daily_note.org")
-         :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n#+filetags: daily"))))
-
+      '(("d" "default" entry "* %<%I:%M %p>\n %?"
+         :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))))
 
   (setq org-roam-capture-templates
         '(("b" "book notes" plain
@@ -655,16 +654,18 @@ Optionally get the NTH quote."
            :unnarrowed t)
 
           ("z" "zettel" plain
-           "\n* Title\n\n* See also\n\n%?"
+           "\n* Content\n\n* See also\n\n%?"
            :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
            :unnarrowed t)
           ))
 
   (org-roam-db-autosync-mode)
   (my/leader-keys
-    "nrr" 'org-roam-buffer-toggle
-    "nrf" 'org-roam-node-find
-    "nri" 'org-roam-node-insert))
+    "nrr"  'org-roam-buffer-toggle
+    "nrf"  'org-roam-node-find
+    "nri"  'org-roam-node-insert
+    "nrdt" 'org-roam-dailies-goto-today
+    "nrct  'org-roam-daileis-capture-today))
 
 (use-package org-roam-ui
   :straight
@@ -712,6 +713,10 @@ Optionally get the NTH quote."
 (use-package ob-js       :after org)
 (use-package ob-java     :after org)
 (use-package ob-jupyter  :after org)
+
+(use-package ob-http
+  :straight t
+  :after org)
 
 (use-package google-translate
   :straight t
@@ -1011,9 +1016,6 @@ Optionally get the NTH quote."
   :straight t
   :init
   (ivy-prescient-mode 1))
-
-(use-package ivy-clipmenu
-  :straight t)
 
 (use-package company
   :straight t
