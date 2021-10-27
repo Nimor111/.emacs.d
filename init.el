@@ -24,6 +24,8 @@
 (use-package use-package-ensure-system-package
   :straight t)
 
+(load-file (concat user-emacs-directory "secrets.el"))
+
 (add-to-list 'load-path (concat user-emacs-directory "modules"))
 
 (defun my/org-babel-tangle-config ()
@@ -53,18 +55,6 @@
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 (setq user-init-file-org (concat user-emacs-directory "init.org"))
-(setq gtd-inbox-file "~/Nextcloud/Orgzly/inbox.org")
-(setq gtd-file "~/Nextcloud/Orgzly/gtd.org")
-(setq gtd-someday-file "~/Nextcloud/Orgzly/someday.org")
-(setq gtd-tickler-file "~/Nextcloud/Orgzly/tickler.org")
-(setq gtd-hobbies-file "~/Nextcloud/Orgzly/hobbies.org")
-(setq ukulele-file "~/Nextcloud/Orgzly/ukulele.org")
-(setq tech-notebook-file "~/Nextcloud/org/tech_notebook.org")
-(setq work-file "~/Nextcloud/org/work/work.org")
-(setq weekly-reviews-file "~/Nextcloud/org/weekly_gtd_reviews.org")
-(setq daily-reviews-file "~/Nextcloud/org/daily_reviews.org")
-(setq monthly-reviews-file "~/Nextcloud/org/monthly_reviews.org")
-(setq reading-inbox-file "~/Nextcloud/org-roam/20210214211549-reading_inbox.org")
 (setq home-dashboard-file "~/Nextcloud/org/home.org")
 (setq reading-list-file "~/Nextcloud/org/reading_list.org")
 
@@ -104,20 +94,7 @@
     "oh"  (list (lambda () (interactive) (find-file home-dashboard-file))   :which-key "home dashboard")
     "rl"  (list (lambda () (interactive) (find-file reading-list-file))     :which-key "reading list")
 
-    ;; "g"   '(:ignore t :which-key "gtd")
-    ;; "gi"   (list (lambda () (interactive) (find-file gtd-inbox-file))       :which-key "inbox")
-    ;; "gg"   (list (lambda () (interactive) (find-file gtd-file))             :which-key "gtd")
-    ;; "gs"   (list (lambda () (interactive) (find-file gtd-someday-file))     :which-key "someday")
-    ;; "gt"   (list (lambda () (interactive) (find-file gtd-tickler-file))     :which-key "tickler")
-    ;; "gh"   (list (lambda () (interactive) (find-file gtd-hobbies-file))     :which-key "hobbies")
-    ;; "gu"   (list (lambda () (interactive) (find-file ukulele-file))         :which-key "ukulele")
-    ;; "gm"   (list (lambda () (interactive) (find-file monthly-reviews-file)) :which-key "monthly")
-    ;; "gd"   (list (lambda () (interactive) (find-file daily-reviews-file))   :which-key "daily")
-    ;; "gw"   (list (lambda () (interactive) (find-file weekly-reviews-file))  :which-key "weekly")
-
     "fw"  (list (lambda () (interactive) (find-file work-file)) :which-key "work")
-
-    "tn"  (list (lambda () (interactive) (find-file tech-notebook-file)) :which-key "tech-notebook")
 
     "x"   '(:ignore t :which-key "buffer")
     "xh"  'previous-buffer
@@ -173,19 +150,24 @@
 ;;   ;; Global settings (defaults)
 ;;   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
 ;;         doom-themes-enable-italic t) ; if nil, italics is universally disabled
-;;   (load-theme 'doom-gruvbox t)
+;;   (load-theme 'doom-one t)
 
 ;;   ;; Enable flashing mode-line on errors
 ;;   (doom-themes-visual-bell-config)
 
 ;;   ;; Enable custom neotree theme (all-the-icons must be installed!)
-;;   (doom-themes-neotree-config)
+;;   ;; (doom-themes-neotree-config)
 ;;   ;; or for treemacs users
-;;   (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
-;;   (doom-themes-treemacs-config)
+;;   ;; (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
+;;   ;; (doom-themes-treemacs-config)
 
 ;;   ;; Corrects (and improves) org-mode's native fontification.
 ;;   (doom-themes-org-config))
+
+;; (use-package zenburn-theme
+;;   :straight t
+;;   :config
+;;   (load-theme 'zenburn t))
 
 (use-package challenger-deep-theme
   :straight t
@@ -449,8 +431,8 @@ Optionally get the NTH quote."
 
 (add-hook 'org-mode-hook (lambda () (display-line-numbers-mode 0)))
 
-(setq org-gtd-dir "~/Nextcloud/org/gtd")
-(setq org-gtd-inbox "~/Nextcloud/org/gtd/inbox.org")
+(setq org-gtd-dir "~/Nextcloud/Orgzly/")
+(setq org-gtd-inbox "~/Nextcloud/Orgzly/inbox.org")
 
 (use-package org-gtd
   :after org
@@ -625,7 +607,7 @@ Optionally get the NTH quote."
     "ocg"  'org-mru-clock-goto))
 
 (use-package org-roam
-  :straight t
+  :straight (:host github :repo "org-roam/org-roam" :branch "master")
   :init
   (setq org-roam-v2-ack t)
   :config
@@ -665,7 +647,7 @@ Optionally get the NTH quote."
     "nrf"  'org-roam-node-find
     "nri"  'org-roam-node-insert
     "nrdt" 'org-roam-dailies-goto-today
-    "nrct  'org-roam-daileis-capture-today))
+    "nrct" 'org-roam-dailies-capture-today))
 
 (use-package org-roam-ui
   :straight
@@ -1016,6 +998,13 @@ Optionally get the NTH quote."
   :straight t
   :init
   (ivy-prescient-mode 1))
+
+;;(use-package secrets)
+
+(use-package ivy-youtube
+  :straight t
+  :config
+  (setq ivy-youtube-key yt-api-key))
 
 (use-package company
   :straight t
@@ -1373,3 +1362,8 @@ Optionally get the NTH quote."
 
 (use-package rg
   :straight t)
+
+(use-package uuidgen
+  :straight t)
+
+(add-to-list 'org-structure-template-alist '("el" . "src elisp"))

@@ -16,38 +16,39 @@ Calling EMACS an editor is like calling the Earth a hunk of dirt.
     - [[#bootstrap-code-for-the-package-manager---straightel][Bootstrap code for the package manager - =straight.el=]]
     - [[#install-use-package-for-sane-package-configuration][Install use-package for sane package configuration]]
     - [[#ensure-system-packages-to-check-they-exist][Ensure system packages to check they exist]]
-  - [[#general-configs][General configs]]
-    - [[#load-module-path][Load module path]]
-    - [[#tangle-config-file-on-save][Tangle config file on save]]
-    - [[#keybindings][Keybindings]]
-    - [[#custom-vars-file-so-it-doesnt-pollute-the-init-file][Custom vars file, so it doesn't pollute the init file]]
-    - [[#start-emacs-in-fullscreen-happens-when-everything-is-loaded][Start emacs in fullscreen, happens when everything is loaded.]]
-    - [[#set-the-emacs-user-directory-for-re-use-in-other-places][Set the emacs user directory for re-use in other places]]
-    - [[#add-binaries-installed-with-nix-to-the-exec-path][Add binaries installed with nix to the exec path]]
-    - [[#exec-path-from-shell][Exec path from shell]]
-    - [[#keeping-folders-clean][Keeping folders clean]]
-    - [[#set-the-default-font][Set the default font]]
-    - [[#set-the-theme][Set the theme]]
-      - [[#doom-emacs-themes][Doom emacs themes]]
-      - [[#challenger-deep-theme][Challenger deep theme]]
-    - [[#no-scrollbar-toolbar-menubar-because-bloat][No scrollbar, toolbar, menubar, because bloat]]
-    - [[#line-numbers--relative-line-numbers][Line numbers + relative line numbers]]
-    - [[#display-battery-in-the-bar][Display battery in the bar]]
-    - [[#display-time-in-the-bar][Display time in the bar]]
-    - [[#use-spaces-instead-of-tabs][Use spaces instead of tabs]]
-    - [[#command-log-mode][Command log mode]]
-    - [[#which-key][Which-key]]
-    - [[#undo-magic][Undo magic]]
-    - [[#delete-unnecessary-whitespace][Delete unnecessary whitespace]]
-    - [[#restart-emacs-from-within-emacs][Restart emacs from within emacs]]
-    - [[#better-yesno-prompts][Better yes/no prompts]]
-    - [[#show-the-column-number][Show the column number]]
-    - [[#auto-fill-and-visual-fill][Auto Fill and Visual fill]]
-      - [[#visual-fill-eg-the-visual-wrap-of-the-lines][Visual fill, e.g. the visual wrap of the lines]]
-      - [[#auto-fill-eg-adding-line-breaks-to-lines][Auto fill, e.g. adding line breaks to lines]]
-    - [[#highlight-current-line][Highlight current line]]
-    - [[#global-revert-mode][Global revert mode]]
-    - [[#set-warning-level-to-error][Set warning level to error]]
+  - [[#load-secrets-file][Load secrets file]]
+  - [[#load-module-path][Load module path]]
+  - [[#tangle-config-file-on-save][Tangle config file on save]]
+  - [[#keybindings][Keybindings]]
+  - [[#custom-vars-file-so-it-doesnt-pollute-the-init-file][Custom vars file, so it doesn't pollute the init file]]
+  - [[#start-emacs-in-fullscreen-happens-when-everything-is-loaded][Start emacs in fullscreen, happens when everything is loaded.]]
+  - [[#set-the-emacs-user-directory-for-re-use-in-other-places][Set the emacs user directory for re-use in other places]]
+  - [[#add-binaries-installed-with-nix-to-the-exec-path][Add binaries installed with nix to the exec path]]
+  - [[#exec-path-from-shell][Exec path from shell]]
+  - [[#keeping-folders-clean][Keeping folders clean]]
+  - [[#set-the-default-font][Set the default font]]
+  - [[#set-the-theme][Set the theme]]
+    - [[#doom-emacs-themes][Doom emacs themes]]
+    - [[#zenburn-theme][Zenburn theme]]
+    - [[#challenger-deep-theme][Challenger deep theme]]
+  - [[#no-scrollbar-toolbar-menubar-because-bloat][No scrollbar, toolbar, menubar, because bloat]]
+  - [[#line-numbers--relative-line-numbers][Line numbers + relative line numbers]]
+  - [[#display-battery-in-the-bar][Display battery in the bar]]
+  - [[#display-time-in-the-bar][Display time in the bar]]
+  - [[#use-spaces-instead-of-tabs][Use spaces instead of tabs]]
+  - [[#command-log-mode][Command log mode]]
+  - [[#which-key][Which-key]]
+  - [[#undo-magic][Undo magic]]
+  - [[#delete-unnecessary-whitespace][Delete unnecessary whitespace]]
+  - [[#restart-emacs-from-within-emacs][Restart emacs from within emacs]]
+  - [[#better-yesno-prompts][Better yes/no prompts]]
+  - [[#show-the-column-number][Show the column number]]
+  - [[#auto-fill-and-visual-fill][Auto Fill and Visual fill]]
+    - [[#visual-fill-eg-the-visual-wrap-of-the-lines][Visual fill, e.g. the visual wrap of the lines]]
+    - [[#auto-fill-eg-adding-line-breaks-to-lines][Auto fill, e.g. adding line breaks to lines]]
+  - [[#highlight-current-line][Highlight current line]]
+  - [[#global-revert-mode][Global revert mode]]
+  - [[#set-warning-level-to-error][Set warning level to error]]
   - [[#modeline][Modeline]]
   - [[#random-quote-for-dashboard][Random quote for dashboard]]
   - [[#projectile][Projectile]]
@@ -157,13 +158,19 @@ Must be in the beginning for =use-package= usage below.
 (use-package use-package-ensure-system-package
   :straight t)
 #+end_src
-** General configs
-*** Load module path
+** Load secrets file
+Poor man's solution because i'm lazy
+
+#+begin_src elisp
+(load-file (concat user-emacs-directory "secrets.el"))
+#+end_src
+
+** Load module path
 Add the custom modules directory to the load path
 #+begin_src elisp
 (add-to-list 'load-path (concat user-emacs-directory "modules"))
 #+end_src
-*** Tangle config file on save
+** Tangle config file on save
 Courtesy of the great emacs from scratch config: [[https://github.com/daviwil/emacs-from-scratch/blob/master/Emacs.org#auto-tangle-configuration-files][Link]]
 #+begin_src elisp
 (defun my/org-babel-tangle-config ()
@@ -193,7 +200,7 @@ Update all dynamic blocks in a file (this is not used, just keeping around for r
 ;; (add-hook 'org-mode-hook
 ;;   (lambda () (add-hook 'before-save-hook #'my/gtd-update-dblocks)))
 #+end_src
-*** Keybindings
+** Keybindings
 Using ~general.el~ to define a leader key and various bindings with it. In modes (e.g. insert mode and emacs mode) where space is not applicable, it uses ctrl + space.
 
 Make escape quit prompts.
@@ -204,18 +211,6 @@ Make escape quit prompts.
 General keybindings
 #+begin_src elisp
 (setq user-init-file-org (concat user-emacs-directory "init.org"))
-(setq gtd-inbox-file "~/Nextcloud/Orgzly/inbox.org")
-(setq gtd-file "~/Nextcloud/Orgzly/gtd.org")
-(setq gtd-someday-file "~/Nextcloud/Orgzly/someday.org")
-(setq gtd-tickler-file "~/Nextcloud/Orgzly/tickler.org")
-(setq gtd-hobbies-file "~/Nextcloud/Orgzly/hobbies.org")
-(setq ukulele-file "~/Nextcloud/Orgzly/ukulele.org")
-(setq tech-notebook-file "~/Nextcloud/org/tech_notebook.org")
-(setq work-file "~/Nextcloud/org/work/work.org")
-(setq weekly-reviews-file "~/Nextcloud/org/weekly_gtd_reviews.org")
-(setq daily-reviews-file "~/Nextcloud/org/daily_reviews.org")
-(setq monthly-reviews-file "~/Nextcloud/org/monthly_reviews.org")
-(setq reading-inbox-file "~/Nextcloud/org-roam/20210214211549-reading_inbox.org")
 (setq home-dashboard-file "~/Nextcloud/org/home.org")
 (setq reading-list-file "~/Nextcloud/org/reading_list.org")
 
@@ -255,20 +250,7 @@ General keybindings
     "oh"  (list (lambda () (interactive) (find-file home-dashboard-file))   :which-key "home dashboard")
     "rl"  (list (lambda () (interactive) (find-file reading-list-file))     :which-key "reading list")
 
-    ;; "g"   '(:ignore t :which-key "gtd")
-    ;; "gi"   (list (lambda () (interactive) (find-file gtd-inbox-file))       :which-key "inbox")
-    ;; "gg"   (list (lambda () (interactive) (find-file gtd-file))             :which-key "gtd")
-    ;; "gs"   (list (lambda () (interactive) (find-file gtd-someday-file))     :which-key "someday")
-    ;; "gt"   (list (lambda () (interactive) (find-file gtd-tickler-file))     :which-key "tickler")
-    ;; "gh"   (list (lambda () (interactive) (find-file gtd-hobbies-file))     :which-key "hobbies")
-    ;; "gu"   (list (lambda () (interactive) (find-file ukulele-file))         :which-key "ukulele")
-    ;; "gm"   (list (lambda () (interactive) (find-file monthly-reviews-file)) :which-key "monthly")
-    ;; "gd"   (list (lambda () (interactive) (find-file daily-reviews-file))   :which-key "daily")
-    ;; "gw"   (list (lambda () (interactive) (find-file weekly-reviews-file))  :which-key "weekly")
-
     "fw"  (list (lambda () (interactive) (find-file work-file)) :which-key "work")
-
-    "tn"  (list (lambda () (interactive) (find-file tech-notebook-file)) :which-key "tech-notebook")
 
     "x"   '(:ignore t :which-key "buffer")
     "xh"  'previous-buffer
@@ -283,7 +265,7 @@ General keybindings
     "fs" 'forward-sexp
     "bs" 'backward-sexp))
 #+end_src
-*** Custom vars file, so it doesn't pollute the init file
+** Custom vars file, so it doesn't pollute the init file
 #+begin_src elisp
 (setq-default
   custom-file (concat user-emacs-directory "custom.el"))
@@ -291,22 +273,22 @@ General keybindings
 (when (file-exists-p custom-file)
   (load custom-file t))
 #+end_src
-*** Start emacs in fullscreen, happens when everything is loaded.
+** Start emacs in fullscreen, happens when everything is loaded.
 #+begin_src elisp
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 (add-to-list 'default-frame-alist '(cursor-color . "palegoldenrod"))
 #+end_src
-*** Set the emacs user directory for re-use in other places
+** Set the emacs user directory for re-use in other places
 #+begin_src elisp
 ;; (let* ((home-dir (getenv "HOME"))
 ;;      (custom-emacs-directory (concat home-dir "/.emacs.d")))
 ;;   (setq user-emacs-directory custom-emacs-directory))
 #+end_src
-*** Add binaries installed with nix to the exec path
+** Add binaries installed with nix to the exec path
 #+begin_src elisp
 (add-to-list 'exec-path (concat user-emacs-directory ".nix-profile/bin"))
 #+end_src
-*** Exec path from shell
+** Exec path from shell
 #+begin_src elisp
 (use-package exec-path-from-shell
   :straight t
@@ -314,7 +296,7 @@ General keybindings
   (when (memq window-system '(mac ns x))
     (exec-path-from-shell-initialize)))
 #+end_src
-*** Keeping folders clean
+** Keeping folders clean
 #+begin_src elisp
 ;; NOTE: If you want to move everything out of the ~/.emacs.d folder
 ;; reliably, set `user-emacs-directory` before loading no-littering!
@@ -328,12 +310,12 @@ General keybindings
 (setq auto-save-file-name-transforms
       `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
 #+end_src
-*** Set the default font
+** Set the default font
 #+begin_src elisp
 (add-to-list 'default-frame-alist '(font . "mononoki Nerd Font Mono 18"))
 #+end_src
-*** Set the theme
-**** Doom emacs themes
+** Set the theme
+*** Doom emacs themes
 #+begin_src elisp
 ;; (use-package doom-themes
 ;;   :straight t
@@ -341,21 +323,32 @@ General keybindings
 ;;   ;; Global settings (defaults)
 ;;   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
 ;;         doom-themes-enable-italic t) ; if nil, italics is universally disabled
-;;   (load-theme 'doom-gruvbox t)
+;;   (load-theme 'doom-one t)
 
 ;;   ;; Enable flashing mode-line on errors
 ;;   (doom-themes-visual-bell-config)
 
 ;;   ;; Enable custom neotree theme (all-the-icons must be installed!)
-;;   (doom-themes-neotree-config)
+;;   ;; (doom-themes-neotree-config)
 ;;   ;; or for treemacs users
-;;   (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
-;;   (doom-themes-treemacs-config)
+;;   ;; (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
+;;   ;; (doom-themes-treemacs-config)
 
 ;;   ;; Corrects (and improves) org-mode's native fontification.
 ;;   (doom-themes-org-config))
 #+end_src
-**** Challenger deep theme
+*** Zenburn theme
+#+begin_src elisp
+;; (use-package zenburn-theme
+;;   :straight t
+;;   :config
+;;   (load-theme 'zenburn t))
+#+end_src
+
+#+RESULTS:
+: t
+
+*** Challenger deep theme
 #+begin_src elisp
 (use-package challenger-deep-theme
   :straight t
@@ -366,38 +359,38 @@ General keybindings
 #+RESULTS:
 : t
 
-*** No scrollbar, toolbar, menubar, because bloat
+** No scrollbar, toolbar, menubar, because bloat
 #+begin_src elisp
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 #+end_src
-*** Line numbers + relative line numbers
+** Line numbers + relative line numbers
 #+begin_src elisp
 (global-display-line-numbers-mode)
 (setq display-line-numbers-type 'relative)
 #+end_src
-*** Display battery in the bar
+** Display battery in the bar
 #+begin_src elisp
 (display-battery-mode t)
 #+end_src
-*** Display time in the bar
+** Display time in the bar
 #+begin_src elisp
 (setq display-time-format "%H:%M %a,%d %b %Y")
 (setq display-time-default-load-average nil)
 (display-time)
 #+end_src
-*** Use spaces instead of tabs
+** Use spaces instead of tabs
 #+begin_src elisp
 (setq-default indent-tabs-mode nil)
 #+end_src
-*** Command log mode
+** Command log mode
 Show command history in sidebar. Looks slick. Works good for demos and stuff.
 #+begin_src elisp
 (use-package command-log-mode
   :straight t)
 #+end_src
-*** Which-key
+** Which-key
 Showing a popup for key combinations that follow the pressed key (like in Spacemacs and Doom)
 #+begin_src elisp
 (use-package which-key
@@ -405,19 +398,19 @@ Showing a popup for key combinations that follow the pressed key (like in Spacem
   :config
   (which-key-mode))
 #+end_src
-*** Undo magic
+** Undo magic
 #+begin_src elisp
 (use-package undo-tree
   :straight t
   :init
   (global-undo-tree-mode))
 #+end_src
-*** Delete unnecessary whitespace
+** Delete unnecessary whitespace
 #+begin_src elisp
 (use-package simple
   :hook (before-save . delete-trailing-whitespace))
 #+end_src
-*** Restart emacs from within emacs
+** Restart emacs from within emacs
 #+begin_src elisp
 (use-package restart-emacs
   :straight t
@@ -425,18 +418,18 @@ Showing a popup for key combinations that follow the pressed key (like in Spacem
   (my/leader-keys
     "re" 'restart-emacs))
 #+end_src
-*** Better yes/no prompts
+** Better yes/no prompts
 Because writing yes is too much work.
 
 #+begin_src elisp
 (fset 'yes-or-no-p 'y-or-n-p)
 #+end_src
-*** Show the column number
+** Show the column number
 #+begin_src elisp
 (column-number-mode 1)
 #+end_src
-*** Auto Fill and Visual fill
-**** Visual fill, e.g. the visual wrap of the lines
+** Auto Fill and Visual fill
+*** Visual fill, e.g. the visual wrap of the lines
 #+begin_src elisp
 (defun my/org-mode-visual-fill ()
   (setq visual-fill-column-width 120
@@ -447,7 +440,7 @@ Because writing yes is too much work.
   :straight t
   :hook (org-mode . my/org-mode-visual-fill))
 #+end_src
-**** Auto fill, e.g. adding line breaks to lines
+*** Auto fill, e.g. adding line breaks to lines
 #+begin_src elisp
 (use-package simple
   :hook ((prog-mode . turn-on-auto-fill)
@@ -455,16 +448,16 @@ Because writing yes is too much work.
   :config
   (setq-default fill-column 112))
 #+end_src
-*** Highlight current line
+** Highlight current line
 #+begin_src elisp
 (global-hl-line-mode)
 #+end_src
-*** Global revert mode
+** Global revert mode
 Revert buffers automatically when they change on disk.
 #+begin_src elisp
 (global-auto-revert-mode 1)
 #+end_src
-*** Set warning level to error
+** Set warning level to error
 This is mostly for when I tried to compile the gcc native comp branch for Emacs.
 #+begin_src elisp
 (setq warning-minimum-level :error)
@@ -706,8 +699,8 @@ Disable line numbers in org-mode
 *** Org-gtd
 Define some paths as =org-gtd= variables are kinda wonky with when they load
 #+begin_src elisp
-(setq org-gtd-dir "~/Nextcloud/org/gtd")
-(setq org-gtd-inbox "~/Nextcloud/org/gtd/inbox.org")
+(setq org-gtd-dir "~/Nextcloud/Orgzly/")
+(setq org-gtd-inbox "~/Nextcloud/Orgzly/inbox.org")
 #+end_src
 
 #+begin_src elisp
@@ -911,7 +904,7 @@ The notes (zettelkasten) god
 
 #+begin_src elisp
 (use-package org-roam
-  :straight t
+  :straight (:host github :repo "org-roam/org-roam" :branch "master")
   :init
   (setq org-roam-v2-ack t)
   :config
@@ -951,7 +944,7 @@ The notes (zettelkasten) god
     "nrf"  'org-roam-node-find
     "nri"  'org-roam-node-insert
     "nrdt" 'org-roam-dailies-goto-today
-    "nrct  'org-roam-daileis-capture-today))
+    "nrct" 'org-roam-dailies-capture-today))
 #+end_src
 
 #+RESULTS:
@@ -1433,6 +1426,22 @@ Being prescient and all
   :init
   (ivy-prescient-mode 1))
 #+end_src
+
+Youtube search with Ivy
+#+begin_src elisp
+;;(use-package secrets)
+#+end_src
+
+#+begin_src elisp
+(use-package ivy-youtube
+  :straight t
+  :config
+  (setq ivy-youtube-key yt-api-key))
+#+end_src
+
+#+RESULTS:
+: t
+
 ** Company
 Complete all the things!
 
@@ -1914,4 +1923,14 @@ or something.
 (use-package rg
   :straight t)
 #+end_src
+
 ** Scratchpad
+#+begin_src elisp
+(use-package uuidgen
+  :straight t)
+#+end_src
+
+Add a =<el= shortcut for an elisp snippet
+#+begin_src elisp
+(add-to-list 'org-structure-template-alist '("el" . "src elisp"))
+#+end_src
