@@ -11,11 +11,11 @@ Calling EMACS an editor is like calling the Earth a hunk of dirt.
 ** Table of contents :TOC_4_gh:
 - [[#configure-all-the-emacs][Configure all the Emacs!]]
   - [[#obligatory-quote-about-emacs][Obligatory quote about emacs]]
-  - [[#try-to-speed-up-startup-time-with-the-garbage-collector][Try to speed up startup time with the garbage collector]]
   - [[#package-manager][Package manager]]
     - [[#bootstrap-code-for-the-package-manager---straightel][Bootstrap code for the package manager - =straight.el=]]
     - [[#install-use-package-for-sane-package-configuration][Install use-package for sane package configuration]]
     - [[#ensure-system-packages-to-check-they-exist][Ensure system packages to check they exist]]
+  - [[#try-to-speed-up-startup-time-with-the-garbage-collector][Try to speed up startup time with the garbage collector]]
   - [[#load-secrets-file][Load secrets file]]
   - [[#load-module-path][Load module path]]
   - [[#tangle-config-file-on-save][Tangle config file on save]]
@@ -120,17 +120,6 @@ Calling EMACS an editor is like calling the Earth a hunk of dirt.
   - [[#ripgrep][Ripgrep]]
   - [[#scratchpad][Scratchpad]]
 
-** Try to speed up startup time with the garbage collector
-Courtesy of [[https://www.emacswiki.org/emacs/OptimizingEmacsStartup][Emacs Wiki]]
-#+begin_src elisp
- ;; Minimize garbage collection during startup
- (setq gc-cons-threshold most-positive-fixnum)
-
-;; Lower threshold back to 8 MiB (default is 800kB)
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (setq gc-cons-threshold (expt 2 23))))
-#+end_src
 ** Package manager
 Must be in the beginning for =use-package= usage below.
 *** Bootstrap code for the package manager - =straight.el=
@@ -157,6 +146,18 @@ Must be in the beginning for =use-package= usage below.
 #+begin_src elisp
 (use-package use-package-ensure-system-package
   :straight t)
+#+end_src
+** Try to speed up startup time with the garbage collector
+Courtesy of [[https://www.emacswiki.org/emacs/OptimizingEmacsStartup][Emacs Wiki]]
+
+#+begin_src elisp
+;; Minimize garbage collection during startup
+(setq gc-cons-threshold most-positive-fixnum)
+
+;; Lower threshold back to 8 MiB (default is 800kB)
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq gc-cons-threshold (expt 2 23))))
 #+end_src
 ** Load secrets file
 Poor man's solution because i'm lazy
@@ -904,7 +905,8 @@ The notes (zettelkasten) god
 
 #+begin_src elisp
 (use-package org-roam
-  :straight (:host github :repo "org-roam/org-roam" :branch "master")
+  ;;:straight (:host github :repo "org-roam/org-roam" :branch "master")
+  :straight t
   :init
   (setq org-roam-v2-ack t)
   :config
@@ -961,7 +963,6 @@ Visualize the org-roam graph, this is an absolutely amazing package.
           org-roam-ui-follow t
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t))
-
 #+end_src
 
 *** Org reading list
@@ -1171,8 +1172,8 @@ For sending emails with org mode files
 For LaTex to work, the =texlive=, =dvipng=, and =texlive-latex-extra= must be present on the system
 #+begin_src elisp
 (use-package org-fragtog
-  :straight t
-  :hook (org-mode . org-fragtog-mode))
+ :straight t
+ :hook (org-mode . org-fragtog-mode))
 #+end_src
 *** Org tree slide
 For simpler presentation in org files
@@ -1415,6 +1416,8 @@ A more minimal completion framework
   :straight t
   :init (all-the-icons-ivy-rich-mode 1))
 #+end_src
+
+#+RESULTS:
 
 Being prescient and all
 #+begin_src elisp

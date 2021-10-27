@@ -88,7 +88,8 @@
  ("no-littering" . "dcc96cbf5f018a91d406926d3b69715847ef665a")
  ("ob-http" . "b1428ea2a63bcb510e7382a1bf5fe82b19c104a7")
  ("ob-translate" . "9d9054a51bafd5a29a8135964069b4fa3a80b169")
- ("org" . "b135b8c7aec31ea7ba35208e8258936672391a63")
+ ;; Before the introduction of the org-persist functionality in commit 6933c1ad78088a5d34237f69868962483319b824
+ ("org" . "ad224f5b8e5a124f57b3dc70c176c79ee2e8bcde")
  ("org-agenda-property" . "3b469f3e93de0036547f3631cd0366d53f7584c8")
  ("org-archive-hierarchically" . "c7ddf3f36570e50d6163e7a4e3099c2c8117f894")
  ("org-books" . "9f4ec4a981bfc5eebff993c3ad49a4bed26aebd1")

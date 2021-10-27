@@ -1,11 +1,3 @@
- ;; Minimize garbage collection during startup
- (setq gc-cons-threshold most-positive-fixnum)
-
-;; Lower threshold back to 8 MiB (default is 800kB)
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (setq gc-cons-threshold (expt 2 23))))
-
 (defvar bootstrap-version)
 (let ((bootstrap-file
         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -23,6 +15,14 @@
 
 (use-package use-package-ensure-system-package
   :straight t)
+
+;; Minimize garbage collection during startup
+(setq gc-cons-threshold most-positive-fixnum)
+
+;; Lower threshold back to 8 MiB (default is 800kB)
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq gc-cons-threshold (expt 2 23))))
 
 (load-file (concat user-emacs-directory "secrets.el"))
 
@@ -607,7 +607,8 @@ Optionally get the NTH quote."
     "ocg"  'org-mru-clock-goto))
 
 (use-package org-roam
-  :straight (:host github :repo "org-roam/org-roam" :branch "master")
+  ;;:straight (:host github :repo "org-roam/org-roam" :branch "master")
+  :straight t
   :init
   (setq org-roam-v2-ack t)
   :config
@@ -806,8 +807,8 @@ Optionally get the NTH quote."
   :straight t)
 
 (use-package org-fragtog
-  :straight t
-  :hook (org-mode . org-fragtog-mode))
+ :straight t
+ :hook (org-mode . org-fragtog-mode))
 
 (use-package org-tree-slide
   :straight t)
