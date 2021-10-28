@@ -427,7 +427,10 @@ Optionally get the NTH quote."
   (setq org-superstar-leading-bullet ?\s))
 
 (use-package org-tempo
-  :after org)
+  :after org
+  :config
+  ;; Add a =<el= shortcut for an elisp snippet
+  (add-to-list 'org-structure-template-alist '("el" . "src elisp")))
 
 (add-hook 'org-mode-hook (lambda () (display-line-numbers-mode 0)))
 
@@ -607,21 +610,43 @@ Optionally get the NTH quote."
     "ocg"  'org-mru-clock-goto))
 
 (use-package org-roam
-  ;;:straight (:host github :repo "org-roam/org-roam" :branch "master")
   :straight t
   :init
   (setq org-roam-v2-ack t)
+  (setq my/daily-note-filename "%<%Y-%m-%d>.org"
+        my/daily-note-header "#+title: %<%Y-%m-%d %a>#+filetags:daily\n\n[[roam:%<%Y-%B>]]\n\n")
   :config
   (setq org-roam-directory "~/Nextcloud/org-roam")
   (setq org-roam-dailies-directory "daily/")
   (setq org-roam-completion-everywhere t)
 
   (setq org-roam-dailies-capture-templates
-      '(("d" "default" entry "* %<%I:%M %p>\n %?"
-         :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))))
+    `(("d" "default" plain
+      "* %?"
+      :if-new (file+head ,my/daily-note-filename
+                         ,my/daily-note-header)
+      :empty-lines 1)
+
+     ("j" "journal" plain
+      "** %<%I:%M %p>  :journal:\n\n%?\n\n"
+      :if-new (file+head+olp ,my/daily-note-filename
+                             ,my/daily-note-header
+                             ("Journal"))
+      :empty-lines 1)
+     ("m" "meeting" entry
+      "** %<%I:%M %p> - %^{Meeting Title}  :meeting:\n\n%?\n\n"
+      :if-new (file+head+olp ,my/daily-note-filename
+                             ,my/daily-note-header
+                             ("Meetings"))
+      :empty-lines 1)))
 
   (setq org-roam-capture-templates
-        '(("b" "book notes" plain
+        '(("d" "default" plain
+           "%?"
+           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+           :unnarrowed t)
+
+          ("b" "book notes" plain
            "\n* Source\n\nAuthor: %^{Author}\nTitle: ${title}\nYear: %^{Year}\n\n* Summary\n\n%?"
            :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
            :unnarrowed t)
@@ -1365,6 +1390,17 @@ Optionally get the NTH quote."
   :straight t)
 
 (use-package uuidgen
-  :straight t)
+  :straight t
+  :config
+  (my/leader-keys
+    "u" 'uuidgen))
 
-(add-to-list 'org-structure-template-alist '("el" . "src elisp"))
+(use-package yankpad
+  :straight t
+  :defer 10
+  :init
+  (setq yankpad-file (concat org-directory "/yankpad.org"))
+  (my/leader-keys
+    "yi" 'yankpad-insert
+    "ye" 'yankpad-edit
+    "yc" 'yankpad-set-category))

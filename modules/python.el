@@ -6,6 +6,9 @@
 
 ;;; Code:
 
+(use-package python-mode
+  :straight t)
+
 (defun my/python-mode-hook ()
   (add-to-list 'company-backends 'company-jedi))
 
