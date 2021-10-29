@@ -614,7 +614,7 @@ Optionally get the NTH quote."
   :init
   (setq org-roam-v2-ack t)
   (setq my/daily-note-filename "%<%Y-%m-%d>.org"
-        my/daily-note-header "#+title: %<%Y-%m-%d %a>#+filetags:daily\n\n[[roam:%<%Y-%B>]]\n\n")
+        my/daily-note-header "#+title: %<%Y-%m-%d %a>\n#+filetags:daily\n\n[[roam:%<%Y-%B>]]\n\n")
   :config
   (setq org-roam-directory "~/Nextcloud/org-roam")
   (setq org-roam-dailies-directory "daily/")
